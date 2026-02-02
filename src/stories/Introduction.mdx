@@ -1,0 +1,66 @@
+# Pantry App Design System
+
+Welcome to the Pantry App component library. This Storybook documents all UI components used in the application, organized following **Atomic Design** principles.
+
+## Atomic Design Structure
+
+### Atoms
+The foundational building blocks - individual UI elements that cannot be broken down further:
+- **Button** - Primary action buttons with multiple variants
+- **Input** - Text input fields with labels and validation states
+- **Card** - Container components for grouping content
+- **Icons** - Custom SVG icons for food items and locations
+
+### Molecules
+Combinations of atoms that form simple UI components:
+- Form fields with labels and validation
+- Search bars
+- Category chips/tags
+
+### Organisms
+Complex components composed of molecules and atoms:
+- **FoodItemCard** - Displays food item with category, quantity, location, and expiration
+- **Header** - App header with navigation
+- **BottomNav** - Bottom tab navigation
+
+### Templates
+Page-level layout structures (coming soon)
+
+### Pages
+Full page implementations:
+- **InventoryPage** - Main pantry view with filtering and sorting
+
+## Brand Colors
+
+| Color | Hex | Usage |
+|-------|-----|-------|
+| Purple | `#8B5CF6` | Primary brand, CTAs |
+| Green | `#22C55E` | Produce, success states |
+| Blue | `#3B82F6` | Dairy, links |
+| Red | `#EF4444` | Meat, errors, expired |
+| Orange | `#F59E0B` | Bakery, warnings |
+| Gray | `#6B7280` | Text, borders |
+
+## Category Colors
+
+Each food category has an associated color for visual identification:
+
+| Category | Color | Hex |
+|----------|-------|-----|
+| Produce | Green | `#22C55E` |
+| Dairy | Blue | `#3B82F6` |
+| Meat | Red | `#EF4444` |
+| Seafood | Cyan | `#06B6D4` |
+| Bakery | Amber | `#F59E0B` |
+| Frozen | Indigo | `#6366F1` |
+| Pantry | Purple | `#8B5CF6` |
+| Beverages | Pink | `#EC4899` |
+| Condiments | Orange | `#F97316` |
+| Snacks | Lime | `#84CC16` |
+
+## Getting Started
+
+Browse the sidebar to explore components. Each component includes:
+- Interactive controls to modify props
+- Multiple story variants showing different states
+- Documentation about usage and best practices

@@ -1,0 +1,27 @@
+# Supabase Local Development Configuration
+# For more options, see: https://supabase.com/docs/guides/cli/config
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public"]
+
+[db]
+port = 54322
+
+[studio]
+enabled = true
+port = 54323
+
+[auth]
+enabled = true
+site_url = "http://localhost:5173"
+
+[functions.process-image]
+verify_jwt = true
+
+[functions.process-receipt]
+verify_jwt = true
+
+[functions.barcode-lookup]
+verify_jwt = true
