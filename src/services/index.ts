@@ -58,6 +58,20 @@ export type {
   HouseholdMemberWithProfile,
 } from './householdApi'
 
+// Recipe API
+export {
+  getRecipes,
+  getRecipe,
+  createRecipe,
+  updateRecipe as updateRecipeApi,
+  deleteRecipe as deleteRecipeApi,
+  toggleFavorite,
+  markAsCooked,
+  searchRecipes,
+  subscribeToRecipes,
+} from './recipeApi'
+export type { RecipeRow, RecipeInsert, RecipeUpdate } from './recipeApi'
+
 // AI API (Edge Functions)
 export {
   processGroceryImage,
@@ -66,6 +80,8 @@ export {
   processReceiptUrl,
   lookupBarcode,
   fileToBase64,
+  importRecipeFromUrl,
+  suggestRecipes,
 } from './aiApi'
 export type {
   DetectedItem,
@@ -74,4 +90,6 @@ export type {
   ProcessImageResult,
   ProcessReceiptResult,
   BarcodeLookupResult,
+  ImportRecipeResult,
+  SuggestRecipesResult,
 } from './aiApi'

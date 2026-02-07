@@ -1,9 +1,9 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { FoodItem, ShoppingListItem, Household, FoodCategory, StorageLocation, QuantityUnit } from '@/types'
+import type { FoodItem, ShoppingListItem, Household, Recipe, FoodCategory, StorageLocation, QuantityUnit } from '@/types'
 
 // Store version - increment this when schema changes to clear old data
-const STORE_VERSION = 2
+const STORE_VERSION = 3
 
 // Valid categories for validation
 const VALID_CATEGORIES: FoodCategory[] = [
@@ -93,6 +93,237 @@ const createDemoInventory = (): FoodItem[] => {
   })
 }
 
+// Demo recipes that use items from the demo inventory
+const createDemoRecipes = (): Recipe[] => {
+  const now = new Date().toISOString()
+  return [
+    {
+      id: 'demo-recipe-1',
+      householdId: DEMO_HOUSEHOLD.id,
+      name: 'Spinach & Egg Scramble',
+      description: 'A quick and healthy breakfast using fresh spinach and eggs.',
+      ingredients: [
+        { name: 'Eggs', quantity: 3, unit: 'count', isOptional: false },
+        { name: 'Spinach', quantity: 1, unit: 'cup', isOptional: false },
+        { name: 'Cheddar Cheese', quantity: 0.25, unit: 'cup', preparation: 'shredded', isOptional: true },
+        { name: 'Olive Oil', quantity: 1, unit: 'tbsp', isOptional: false },
+      ],
+      instructions: [
+        'Heat olive oil in a non-stick skillet over medium heat.',
+        'Add spinach and cook until wilted, about 2 minutes.',
+        'Crack eggs into the pan and scramble with the spinach.',
+        'Top with shredded cheddar cheese and serve.',
+      ],
+      prepTimeMinutes: 5,
+      cookTimeMinutes: 8,
+      servings: 2,
+      difficulty: 'easy',
+      cuisine: 'American',
+      tags: ['breakfast', 'quick'],
+      dietaryInfo: ['vegetarian'],
+      isFavorite: true,
+      timesCooked: 3,
+      lastCookedAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+      source: 'user',
+      createdBy: DEMO_USER.id,
+      createdAt: now,
+      updatedAt: now,
+    },
+    {
+      id: 'demo-recipe-2',
+      householdId: DEMO_HOUSEHOLD.id,
+      name: 'Chicken Stir-Fry with Rice',
+      description: 'Simple chicken stir-fry served over steamed rice.',
+      ingredients: [
+        { name: 'Chicken Thighs', quantity: 1, unit: 'lb', preparation: 'sliced', isOptional: false },
+        { name: 'Rice', quantity: 1, unit: 'cup', isOptional: false },
+        { name: 'Spinach', quantity: 2, unit: 'cup', isOptional: false },
+        { name: 'Olive Oil', quantity: 2, unit: 'tbsp', isOptional: false },
+        { name: 'Soy Sauce', quantity: 2, unit: 'tbsp', isOptional: false },
+      ],
+      instructions: [
+        'Cook rice according to package directions.',
+        'Heat olive oil in a large skillet or wok over high heat.',
+        'Add sliced chicken thighs and cook until browned, 5-6 minutes.',
+        'Add spinach and soy sauce, stir-fry for 2 more minutes.',
+        'Serve over steamed rice.',
+      ],
+      prepTimeMinutes: 10,
+      cookTimeMinutes: 20,
+      servings: 3,
+      difficulty: 'easy',
+      cuisine: 'Asian',
+      tags: ['dinner', 'stir-fry'],
+      dietaryInfo: [],
+      isFavorite: false,
+      timesCooked: 1,
+      source: 'user',
+      createdBy: DEMO_USER.id,
+      createdAt: now,
+      updatedAt: now,
+    },
+    {
+      id: 'demo-recipe-3',
+      householdId: DEMO_HOUSEHOLD.id,
+      name: 'Classic Spaghetti Bolognese',
+      description: 'A hearty Italian classic with ground beef and pasta.',
+      ingredients: [
+        { name: 'Spaghetti Pasta', quantity: 1, unit: 'pack', isOptional: false },
+        { name: 'Ground Beef', quantity: 1, unit: 'lb', isOptional: false },
+        { name: 'Olive Oil', quantity: 1, unit: 'tbsp', isOptional: false },
+        { name: 'Salsa', quantity: 0.5, unit: 'cup', preparation: 'as sauce base', isOptional: false, substitutes: ['Tomato Sauce', 'Marinara'] },
+        { name: 'Cheddar Cheese', quantity: 0.25, unit: 'cup', preparation: 'grated', isOptional: true, substitutes: ['Parmesan'] },
+      ],
+      instructions: [
+        'Cook spaghetti according to package directions, drain and set aside.',
+        'Heat olive oil in a large pan over medium-high heat.',
+        'Add ground beef and cook until browned, breaking it apart.',
+        'Add salsa/tomato sauce and simmer for 10 minutes.',
+        'Serve sauce over spaghetti, topped with cheese.',
+      ],
+      prepTimeMinutes: 5,
+      cookTimeMinutes: 25,
+      servings: 4,
+      difficulty: 'easy',
+      cuisine: 'Italian',
+      tags: ['dinner', 'pasta', 'comfort food'],
+      dietaryInfo: [],
+      isFavorite: true,
+      timesCooked: 5,
+      lastCookedAt: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString(),
+      source: 'user',
+      createdBy: DEMO_USER.id,
+      createdAt: now,
+      updatedAt: now,
+    },
+    {
+      id: 'demo-recipe-4',
+      householdId: DEMO_HOUSEHOLD.id,
+      name: 'Greek Yogurt Banana Bowl',
+      description: 'A creamy and nutritious yogurt bowl with fresh banana.',
+      ingredients: [
+        { name: 'Greek Yogurt', quantity: 1, unit: 'cup', isOptional: false },
+        { name: 'Banana', quantity: 1, unit: 'count', preparation: 'sliced', isOptional: false },
+        { name: 'Honey', quantity: 1, unit: 'tbsp', isOptional: true },
+        { name: 'Granola', quantity: 0.25, unit: 'cup', isOptional: true },
+      ],
+      instructions: [
+        'Add Greek yogurt to a bowl.',
+        'Top with sliced banana.',
+        'Drizzle with honey and sprinkle granola if desired.',
+      ],
+      prepTimeMinutes: 3,
+      cookTimeMinutes: 0,
+      servings: 1,
+      difficulty: 'easy',
+      cuisine: 'American',
+      tags: ['breakfast', 'snack', 'no-cook'],
+      dietaryInfo: ['vegetarian'],
+      isFavorite: false,
+      timesCooked: 0,
+      source: 'user',
+      createdBy: DEMO_USER.id,
+      createdAt: now,
+      updatedAt: now,
+    },
+    {
+      id: 'demo-recipe-5',
+      householdId: DEMO_HOUSEHOLD.id,
+      name: 'Beef Tacos',
+      description: 'Quick beef tacos with all the fixings.',
+      ingredients: [
+        { name: 'Ground Beef', quantity: 1, unit: 'lb', isOptional: false },
+        { name: 'Cheddar Cheese', quantity: 0.5, unit: 'cup', preparation: 'shredded', isOptional: false },
+        { name: 'Salsa', quantity: 0.5, unit: 'cup', isOptional: false },
+        { name: 'Taco Shells', quantity: 8, unit: 'count', isOptional: false },
+        { name: 'Lettuce', quantity: 1, unit: 'cup', preparation: 'shredded', isOptional: true, substitutes: ['Spinach'] },
+      ],
+      instructions: [
+        'Brown ground beef in a skillet over medium-high heat.',
+        'Season with taco seasoning (salt, cumin, chili powder, garlic powder).',
+        'Warm taco shells according to package directions.',
+        'Fill shells with beef, cheese, salsa, and lettuce.',
+      ],
+      prepTimeMinutes: 5,
+      cookTimeMinutes: 15,
+      servings: 4,
+      difficulty: 'easy',
+      cuisine: 'Mexican',
+      tags: ['dinner', 'quick'],
+      dietaryInfo: [],
+      isFavorite: false,
+      timesCooked: 2,
+      source: 'user',
+      createdBy: DEMO_USER.id,
+      createdAt: now,
+      updatedAt: now,
+    },
+    {
+      id: 'demo-recipe-6',
+      householdId: DEMO_HOUSEHOLD.id,
+      name: 'Pan-Fried Gyoza',
+      description: 'Crispy pan-fried pork gyoza with dipping sauce.',
+      ingredients: [
+        { name: 'Pork Gyoza', quantity: 1, unit: 'pack', isOptional: false },
+        { name: 'Olive Oil', quantity: 1, unit: 'tbsp', isOptional: false, substitutes: ['Sesame Oil'] },
+        { name: 'Soy Sauce', quantity: 2, unit: 'tbsp', isOptional: true },
+        { name: 'Rice Vinegar', quantity: 1, unit: 'tbsp', isOptional: true },
+      ],
+      instructions: [
+        'Heat olive oil in a non-stick skillet over medium-high heat.',
+        'Place gyoza in a single layer and cook until bottoms are golden, about 3 minutes.',
+        'Add 1/4 cup water to the pan and cover immediately.',
+        'Steam for 5 minutes until water evaporates and gyoza are cooked through.',
+        'Mix soy sauce and rice vinegar for dipping sauce.',
+      ],
+      prepTimeMinutes: 2,
+      cookTimeMinutes: 10,
+      servings: 2,
+      difficulty: 'easy',
+      cuisine: 'Japanese',
+      tags: ['dinner', 'appetizer', 'quick'],
+      dietaryInfo: [],
+      isFavorite: false,
+      timesCooked: 0,
+      source: 'user',
+      createdBy: DEMO_USER.id,
+      createdAt: now,
+      updatedAt: now,
+    },
+    {
+      id: 'demo-recipe-7',
+      householdId: DEMO_HOUSEHOLD.id,
+      name: 'Cheesy Egg Toast',
+      description: 'Comfort food classic — toasted bread with melted cheese and a fried egg.',
+      ingredients: [
+        { name: 'Bread', quantity: 2, unit: 'count', preparation: 'sliced', isOptional: false },
+        { name: 'Eggs', quantity: 2, unit: 'count', isOptional: false },
+        { name: 'Cheddar Cheese', quantity: 2, unit: 'count', preparation: 'slices', isOptional: false },
+        { name: 'Olive Oil', quantity: 1, unit: 'tsp', isOptional: false, substitutes: ['Butter'] },
+      ],
+      instructions: [
+        'Toast bread slices until golden.',
+        'Fry eggs in olive oil to your liking.',
+        'Place cheese on toast and top with fried eggs.',
+        'Season with salt and pepper.',
+      ],
+      prepTimeMinutes: 2,
+      cookTimeMinutes: 5,
+      servings: 1,
+      difficulty: 'easy',
+      cuisine: 'American',
+      tags: ['breakfast', 'quick', 'comfort food'],
+      dietaryInfo: ['vegetarian'],
+      isFavorite: false,
+      timesCooked: 0,
+      source: 'user',
+      createdBy: DEMO_USER.id,
+      createdAt: now,
+      updatedAt: now,
+    },
+  ]
+}
+
 // Initial demo shopping list
 const createDemoShoppingList = (): ShoppingListItem[] => [
   { id: 'shop-1', shoppingListId: 'demo-list', name: 'Avocados', quantity: 3, category: 'produce', isChecked: false, source: 'manual', priority: 'normal', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
@@ -105,6 +336,7 @@ interface DemoState {
   isDemoMode: boolean
   inventory: FoodItem[]
   shoppingList: ShoppingListItem[]
+  recipes: Recipe[]
 
   // Actions
   enableDemoMode: () => void
@@ -121,6 +353,13 @@ interface DemoState {
   toggleShoppingItem: (id: string) => void
   removeShoppingItem: (id: string) => void
   clearCheckedItems: () => ShoppingListItem[]
+
+  // Recipe actions
+  addRecipe: (recipe: Omit<Recipe, 'id' | 'createdAt' | 'updatedAt'>) => Recipe
+  updateRecipe: (id: string, updates: Partial<Recipe>) => Recipe | null
+  deleteRecipe: (id: string) => void
+  toggleRecipeFavorite: (id: string) => void
+  markRecipeCooked: (id: string) => void
 }
 
 // Validate and clean inventory data
@@ -152,12 +391,14 @@ export const useDemoStore = create<DemoState>()(
       isDemoMode: false,
       inventory: [],
       shoppingList: [],
+      recipes: [],
 
       enableDemoMode: () => {
         set({
           isDemoMode: true,
           inventory: createDemoInventory(),
           shoppingList: createDemoShoppingList(),
+          recipes: createDemoRecipes(),
         })
       },
 
@@ -166,6 +407,7 @@ export const useDemoStore = create<DemoState>()(
           isDemoMode: false,
           inventory: [],
           shoppingList: [],
+          recipes: [],
         })
       },
 
@@ -261,6 +503,65 @@ export const useDemoStore = create<DemoState>()(
         }))
         return checkedItems
       },
+
+      addRecipe: (recipeData) => {
+        const now = new Date().toISOString()
+        const newRecipe: Recipe = {
+          ...recipeData,
+          id: `demo-recipe-${Date.now()}`,
+          createdAt: now,
+          updatedAt: now,
+        }
+        set((state) => ({
+          recipes: [...state.recipes, newRecipe],
+        }))
+        return newRecipe
+      },
+
+      updateRecipe: (id, updates) => {
+        let updatedRecipe: Recipe | null = null
+        set((state) => ({
+          recipes: state.recipes.map((recipe) => {
+            if (recipe.id === id) {
+              updatedRecipe = { ...recipe, ...updates, updatedAt: new Date().toISOString() }
+              return updatedRecipe
+            }
+            return recipe
+          }),
+        }))
+        return updatedRecipe
+      },
+
+      deleteRecipe: (id) => {
+        set((state) => ({
+          recipes: state.recipes.filter((recipe) => recipe.id !== id),
+        }))
+      },
+
+      toggleRecipeFavorite: (id) => {
+        set((state) => ({
+          recipes: state.recipes.map((recipe) =>
+            recipe.id === id
+              ? { ...recipe, isFavorite: !recipe.isFavorite, updatedAt: new Date().toISOString() }
+              : recipe
+          ),
+        }))
+      },
+
+      markRecipeCooked: (id) => {
+        set((state) => ({
+          recipes: state.recipes.map((recipe) =>
+            recipe.id === id
+              ? {
+                  ...recipe,
+                  timesCooked: recipe.timesCooked + 1,
+                  lastCookedAt: new Date().toISOString(),
+                  updatedAt: new Date().toISOString(),
+                }
+              : recipe
+          ),
+        }))
+      },
     }),
     {
       name: 'pantry-demo-store',
@@ -273,6 +574,7 @@ export const useDemoStore = create<DemoState>()(
             isDemoMode: false,
             inventory: [],
             shoppingList: [],
+            recipes: [],
           }
         }
 

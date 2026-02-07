@@ -106,6 +106,7 @@ export type Database = {
           quantity_changed: number
           quantity_remaining: number
           notes: string | null
+          recipe_id: string | null
           created_at: string
         }
         Insert: {
@@ -117,6 +118,7 @@ export type Database = {
           quantity_changed: number
           quantity_remaining: number
           notes?: string | null
+          recipe_id?: string | null
           created_at?: string
         }
         Update: {
@@ -128,7 +130,89 @@ export type Database = {
           quantity_changed?: number
           quantity_remaining?: number
           notes?: string | null
+          recipe_id?: string | null
           created_at?: string
+        }
+        Relationships: []
+      }
+      recipes: {
+        Row: {
+          id: string
+          household_id: string | null
+          name: string
+          description: string | null
+          ingredients: Json
+          instructions: string[]
+          prep_time_minutes: number | null
+          cook_time_minutes: number | null
+          servings: number | null
+          difficulty: string | null
+          cuisine: string | null
+          tags: string[]
+          dietary_info: string[]
+          image_url: string | null
+          source_url: string | null
+          is_favorite: boolean
+          times_cooked: number
+          last_cooked_at: string | null
+          rating: number | null
+          notes: string | null
+          source: string
+          created_by: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          household_id?: string | null
+          name: string
+          description?: string | null
+          ingredients?: Json
+          instructions?: string[]
+          prep_time_minutes?: number | null
+          cook_time_minutes?: number | null
+          servings?: number | null
+          difficulty?: string | null
+          cuisine?: string | null
+          tags?: string[]
+          dietary_info?: string[]
+          image_url?: string | null
+          source_url?: string | null
+          is_favorite?: boolean
+          times_cooked?: number
+          last_cooked_at?: string | null
+          rating?: number | null
+          notes?: string | null
+          source?: string
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          household_id?: string | null
+          name?: string
+          description?: string | null
+          ingredients?: Json
+          instructions?: string[]
+          prep_time_minutes?: number | null
+          cook_time_minutes?: number | null
+          servings?: number | null
+          difficulty?: string | null
+          cuisine?: string | null
+          tags?: string[]
+          dietary_info?: string[]
+          image_url?: string | null
+          source_url?: string | null
+          is_favorite?: boolean
+          times_cooked?: number
+          last_cooked_at?: string | null
+          rating?: number | null
+          notes?: string | null
+          source?: string
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
         }
         Relationships: []
       }

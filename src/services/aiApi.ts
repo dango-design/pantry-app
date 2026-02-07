@@ -159,6 +159,90 @@ export async function lookupBarcode(barcode: string): Promise<BarcodeLookupResul
 }
 
 /**
+ * Import a recipe from a URL
+ */
+interface ImportRecipeResult {
+  success: boolean
+  recipe?: {
+    name: string
+    description?: string
+    ingredients: Array<{
+      name: string
+      quantity: number
+      unit: string
+      preparation?: string
+      isOptional: boolean
+    }>
+    instructions: string[]
+    prepTimeMinutes?: number
+    cookTimeMinutes?: number
+    servings?: number
+    cuisine?: string
+    imageUrl?: string
+  }
+  error?: string
+}
+
+export async function importRecipeFromUrl(url: string): Promise<ImportRecipeResult> {
+  if (isDemoMode) {
+    return { success: false, error: DEMO_MODE_ERROR }
+  }
+
+  const { data, error } = await supabase.functions.invoke('import-recipe', {
+    body: { url },
+  })
+
+  if (error) {
+    console.error('Import recipe error:', error)
+    return { success: false, error: error.message }
+  }
+
+  return data as ImportRecipeResult
+}
+
+/**
+ * Get AI-suggested recipes based on available ingredients
+ */
+interface SuggestRecipesResult {
+  success: boolean
+  recipes?: Array<{
+    name: string
+    description: string
+    ingredients: Array<{
+      name: string
+      quantity: number
+      unit: string
+      preparation?: string
+      isOptional: boolean
+    }>
+    instructions: string[]
+    prepTimeMinutes?: number
+    cookTimeMinutes?: number
+    servings?: number
+    difficulty?: string
+    cuisine?: string
+  }>
+  error?: string
+}
+
+export async function suggestRecipes(ingredients: string[]): Promise<SuggestRecipesResult> {
+  if (isDemoMode) {
+    return { success: false, error: DEMO_MODE_ERROR }
+  }
+
+  const { data, error } = await supabase.functions.invoke('suggest-recipes', {
+    body: { ingredients },
+  })
+
+  if (error) {
+    console.error('Suggest recipes error:', error)
+    return { success: false, error: error.message }
+  }
+
+  return data as SuggestRecipesResult
+}
+
+/**
  * Convert a File to base64 string
  */
 export async function fileToBase64(file: File): Promise<string> {
@@ -182,4 +266,6 @@ export type {
   ProcessImageResult,
   ProcessReceiptResult,
   BarcodeLookupResult,
+  ImportRecipeResult,
+  SuggestRecipesResult,
 }
