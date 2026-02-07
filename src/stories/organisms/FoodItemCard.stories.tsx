@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { FoodItemCard } from '@/components/inventory/FoodItemCard'
+import { FoodItemCard, FoodItemCheckboxCard } from '@/components/inventory/FoodItemCard'
 import type { FoodItem } from '@/types'
 import { addDays, subDays, format } from 'date-fns'
 
@@ -33,14 +33,14 @@ const meta = {
     layout: 'padded',
     docs: {
       description: {
-        component: 'Card displaying a food item with quantity, location, expiration status, and quick actions.',
+        component: 'M3-styled horizontal card displaying a food item with quantity, location, expiration status, and quick actions.',
       },
     },
   },
   tags: ['autodocs'],
   decorators: [
     (Story) => (
-      <div style={{ maxWidth: '400px' }}>
+      <div style={{ maxWidth: '382px' }}>
         <Story />
       </div>
     ),
@@ -63,12 +63,12 @@ export const Default: Story = {
 export const Produce: Story = {
   args: {
     item: createMockItem({
-      name: 'Spinach',
+      name: 'Honeycrisp Apple',
       category: 'produce',
       quantity: 1,
-      quantityUnit: 'pack',
+      quantityUnit: 'unit',
       storageLocation: 'refrigerator',
-      expirationDate: format(addDays(new Date(), 3), 'yyyy-MM-dd'),
+      expirationDate: format(addDays(new Date(), 9), 'yyyy-MM-dd'),
     }),
   },
 }
@@ -78,9 +78,9 @@ export const Dairy: Story = {
     item: createMockItem({
       name: 'Almond Milk',
       category: 'dairy',
-      quantity: 2,
-      quantityUnit: 'count',
-      storageLocation: 'refrigerator',
+      quantity: 1,
+      quantityUnit: 'unit',
+      storageLocation: 'pantry',
       expirationDate: format(addDays(new Date(), 7), 'yyyy-MM-dd'),
     }),
   },
@@ -94,7 +94,7 @@ export const Meat: Story = {
       quantity: 1.34,
       quantityUnit: 'lb',
       storageLocation: 'refrigerator',
-      expirationDate: format(addDays(new Date(), 2), 'yyyy-MM-dd'),
+      expirationDate: format(addDays(new Date(), 7), 'yyyy-MM-dd'),
     }),
   },
 }
@@ -108,6 +108,32 @@ export const Frozen: Story = {
       quantityUnit: 'pack',
       storageLocation: 'freezer',
       expirationDate: format(addDays(new Date(), 90), 'yyyy-MM-dd'),
+    }),
+  },
+}
+
+export const Bakery: Story = {
+  args: {
+    item: createMockItem({
+      name: 'Whole Wheat Bread',
+      category: 'bakery',
+      quantity: 1,
+      quantityUnit: 'unit',
+      storageLocation: 'counter',
+      expirationDate: format(addDays(new Date(), 5), 'yyyy-MM-dd'),
+    }),
+  },
+}
+
+export const Pantry: Story = {
+  args: {
+    item: createMockItem({
+      name: 'Dried Spaghetti',
+      category: 'pantry',
+      quantity: 1,
+      quantityUnit: 'pack',
+      storageLocation: 'pantry',
+      expirationDate: format(addDays(new Date(), 730), 'yyyy-MM-dd'),
     }),
   },
 }
@@ -172,38 +198,42 @@ export const AllCategories: Story = {
     <div className="space-y-2">
       <FoodItemCard
         item={createMockItem({
-          name: 'Bananas',
-          category: 'produce',
-          quantity: 6,
-          quantityUnit: 'count',
-          storageLocation: 'counter',
-        })}
-      />
-      <FoodItemCard
-        item={createMockItem({
-          name: 'Milk',
+          name: 'Almond Milk',
           category: 'dairy',
           quantity: 1,
-          quantityUnit: 'gal',
-          storageLocation: 'refrigerator',
+          quantityUnit: 'unit',
+          storageLocation: 'pantry',
+          expirationDate: format(addDays(new Date(), 7), 'yyyy-MM-dd'),
         })}
       />
       <FoodItemCard
         item={createMockItem({
-          name: 'Chicken Breast',
-          category: 'meat',
-          quantity: 2,
-          quantityUnit: 'lb',
-          storageLocation: 'refrigerator',
-        })}
-      />
-      <FoodItemCard
-        item={createMockItem({
-          name: 'Frozen Pizza',
-          category: 'frozen',
+          name: 'Banana',
+          category: 'produce',
           quantity: 1,
           quantityUnit: 'unit',
+          storageLocation: 'pantry',
+          expirationDate: format(addDays(new Date(), 9), 'yyyy-MM-dd'),
+        })}
+      />
+      <FoodItemCard
+        item={createMockItem({
+          name: 'Chicken Thighs',
+          category: 'meat',
+          quantity: 1.34,
+          quantityUnit: 'lb',
+          storageLocation: 'refrigerator',
+          expirationDate: format(addDays(new Date(), 7), 'yyyy-MM-dd'),
+        })}
+      />
+      <FoodItemCard
+        item={createMockItem({
+          name: 'Pork Gyoza',
+          category: 'frozen',
+          quantity: 1,
+          quantityUnit: 'pack',
           storageLocation: 'freezer',
+          expirationDate: format(addDays(new Date(), 90), 'yyyy-MM-dd'),
         })}
       />
       <FoodItemCard
@@ -213,15 +243,37 @@ export const AllCategories: Story = {
           quantity: 1,
           quantityUnit: 'unit',
           storageLocation: 'counter',
+          expirationDate: format(addDays(new Date(), 5), 'yyyy-MM-dd'),
         })}
       />
       <FoodItemCard
         item={createMockItem({
-          name: 'Pasta',
+          name: 'Dried Spaghetti',
           category: 'pantry',
-          quantity: 2,
+          quantity: 1,
           quantityUnit: 'pack',
           storageLocation: 'pantry',
+          expirationDate: format(addDays(new Date(), 730), 'yyyy-MM-dd'),
+        })}
+      />
+      <FoodItemCard
+        item={createMockItem({
+          name: 'Salmon Fillet',
+          category: 'seafood',
+          quantity: 1,
+          quantityUnit: 'lb',
+          storageLocation: 'refrigerator',
+          expirationDate: format(addDays(new Date(), 2), 'yyyy-MM-dd'),
+        })}
+      />
+      <FoodItemCard
+        item={createMockItem({
+          name: 'Orange Juice',
+          category: 'beverages',
+          quantity: 1,
+          quantityUnit: 'gal',
+          storageLocation: 'refrigerator',
+          expirationDate: format(addDays(new Date(), 14), 'yyyy-MM-dd'),
         })}
       />
     </div>
@@ -234,34 +286,69 @@ export const ExpirationStates: Story = {
   },
   render: () => (
     <div className="space-y-2">
-      <p className="text-sm text-gray-500 mb-2">Fresh (green)</p>
+      <p className="text-sm mb-2" style={{ color: '#1D1B20' }}>Fresh (&gt;7 days)</p>
       <FoodItemCard
         item={createMockItem({
           name: 'Fresh Apples',
           expirationDate: format(addDays(new Date(), 14), 'yyyy-MM-dd'),
         })}
       />
-      <p className="text-sm text-gray-500 mb-2 mt-4">Expiring Soon (orange)</p>
+      <p className="text-sm mb-2 mt-4" style={{ color: '#1D1B20' }}>Warning (4-7 days)</p>
       <FoodItemCard
         item={createMockItem({
           name: 'Use Soon Milk',
-          expirationDate: format(addDays(new Date(), 2), 'yyyy-MM-dd'),
+          category: 'dairy',
+          storageLocation: 'refrigerator',
+          expirationDate: format(addDays(new Date(), 5), 'yyyy-MM-dd'),
         })}
       />
-      <p className="text-sm text-gray-500 mb-2 mt-4">Expires Today (red)</p>
+      <p className="text-sm mb-2 mt-4" style={{ color: '#1D1B20' }}>Urgent (&le;3 days)</p>
       <FoodItemCard
         item={createMockItem({
-          name: 'Expires Today Yogurt',
-          expirationDate: format(new Date(), 'yyyy-MM-dd'),
+          name: 'Expiring Yogurt',
+          category: 'dairy',
+          storageLocation: 'refrigerator',
+          expirationDate: format(addDays(new Date(), 1), 'yyyy-MM-dd'),
         })}
       />
-      <p className="text-sm text-gray-500 mb-2 mt-4">Expired (dark red)</p>
+      <p className="text-sm mb-2 mt-4" style={{ color: '#1D1B20' }}>Expired</p>
       <FoodItemCard
         item={createMockItem({
           name: 'Expired Bread',
+          category: 'bakery',
+          storageLocation: 'counter',
           expirationDate: format(subDays(new Date(), 3), 'yyyy-MM-dd'),
         })}
       />
     </div>
   ),
+}
+
+// Checkbox variant stories
+export const CheckboxUnchecked: Story = {
+  args: {
+    item: createMockItem({
+      name: 'Almond Milk',
+      category: 'dairy',
+      quantity: 1,
+      quantityUnit: 'unit',
+      storageLocation: 'pantry',
+      expirationDate: format(addDays(new Date(), 7), 'yyyy-MM-dd'),
+    }),
+  },
+  render: (args) => <FoodItemCheckboxCard {...args} checked={false} />,
+}
+
+export const CheckboxChecked: Story = {
+  args: {
+    item: createMockItem({
+      name: 'Almond Milk',
+      category: 'dairy',
+      quantity: 1,
+      quantityUnit: 'unit',
+      storageLocation: 'pantry',
+      expirationDate: format(addDays(new Date(), 7), 'yyyy-MM-dd'),
+    }),
+  },
+  render: (args) => <FoodItemCheckboxCard {...args} checked={true} />,
 }

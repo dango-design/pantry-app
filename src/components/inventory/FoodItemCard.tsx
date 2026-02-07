@@ -1,13 +1,39 @@
 import { useRef, useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Timer, ShoppingCart, Trash2 } from 'lucide-react'
+import { ShoppingCart, Trash2 } from 'lucide-react'
+import Inventory2Outlined from '@mui/icons-material/Inventory2Outlined'
+import AutoDeleteOutlined from '@mui/icons-material/AutoDeleteOutlined'
 import { cn } from '@/utils/cn'
-import { CATEGORIES, STORAGE_LOCATIONS } from '@/utils/constants'
+import { STORAGE_LOCATIONS } from '@/utils/constants'
 import { formatExpirationText, getFreshnessLevel, FRESHNESS_COLORS } from '@/utils/freshness'
 import { QUANTITY_UNITS } from '@/utils/constants'
 import { getFoodIcon, getLocationIcon } from '@/components/icons'
 import { useFlyToCart } from '@/components/common'
-import type { FoodItem } from '@/types'
+import type { FoodItem, FoodCategory } from '@/types'
+
+// M3 pastel tones for the card color strip (softer than base category colors)
+const CATEGORY_STRIP_COLORS: Record<FoodCategory, string> = {
+  produce: '#48dc8d',
+  dairy: '#a2b8f1',
+  meat: '#f4a4a4',
+  seafood: '#88d4e8',
+  bakery: '#f0cc88',
+  frozen: '#b0b4f8',
+  pantry: '#c4b0f8',
+  beverages: '#f0a8c8',
+  condiments: '#f4b888',
+  snacks: '#b8dc78',
+  prepared: '#88d8c8',
+  other: '#b8bcc4',
+}
+
+// M3 design tokens
+const M3 = {
+  onSurface: '#1D1B20',
+  surface: '#FEF7FF',
+  outlineVariant: '#CAC4D0',
+  surfaceContainerHigh: '#ECE6F0',
+}
 
 interface FoodItemCardProps {
   item: FoodItem
@@ -16,11 +42,11 @@ interface FoodItemCardProps {
   className?: string
 }
 
-// Format quantity - use "x5" format if no unit, otherwise "1.34 lbs"
+// Format quantity to match Figma: "1 unit", "1.34 lbs", "1 pkg"
 function formatQuantity(quantity: number, unitKey: string): string {
   const unit = QUANTITY_UNITS[unitKey as keyof typeof QUANTITY_UNITS]
   if (!unit || unitKey === 'count' || unitKey === 'unit') {
-    return `×${quantity}`
+    return `${quantity} unit`
   }
   return `${quantity} ${unit.shortLabel}`
 }
@@ -29,7 +55,6 @@ function formatQuantity(quantity: number, unitKey: string): string {
 function getLocationLabel(location: string): string {
   const locationConfig = STORAGE_LOCATIONS[location]
   if (locationConfig) {
-    // Return short versions
     switch (location) {
       case 'refrigerator': return 'Fridge'
       case 'freezer': return 'Freezer'
@@ -56,6 +81,9 @@ function useIsTouchDevice() {
 const SWIPE_THRESHOLD = 80
 const ACTION_WIDTH = 72
 
+// Icon size matching Figma's 16.667px
+const META_ICON_SIZE = 17
+
 export function FoodItemCard({
   item,
   onMarkUsed,
@@ -75,11 +103,11 @@ export function FoodItemCard({
   const [isDragging, setIsDragging] = useState(false)
   const [swipeDirection, setSwipeDirection] = useState<'left' | 'right' | null>(null)
 
-  const category = CATEGORIES[item.category] || CATEGORIES.other
   const freshnessLevel = getFreshnessLevel(item.expirationDate)
   const expirationText = formatExpirationText(item.expirationDate)
   const quantityDisplay = formatQuantity(item.quantity, item.quantityUnit)
   const locationLabel = getLocationLabel(item.storageLocation)
+  const stripColor = CATEGORY_STRIP_COLORS[item.category] || CATEGORY_STRIP_COLORS.other
 
   // Get the appropriate icons
   const FoodIcon = getFoodIcon(item.name)
@@ -156,9 +184,6 @@ export function FoodItemCard({
     setTouchCurrentX(0)
   }
 
-  // Default gray color for all metadata
-  const metaColor = '#6B7280' // gray-500
-
   return (
     <div
       className={cn('relative overflow-hidden rounded-xl', className)}
@@ -198,42 +223,70 @@ export function FoodItemCard({
         onTouchStart={isTouch ? handleTouchStart : undefined}
         onTouchMove={isTouch ? handleTouchMove : undefined}
         onTouchEnd={isTouch ? handleTouchEnd : undefined}
-        className={cn(
-          'relative flex items-center bg-white cursor-pointer',
-          'shadow-sm hover:shadow-md transition-shadow'
-        )}
+        className="relative flex items-center cursor-pointer rounded-xl overflow-hidden"
         style={{
-          borderLeft: `4px solid ${category.color}`,
+          backgroundColor: M3.surface,
+          border: `1px solid ${M3.outlineVariant}`,
           transform: isTouch && isDragging ? `translateX(${clampedOffset}px)` : undefined,
           transition: isDragging ? 'none' : 'transform 0.2s ease-out',
         }}
       >
-        {/* Main content */}
-        <div className="flex-1 py-3 pl-4 pr-2 min-w-0">
-          <h3 className="font-semibold text-gray-900 text-base leading-tight truncate">{item.name}</h3>
-          <div className="flex items-center gap-3 mt-1 text-sm" style={{ color: metaColor }}>
-            {/* Quantity - fixed width */}
-            <span className="w-10 flex-shrink-0">{quantityDisplay}</span>
+        {/* Left content section */}
+        <div className="flex flex-1 items-center self-stretch gap-4 min-w-0">
+          {/* Color strip - 8px wide, full height, straight right edge */}
+          <div
+            className="w-2 self-stretch shrink-0"
+            style={{ backgroundColor: stripColor }}
+          />
 
-            {/* Location - with icon */}
-            <span className="flex items-center gap-1 w-20 flex-shrink-0">
-              {LocationIcon && <LocationIcon size={16} className="flex-shrink-0" />}
-              <span className="truncate">{locationLabel}</span>
-            </span>
-
-            {/* Expiration - wider width for "2 months" etc */}
-            <span
-              className="flex items-center gap-1 w-24 flex-shrink-0"
-              style={{ color: freshnessLevel === 'fresh' ? metaColor : FRESHNESS_COLORS[freshnessLevel] }}
+          {/* Text content */}
+          <div className="flex-1 flex flex-col gap-1 py-4 min-w-0">
+            {/* Title - M3 Title Medium */}
+            <h3
+              className="font-medium text-base leading-6 truncate"
+              style={{ color: M3.onSurface, letterSpacing: '0.15px' }}
             >
-              <Timer className="h-4 w-4 flex-shrink-0" />
-              <span className="font-medium whitespace-nowrap">{expirationText}</span>
-            </span>
+              {item.name}
+            </h3>
+
+            {/* Metadata row - M3 Body Medium */}
+            <div
+              className="flex items-center gap-2.5 text-sm leading-5"
+              style={{ color: M3.onSurface, letterSpacing: '0.25px' }}
+            >
+              {/* Quantity */}
+              <span className="flex-1 flex items-center gap-1 min-w-0">
+                <Inventory2Outlined className="shrink-0" style={{ fontSize: META_ICON_SIZE }} />
+                <span className="truncate">{quantityDisplay}</span>
+              </span>
+
+              {/* Location */}
+              <span className="flex-1 flex items-center gap-1 min-w-0">
+                {LocationIcon && <LocationIcon size={META_ICON_SIZE} className="shrink-0" />}
+                <span className="truncate">{locationLabel}</span>
+              </span>
+
+              {/* Expiration */}
+              <span
+                className="flex-1 flex items-center gap-1 min-w-0"
+                style={{ color: freshnessLevel === 'fresh' ? M3.onSurface : FRESHNESS_COLORS[freshnessLevel] }}
+              >
+                <AutoDeleteOutlined className="shrink-0" style={{ fontSize: META_ICON_SIZE }} />
+                <span className="truncate">{expirationText}</span>
+              </span>
+            </div>
           </div>
         </div>
 
-        {/* Food icon on the right */}
-        <div ref={iconRef} className="flex-shrink-0 w-16 h-16 flex items-center justify-center mr-2">
+        {/* Media section - 80px, bordered, with food icon */}
+        <div
+          ref={iconRef}
+          className="w-20 self-stretch shrink-0 flex items-center justify-center"
+          style={{
+            backgroundColor: M3.surfaceContainerHigh,
+            borderLeft: `1px solid ${M3.outlineVariant}`,
+          }}
+        >
           <FoodIcon size={48} />
         </div>
       </div>
@@ -246,7 +299,6 @@ export function FoodItemCard({
             isHovered ? 'translate-x-0' : 'translate-x-full'
           )}
         >
-          {/* Add to Cart button - teal/green */}
           <button
             onClick={handleAddToCart}
             className="w-14 flex items-center justify-center bg-teal-500 text-white hover:bg-teal-600 transition-colors"
@@ -254,7 +306,6 @@ export function FoodItemCard({
           >
             <ShoppingCart className="h-5 w-5" />
           </button>
-          {/* Mark as Used button - red */}
           <button
             onClick={handleMarkUsed}
             className="w-14 flex items-center justify-center bg-red-500 text-white hover:bg-red-600 transition-colors"
@@ -280,28 +331,35 @@ export function FoodItemCheckboxCard({
   onCheckedChange,
   className,
 }: FoodItemCheckboxCardProps) {
-  const category = CATEGORIES[item.category] || CATEGORIES.other
   const freshnessLevel = getFreshnessLevel(item.expirationDate)
   const expirationText = formatExpirationText(item.expirationDate)
   const quantityDisplay = formatQuantity(item.quantity, item.quantityUnit)
   const locationLabel = getLocationLabel(item.storageLocation)
   const FoodIcon = getFoodIcon(item.name)
   const LocationIcon = getLocationIcon(item.storageLocation)
+  const stripColor = CATEGORY_STRIP_COLORS[item.category] || CATEGORY_STRIP_COLORS.other
 
-  // Default gray color for all metadata
-  const metaColor = checked ? '#9CA3AF' : '#6B7280' // gray-400 when checked, gray-500 otherwise
+  const textColor = checked ? '#9CA3AF' : M3.onSurface
 
   return (
     <div
       className={cn(
-        'flex items-center bg-white rounded-xl overflow-hidden cursor-pointer',
-        'shadow-sm hover:shadow-md transition-all',
+        'flex items-center rounded-xl overflow-hidden cursor-pointer',
         checked && 'opacity-60',
         className
       )}
-      style={{ borderLeft: `4px solid ${category.color}` }}
+      style={{
+        backgroundColor: M3.surface,
+        border: `1px solid ${M3.outlineVariant}`,
+      }}
       onClick={() => onCheckedChange?.(!checked)}
     >
+      {/* Color strip */}
+      <div
+        className="w-2 self-stretch shrink-0"
+        style={{ backgroundColor: stripColor }}
+      />
+
       {/* Checkbox */}
       <div className="pl-3">
         <div
@@ -324,35 +382,51 @@ export function FoodItemCheckboxCard({
       <div className="flex-1 py-3 pl-3 pr-2 min-w-0">
         <h3
           className={cn(
-            'font-semibold text-base leading-tight truncate transition-colors',
-            checked ? 'text-gray-400 line-through' : 'text-gray-900'
+            'font-medium text-base leading-6 truncate transition-colors',
+            checked && 'line-through'
           )}
+          style={{ color: textColor, letterSpacing: '0.15px' }}
         >
           {item.name}
         </h3>
-        <div className="flex items-center gap-3 mt-1 text-sm" style={{ color: metaColor }}>
+        <div
+          className="flex items-center gap-2.5 mt-1 text-sm leading-5"
+          style={{ color: textColor, letterSpacing: '0.25px' }}
+        >
           {/* Quantity */}
-          <span className="w-10 flex-shrink-0">{quantityDisplay}</span>
+          <span className="flex-1 flex items-center gap-1 min-w-0">
+            <Inventory2Outlined className="shrink-0" style={{ fontSize: META_ICON_SIZE }} />
+            <span className="truncate">{quantityDisplay}</span>
+          </span>
 
-          {/* Location - with icon */}
-          <span className="flex items-center gap-1 w-20 flex-shrink-0">
-            {LocationIcon && <LocationIcon size={16} className="flex-shrink-0" />}
+          {/* Location */}
+          <span className="flex-1 flex items-center gap-1 min-w-0">
+            {LocationIcon && <LocationIcon size={META_ICON_SIZE} className="shrink-0" />}
             <span className="truncate">{locationLabel}</span>
           </span>
 
           {/* Expiration */}
           <span
-            className="flex items-center gap-1 w-24 flex-shrink-0"
-            style={{ color: checked ? metaColor : (freshnessLevel === 'fresh' ? metaColor : FRESHNESS_COLORS[freshnessLevel]) }}
+            className="flex-1 flex items-center gap-1 min-w-0"
+            style={{ color: checked ? textColor : (freshnessLevel === 'fresh' ? textColor : FRESHNESS_COLORS[freshnessLevel]) }}
           >
-            <Timer className="h-4 w-4 flex-shrink-0" />
-            <span className="font-medium whitespace-nowrap">{expirationText}</span>
+            <AutoDeleteOutlined className="shrink-0" style={{ fontSize: META_ICON_SIZE }} />
+            <span className="truncate">{expirationText}</span>
           </span>
         </div>
       </div>
 
       {/* Food icon */}
-      <div className={cn('flex-shrink-0 w-16 h-16 flex items-center justify-center mr-2', checked && 'opacity-50')}>
+      <div
+        className={cn(
+          'w-20 self-stretch shrink-0 flex items-center justify-center',
+          checked && 'opacity-50'
+        )}
+        style={{
+          backgroundColor: M3.surfaceContainerHigh,
+          borderLeft: `1px solid ${M3.outlineVariant}`,
+        }}
+      >
         <FoodIcon size={48} />
       </div>
     </div>
