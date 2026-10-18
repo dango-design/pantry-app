@@ -1,4 +1,4 @@
-import { differenceInDays, parseISO } from 'date-fns'
+import { differenceInCalendarDays, parseISO } from 'date-fns'
 
 export type FreshnessLevel = 'fresh' | 'warning' | 'urgent'
 
@@ -7,8 +7,8 @@ export function calculateFreshnessScore(purchaseDate: string, expirationDate: st
   const expiration = parseISO(expirationDate)
   const today = new Date()
 
-  const totalDays = differenceInDays(expiration, purchase)
-  const daysRemaining = differenceInDays(expiration, today)
+  const totalDays = differenceInCalendarDays(expiration, purchase)
+  const daysRemaining = differenceInCalendarDays(expiration, today)
 
   if (daysRemaining <= 0) return 0
   if (totalDays <= 0) return 100
@@ -31,8 +31,9 @@ export function getFreshnessLevel(
   return 'fresh'
 }
 
+// Calendar days from today, so an item expiring tomorrow is 1 at any time of day
 export function getDaysUntilExpiration(expirationDate: string): number {
-  return differenceInDays(parseISO(expirationDate), new Date())
+  return differenceInCalendarDays(parseISO(expirationDate), new Date())
 }
 
 export function formatExpirationText(expirationDate: string): string {

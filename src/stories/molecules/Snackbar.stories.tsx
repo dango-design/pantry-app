@@ -63,7 +63,7 @@ export const ShortDuration: Story = {
 }
 
 // Interactive demo showing snackbar trigger
-export const Interactive: Story = {
+export const Interactive: StoryObj = {
   render: function InteractiveSnackbar() {
     const [snackbar, setSnackbar] = useState<{
       open: boolean

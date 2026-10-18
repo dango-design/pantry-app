@@ -1,10 +1,11 @@
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { ArrowLeft, Minus, Plus, Clock, MapPin, Tag, ShoppingCart, CheckCircle2 } from 'lucide-react'
+import { ArrowLeft, Minus, Plus, Clock, MapPin, Tag, ShoppingCart, CheckCircle2, Edit2 } from 'lucide-react'
 import { Button, Card, CardContent, Dialog, DialogActions, Snackbar } from '@/components/common'
 import { useDemoStore } from '@/stores/demoStore'
 import { CATEGORIES, STORAGE_LOCATIONS, QUANTITY_UNITS } from '@/utils/constants'
-import { formatExpirationText, getFreshnessLevel, FRESHNESS_COLORS } from '@/utils/freshness'
+import { calculateFreshnessScore, formatExpirationText, getFreshnessLevel, FRESHNESS_COLORS } from '@/utils/freshness'
+import { formatDateString } from '@/utils/dates'
 import { getFoodIcon } from '@/components/icons'
 
 // Snackbar state type
@@ -17,7 +18,7 @@ interface SnackbarState {
 export function ItemDetailPage() {
   const navigate = useNavigate()
   const { id } = useParams<{ id: string }>()
-  const { inventory, deleteItem, useItem, updateItem, addShoppingItem } = useDemoStore()
+  const { inventory, deleteItem, consumeItem, updateItem, addShoppingItem } = useDemoStore()
 
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const [showUseDialog, setShowUseDialog] = useState(false)
@@ -41,13 +42,14 @@ export function ItemDetailPage() {
 
   const category = CATEGORIES[item.category] || CATEGORIES.other
   const location = STORAGE_LOCATIONS[item.storageLocation] || { label: item.storageLocation, color: '#6B7280' }
-  const freshnessLevel = getFreshnessLevel(item.expirationDate, item.freshnessScore)
+  const freshnessLevel = getFreshnessLevel(item.expirationDate)
+  const freshnessScore = calculateFreshnessScore(item.purchaseDate, item.expirationDate)
   const unitLabel = QUANTITY_UNITS[item.quantityUnit]?.shortLabel || ''
   const FoodIcon = getFoodIcon(item.name)
 
 
   const handleUse = () => {
-    useItem(item.id, useQuantity)
+    consumeItem(item.id, useQuantity)
     setShowUseDialog(false)
 
     // If fully consumed, go back
@@ -56,10 +58,9 @@ export function ItemDetailPage() {
     }
   }
 
-  const handleMarkUsed = useCallback(() => {
-    if (!item) return
+  const handleMarkUsed = () => {
     const previousQuantity = item.quantity
-    useItem(item.id, item.quantity) // Sets quantity to 0
+    consumeItem(item.id, item.quantity) // Sets quantity to 0
 
     setSnackbar({
       open: true,
@@ -71,12 +72,11 @@ export function ItemDetailPage() {
 
     // Navigate back after a short delay
     setTimeout(() => navigate('/'), 300)
-  }, [item, useItem, updateItem, navigate])
+  }
 
-  const handleAddToGroceryList = useCallback(() => {
-    if (!item) return
+  const handleAddToGroceryList = () => {
     const previousQuantity = item.quantity
-    useItem(item.id, item.quantity) // Sets quantity to 0
+    consumeItem(item.id, item.quantity) // Sets quantity to 0
 
     // Add to shopping list
     const newShoppingItem = addShoppingItem({
@@ -102,10 +102,9 @@ export function ItemDetailPage() {
 
     // Navigate back after a short delay
     setTimeout(() => navigate('/'), 300)
-  }, [item, useItem, updateItem, addShoppingItem, navigate])
+  }
 
   const handleRemove = () => {
-    if (!item) return
     deleteItem(item.id)
     navigate('/')
   }
@@ -122,7 +121,13 @@ export function ItemDetailPage() {
             <ArrowLeft className="h-5 w-5" />
           </button>
           <h1 className="text-lg font-semibold text-gray-900">Item Details</h1>
-          <div className="w-9" /> {/* Spacer for balance */}
+          <button
+            onClick={() => navigate(`/item/${item.id}/edit`)}
+            className="p-2 -mr-2 text-gray-500 hover:text-gray-700"
+            aria-label="Edit item"
+          >
+            <Edit2 className="h-5 w-5" />
+          </button>
         </div>
       </header>
 
@@ -159,13 +164,13 @@ export function ItemDetailPage() {
                     <div
                       className="h-full rounded-full transition-all"
                       style={{
-                        width: `${item.freshnessScore}%`,
+                        width: `${freshnessScore}%`,
                         backgroundColor: FRESHNESS_COLORS[freshnessLevel],
                       }}
                     />
                   </div>
                   <p className="text-xs text-gray-500 mt-1">
-                    {item.freshnessScore}% freshness remaining
+                    {freshnessScore}% freshness remaining
                   </p>
                 </div>
               </div>
@@ -210,11 +215,11 @@ export function ItemDetailPage() {
             <div className="pt-2 border-t border-gray-100">
               <div className="flex justify-between text-sm">
                 <span className="text-gray-500">Purchased</span>
-                <span>{new Date(item.purchaseDate).toLocaleDateString()}</span>
+                <span>{formatDateString(item.purchaseDate)}</span>
               </div>
               <div className="flex justify-between text-sm mt-2">
                 <span className="text-gray-500">Expires</span>
-                <span>{new Date(item.expirationDate).toLocaleDateString()}</span>
+                <span>{formatDateString(item.expirationDate)}</span>
               </div>
               <div className="flex justify-between text-sm mt-2">
                 <span className="text-gray-500">Added via</span>

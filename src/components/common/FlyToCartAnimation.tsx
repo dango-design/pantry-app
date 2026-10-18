@@ -69,7 +69,7 @@ export function FlyToCartProvider({ children }: FlyToCartProviderProps) {
   )
 }
 
-interface FlyingIconProps extends AnimationItem {}
+type FlyingIconProps = AnimationItem
 
 function FlyingIcon({ startX, startY, icon }: FlyingIconProps) {
   const [style, setStyle] = useState({

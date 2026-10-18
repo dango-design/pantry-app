@@ -140,7 +140,7 @@ export const QuantitySelector: Story = {
   },
 }
 
-export const Interactive: Story = {
+export const Interactive: StoryObj = {
   render: () => (
     <DialogDemo>
       {({ open, onClose }) => (

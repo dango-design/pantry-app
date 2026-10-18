@@ -103,8 +103,8 @@ export function HouseholdPage() {
       await loadHouseholdData()
       setView('main')
       setInviteCode('')
-    } catch (err: any) {
-      setError(err.message || 'Failed to join household')
+    } catch (err) {
+      setError((err as { message?: string }).message || 'Failed to join household')
     } finally {
       setJoining(false)
     }
@@ -117,8 +117,8 @@ export function HouseholdPage() {
     try {
       await leaveHousehold()
       await loadHouseholdData()
-    } catch (err: any) {
-      setError(err.message || 'Failed to leave household')
+    } catch (err) {
+      setError((err as { message?: string }).message || 'Failed to leave household')
     }
   }
 
@@ -129,8 +129,8 @@ export function HouseholdPage() {
     try {
       await removeHouseholdMember(memberId)
       setMembers(members.filter(m => m.id !== memberId))
-    } catch (err: any) {
-      setError(err.message || 'Failed to remove member')
+    } catch (err) {
+      setError((err as { message?: string }).message || 'Failed to remove member')
     }
   }
 

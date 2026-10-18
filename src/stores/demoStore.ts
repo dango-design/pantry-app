@@ -1,9 +1,16 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { FoodItem, ShoppingListItem, Household, Recipe, FoodCategory, StorageLocation, QuantityUnit } from '@/types'
+import { toLocalDateString } from '@/utils/dates'
+import { calculateFreshnessScore } from '@/utils/freshness'
+import { roundQuantity } from '@/utils/units'
 
 // Store version - increment this when schema changes to clear old data
 const STORE_VERSION = 3
+
+// Unique id for new records. Date.now() alone repeats when several items are
+// added in the same loop (e.g. adding all checked shopping items at once).
+const createId = (prefix: string) => `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
 
 // Valid categories for validation
 const VALID_CATEGORIES: FoodCategory[] = [
@@ -66,9 +73,8 @@ const createDemoInventory = (): FoodItem[] => {
     const expirationDate = new Date(now)
     expirationDate.setDate(expirationDate.getDate() + item.daysUntilExpiry)
 
-    const totalDays = Math.ceil((expirationDate.getTime() - purchaseDate.getTime()) / (1000 * 60 * 60 * 24))
-    const daysRemaining = Math.ceil((expirationDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
-    const freshnessScore = Math.max(0, Math.min(100, Math.round((daysRemaining / totalDays) * 100)))
+    const purchaseDateString = toLocalDateString(purchaseDate)
+    const expirationDateString = toLocalDateString(expirationDate)
 
     return {
       id: `demo-item-${index + 1}`,
@@ -79,10 +85,10 @@ const createDemoInventory = (): FoodItem[] => {
       quantityUnit: item.quantityUnit!,
       originalQuantity: item.quantity!,
       storageLocation: item.storageLocation as StorageLocation,
-      purchaseDate: purchaseDate.toISOString().split('T')[0],
-      expirationDate: expirationDate.toISOString().split('T')[0],
+      purchaseDate: purchaseDateString,
+      expirationDate: expirationDateString,
       expirationSource: 'calculated' as const,
-      freshnessScore,
+      freshnessScore: calculateFreshnessScore(purchaseDateString, expirationDateString),
       tags: [],
       addedBy: DEMO_USER.id,
       addedVia: 'manual' as const,
@@ -346,7 +352,7 @@ interface DemoState {
   addItem: (item: Omit<FoodItem, 'id' | 'createdAt' | 'updatedAt'>) => FoodItem
   updateItem: (id: string, updates: Partial<FoodItem>) => FoodItem | null
   deleteItem: (id: string) => void
-  useItem: (id: string, quantityUsed: number) => FoodItem | null
+  consumeItem: (id: string, quantityUsed: number) => FoodItem | null
 
   // Shopping list actions
   addShoppingItem: (item: Omit<ShoppingListItem, 'id' | 'createdAt' | 'updatedAt'>) => ShoppingListItem
@@ -415,7 +421,7 @@ export const useDemoStore = create<DemoState>()(
         const now = new Date().toISOString()
         const newItem: FoodItem = {
           ...itemData,
-          id: `demo-item-${Date.now()}`,
+          id: createId('demo-item'),
           createdAt: now,
           updatedAt: now,
         }
@@ -445,12 +451,12 @@ export const useDemoStore = create<DemoState>()(
         }))
       },
 
-      useItem: (id, quantityUsed) => {
+      consumeItem: (id, quantityUsed) => {
         let updatedItem: FoodItem | null = null
         set((state) => ({
           inventory: state.inventory.map((item) => {
             if (item.id === id) {
-              const newQuantity = Math.max(0, item.quantity - quantityUsed)
+              const newQuantity = Math.max(0, roundQuantity(item.quantity - quantityUsed))
               updatedItem = {
                 ...item,
                 quantity: newQuantity,
@@ -470,7 +476,7 @@ export const useDemoStore = create<DemoState>()(
         const now = new Date().toISOString()
         const newItem: ShoppingListItem = {
           ...itemData,
-          id: `shop-${Date.now()}`,
+          id: createId('shop'),
           createdAt: now,
           updatedAt: now,
         }
@@ -508,7 +514,7 @@ export const useDemoStore = create<DemoState>()(
         const now = new Date().toISOString()
         const newRecipe: Recipe = {
           ...recipeData,
-          id: `demo-recipe-${Date.now()}`,
+          id: createId('demo-recipe'),
           createdAt: now,
           updatedAt: now,
         }
@@ -566,7 +572,7 @@ export const useDemoStore = create<DemoState>()(
     {
       name: 'pantry-demo-store',
       version: STORE_VERSION,
-      migrate: (persistedState: any, version: number) => {
+      migrate: (persistedState, version) => {
         // If version doesn't match, reset to fresh state
         if (version !== STORE_VERSION) {
           console.log('Store version mismatch, resetting data')
@@ -575,24 +581,26 @@ export const useDemoStore = create<DemoState>()(
             inventory: [],
             shoppingList: [],
             recipes: [],
-          }
+          } as Partial<DemoState> as DemoState
         }
 
         // Validate and clean existing data
-        if (persistedState) {
-          persistedState.inventory = validateInventory(persistedState.inventory || [])
+        const state = persistedState as DemoState
+        if (state) {
+          state.inventory = validateInventory(state.inventory || [])
         }
 
-        return persistedState
+        return state
       },
       // Custom merge to validate data on load
-      merge: (persistedState: any, currentState: DemoState) => {
+      merge: (persistedState, currentState) => {
         if (!persistedState) return currentState
+        const state = persistedState as Partial<DemoState>
 
         return {
           ...currentState,
-          ...persistedState,
-          inventory: validateInventory(persistedState.inventory || []),
+          ...state,
+          inventory: validateInventory(state.inventory || []),
         }
       },
     }

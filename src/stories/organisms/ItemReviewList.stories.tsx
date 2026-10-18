@@ -17,7 +17,6 @@ const meta = {
 } satisfies Meta<typeof ItemReviewList>
 
 export default meta
-type Story = StoryObj<typeof meta>
 
 // Sample detected items
 const sampleItems: ReviewItem[] = [
@@ -81,7 +80,7 @@ function ItemReviewListDemo({
   return <ItemReviewList {...props} items={items} onItemsChange={setItems} />
 }
 
-export const MultipleItems: Story = {
+export const MultipleItems: StoryObj = {
   render: () => (
     <ItemReviewListDemo
       initialItems={sampleItems}
@@ -91,7 +90,7 @@ export const MultipleItems: Story = {
   ),
 }
 
-export const SingleItem: Story = {
+export const SingleItem: StoryObj = {
   render: () => (
     <ItemReviewListDemo
       initialItems={[sampleItems[0]]}
@@ -101,7 +100,7 @@ export const SingleItem: Story = {
   ),
 }
 
-export const NoItems: Story = {
+export const NoItems: StoryObj = {
   render: () => (
     <ItemReviewListDemo
       initialItems={[]}
@@ -111,7 +110,7 @@ export const NoItems: Story = {
   ),
 }
 
-export const Loading: Story = {
+export const Loading: StoryObj = {
   render: () => (
     <ItemReviewListDemo
       initialItems={sampleItems}
@@ -122,7 +121,7 @@ export const Loading: Story = {
   ),
 }
 
-export const FromReceipt: Story = {
+export const FromReceipt: StoryObj = {
   render: () => (
     <ItemReviewListDemo
       initialItems={[

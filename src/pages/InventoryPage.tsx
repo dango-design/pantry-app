@@ -50,7 +50,7 @@ export function InventoryPage() {
   const [showFilterSheet, setShowFilterSheet] = useState(false)
   const [snackbar, setSnackbar] = useState<SnackbarState>({ open: false, message: '' })
 
-  const { inventory, useItem, updateItem, addShoppingItem } = useDemoStore()
+  const { inventory, consumeItem, updateItem, addShoppingItem } = useDemoStore()
 
   // Count active filters for badge
   const activeFilterCount =
@@ -67,7 +67,7 @@ export function InventoryPage() {
   // Handle marking an item as used
   const handleMarkUsed = useCallback((item: FoodItem) => {
     const previousQuantity = item.quantity
-    useItem(item.id, item.quantity) // Sets quantity to 0
+    consumeItem(item.id, item.quantity) // Sets quantity to 0
 
     setSnackbar({
       open: true,
@@ -76,12 +76,12 @@ export function InventoryPage() {
         updateItem(item.id, { quantity: previousQuantity, status: 'active', consumedAt: undefined })
       },
     })
-  }, [useItem, updateItem])
+  }, [consumeItem, updateItem])
 
   // Handle adding item to cart (mark used + add to shopping list)
   const handleAddToCart = useCallback((item: FoodItem) => {
     const previousQuantity = item.quantity
-    useItem(item.id, item.quantity) // Sets quantity to 0
+    consumeItem(item.id, item.quantity) // Sets quantity to 0
 
     // Add to shopping list
     const newShoppingItem = addShoppingItem({
@@ -105,7 +105,7 @@ export function InventoryPage() {
         useDemoStore.getState().removeShoppingItem(newShoppingItem.id)
       },
     })
-  }, [useItem, updateItem, addShoppingItem])
+  }, [consumeItem, updateItem, addShoppingItem])
 
   // Filter active items
   const activeItems = useMemo(() => {

@@ -1,5 +1,6 @@
 import { supabase } from './supabase'
 import type { Tables, InsertTables, UpdateTables } from '@/types/database'
+import { dateStringFromToday } from '@/utils/dates'
 
 export type FoodItemRow = Tables<'food_items'>
 export type FoodItemInsert = InsertTables<'food_items'>
@@ -213,15 +214,13 @@ export async function getExpiringItems(daysAhead: number = 7): Promise<FoodItemR
   const householdId = await getUserHouseholdId()
   if (!householdId) return []
 
-  const futureDate = new Date()
-  futureDate.setDate(futureDate.getDate() + daysAhead)
 
   const { data, error } = await supabase
     .from('food_items')
     .select('*')
     .eq('household_id', householdId)
     .eq('status', 'active')
-    .lte('expiration_date', futureDate.toISOString().split('T')[0])
+    .lte('expiration_date', dateStringFromToday(daysAhead))
     .order('expiration_date', { ascending: true })
 
   if (error) {
