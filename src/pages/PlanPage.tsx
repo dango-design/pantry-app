@@ -284,49 +284,41 @@ export function PlanPage() {
                             isDropTarget && 'bg-primary-soft ring-2 ring-inset ring-primary/30'
                           )}
                         >
-                          <div className="w-[4.5rem] flex-shrink-0 pt-2">
+                          {/* Label lines up with the dashed Add button, or with the first card's title */}
+                          <div className={cn('w-[4.5rem] flex-shrink-0', slotEntries.length > 0 ? 'pt-3.5' : 'pt-2.5')}>
                             <p className="text-xs font-medium uppercase tracking-wide text-gray-500">{label}</p>
-                            {slotEntries.length > 0 && !isPast && (
-                              <button
-                                onClick={() => setPickerTarget({ date, slot })}
-                                aria-label={`Add another ${label.toLowerCase()} on ${format(day, 'EEEE')}`}
-                                className="mt-1 flex items-center gap-0.5 text-xs font-medium text-primary hover:text-primary-hover"
-                              >
-                                <Plus className="h-3 w-3" />
-                                Add
-                              </button>
-                            )}
                           </div>
                           <div className="flex-1 min-w-0 space-y-2">
-                            {slotEntries.length === 0 ? (
+                            {slotEntries.map((entry) => {
+                              const recipe = recipesById.get(entry.recipeId)
+                              if (!recipe) return null
+                              return (
+                                <MealPlanEntryCard
+                                  key={entry.id}
+                                  entry={entry}
+                                  recipe={recipe}
+                                  matchResult={matchByRecipeId.get(recipe.id)}
+                                  onServingsChange={(servings) => updateMealPlanEntry(entry.id, { servings })}
+                                  onStatusChange={(status) => updateMealPlanEntry(entry.id, { status })}
+                                  onRemove={() => handleRemove(entry)}
+                                  onMove={() => setMoveTarget(entry)}
+                                  onMoveToDate={(newDate) => moveEntry(entry, newDate, entry.slot)}
+                                  dragHandleProps={getHandleProps(entry.id, recipe.name, () => setMoveTarget(entry))}
+                                  isDragging={drag?.entryId === entry.id}
+                                />
+                              )
+                            })}
+
+                            {/* Empty slots and filled ones both end in the same Add button; past days are read-only */}
+                            {!isPast && (
                               <button
                                 onClick={() => setPickerTarget({ date, slot })}
-                                aria-label={`Add ${label.toLowerCase()} on ${format(day, 'EEEE')}`}
+                                aria-label={`Add ${slotEntries.length > 0 ? 'another ' : ''}${label.toLowerCase()} on ${format(day, 'EEEE')}`}
                                 className="w-full h-9 flex items-center justify-center gap-1 rounded-xl border border-dashed border-gray-300 text-sm text-gray-500 hover:border-primary/40 hover:text-primary hover:bg-primary-soft/50 transition-colors"
                               >
                                 <Plus className="h-4 w-4" />
                                 {isDropTarget ? 'Drop here' : 'Add'}
                               </button>
-                            ) : (
-                              slotEntries.map((entry) => {
-                                const recipe = recipesById.get(entry.recipeId)
-                                if (!recipe) return null
-                                return (
-                                  <MealPlanEntryCard
-                                    key={entry.id}
-                                    entry={entry}
-                                    recipe={recipe}
-                                    matchResult={matchByRecipeId.get(recipe.id)}
-                                    onServingsChange={(servings) => updateMealPlanEntry(entry.id, { servings })}
-                                    onStatusChange={(status) => updateMealPlanEntry(entry.id, { status })}
-                                    onRemove={() => handleRemove(entry)}
-                                    onMove={() => setMoveTarget(entry)}
-                                    onMoveToDate={(newDate) => moveEntry(entry, newDate, entry.slot)}
-                                    dragHandleProps={getHandleProps(entry.id, recipe.name, () => setMoveTarget(entry))}
-                                    isDragging={drag?.entryId === entry.id}
-                                  />
-                                )
-                              })
                             )}
                           </div>
                         </div>

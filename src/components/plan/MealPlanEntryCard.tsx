@@ -66,20 +66,21 @@ export function MealPlanEntryCard({
   return (
     <div
       className={cn(
-        'flex rounded-xl bg-primary-soft py-2 pr-3 transition-opacity',
-        canMove ? 'pl-0.5' : 'pl-3',
+        'flex gap-1.5 rounded-xl bg-primary-soft p-3 transition-opacity',
+        canMove && 'pl-1.5',
         entry.status === 'skipped' && 'opacity-60',
         isDragging && 'opacity-40'
       )}
     >
+      {/* Grip sits beside the title line; it spans the card's height so it stays easy to grab */}
       {canMove && (
         <button
           {...dragHandleProps}
           aria-label={`Move ${recipe.name}`}
           title="Drag to move, or tap for more options"
-          className="w-6 flex-shrink-0 self-stretch flex items-center justify-center rounded-lg text-gray-400 hover:text-gray-600 cursor-grab active:cursor-grabbing touch-none select-none"
+          className="w-5 -my-3 py-3 flex-shrink-0 self-stretch flex items-start justify-center rounded-lg text-gray-400 hover:text-gray-600 cursor-grab active:cursor-grabbing touch-none select-none"
         >
-          <GripVertical className="h-4 w-4" />
+          <GripVertical className="h-4 w-4 mt-0.5" />
         </button>
       )}
 
@@ -121,7 +122,7 @@ export function MealPlanEntryCard({
             </div>
           </button>
 
-          <div className="relative -mr-1.5">
+          <div className="relative -mr-1.5 -mt-1.5">
             <button
               onClick={() => setShowMenu(!showMenu)}
               aria-label={`Options for ${recipe.name}`}
@@ -157,11 +158,11 @@ export function MealPlanEntryCard({
         </div>
 
         {isPlanned ? (
-          <div className="mt-1.5">
+          <div className="mt-2.5">
             <ServingsStepper value={entry.servings} onChange={onServingsChange} />
           </div>
         ) : (
-          <p className="mt-1 text-xs text-gray-500">
+          <p className="mt-1.5 text-xs text-gray-500">
             {entry.servings} serving{entry.servings !== 1 ? 's' : ''}
           </p>
         )}
