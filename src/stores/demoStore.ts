@@ -346,7 +346,7 @@ interface DemoState {
   addItem: (item: Omit<FoodItem, 'id' | 'createdAt' | 'updatedAt'>) => FoodItem
   updateItem: (id: string, updates: Partial<FoodItem>) => FoodItem | null
   deleteItem: (id: string) => void
-  useItem: (id: string, quantityUsed: number) => FoodItem | null
+  consumeItem: (id: string, quantityUsed: number) => FoodItem | null
 
   // Shopping list actions
   addShoppingItem: (item: Omit<ShoppingListItem, 'id' | 'createdAt' | 'updatedAt'>) => ShoppingListItem
@@ -445,7 +445,7 @@ export const useDemoStore = create<DemoState>()(
         }))
       },
 
-      useItem: (id, quantityUsed) => {
+      consumeItem: (id, quantityUsed) => {
         let updatedItem: FoodItem | null = null
         set((state) => ({
           inventory: state.inventory.map((item) => {
@@ -566,7 +566,7 @@ export const useDemoStore = create<DemoState>()(
     {
       name: 'pantry-demo-store',
       version: STORE_VERSION,
-      migrate: (persistedState: any, version: number) => {
+      migrate: (persistedState: unknown, version: number) => {
         // If version doesn't match, reset to fresh state
         if (version !== STORE_VERSION) {
           console.log('Store version mismatch, resetting data')
@@ -579,20 +579,22 @@ export const useDemoStore = create<DemoState>()(
         }
 
         // Validate and clean existing data
-        if (persistedState) {
-          persistedState.inventory = validateInventory(persistedState.inventory || [])
+        const state = persistedState as Partial<DemoState> | undefined
+        if (state) {
+          state.inventory = validateInventory(state.inventory || [])
         }
 
-        return persistedState
+        return state as DemoState
       },
       // Custom merge to validate data on load
-      merge: (persistedState: any, currentState: DemoState) => {
+      merge: (persistedState: unknown, currentState: DemoState) => {
         if (!persistedState) return currentState
+        const state = persistedState as Partial<DemoState>
 
         return {
           ...currentState,
-          ...persistedState,
-          inventory: validateInventory(persistedState.inventory || []),
+          ...state,
+          inventory: validateInventory(state.inventory || []),
         }
       },
     }

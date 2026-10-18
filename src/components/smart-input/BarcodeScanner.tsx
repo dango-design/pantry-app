@@ -3,6 +3,12 @@ import { Barcode, X, Camera, Keyboard, Loader2 } from 'lucide-react'
 import { Button, Input } from '@/components/common'
 import { lookupBarcode, type BarcodeProduct } from '@/services'
 
+// BarcodeDetector is not in TypeScript's DOM lib yet
+interface BarcodeDetectorInstance {
+  detect(source: HTMLVideoElement): Promise<{ rawValue: string }[]>
+}
+type BarcodeDetectorConstructor = new (options: { formats: string[] }) => BarcodeDetectorInstance
+
 interface BarcodeScannerProps {
   onScan: (product: BarcodeProduct) => void
   onCancel: () => void
@@ -16,7 +22,7 @@ export function BarcodeScanner({ onScan, onCancel }: BarcodeScannerProps) {
   const [stream, setStream] = useState<MediaStream | null>(null)
 
   const videoRef = useRef<HTMLVideoElement>(null)
-  const detectorRef = useRef<any>(null)
+  const detectorRef = useRef<BarcodeDetectorInstance | null>(null)
   const scanIntervalRef = useRef<NodeJS.Timeout | null>(null)
 
   // Check if BarcodeDetector API is available
@@ -45,7 +51,7 @@ export function BarcodeScanner({ onScan, onCancel }: BarcodeScannerProps) {
       } else {
         setError(result.error || 'Product not found')
       }
-    } catch (err) {
+    } catch {
       setError('Failed to lookup barcode')
     } finally {
       setLoading(false)
@@ -75,8 +81,8 @@ export function BarcodeScanner({ onScan, onCancel }: BarcodeScannerProps) {
 
       // Try to use BarcodeDetector API if available
       if (hasBarcodeDetector) {
-        // @ts-ignore - BarcodeDetector is not in TypeScript lib yet
-        detectorRef.current = new window.BarcodeDetector({
+        const { BarcodeDetector } = window as unknown as { BarcodeDetector: BarcodeDetectorConstructor }
+        detectorRef.current = new BarcodeDetector({
           formats: ['ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_128', 'code_39'],
         })
 
@@ -93,7 +99,7 @@ export function BarcodeScanner({ onScan, onCancel }: BarcodeScannerProps) {
               }
               await lookupAndReturn(barcode)
             }
-          } catch (err) {
+          } catch {
             // Detection failed, continue scanning
           }
         }, 200)

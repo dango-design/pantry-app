@@ -140,7 +140,8 @@ export const QuantitySelector: Story = {
   },
 }
 
-export const Interactive: Story = {
+// Manages its own open state, so it takes no args
+export const Interactive: StoryObj = {
   render: () => (
     <DialogDemo>
       {({ open, onClose }) => (

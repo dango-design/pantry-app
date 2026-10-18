@@ -29,6 +29,12 @@ import { cn } from '@/utils/cn'
 
 type View = 'main' | 'join'
 
+// Supabase errors aren't always Error instances, so read `message` off any object
+function getErrorMessage(err: unknown, fallback: string): string {
+  const message = typeof err === 'object' && err !== null && 'message' in err ? err.message : undefined
+  return typeof message === 'string' && message ? message : fallback
+}
+
 export function HouseholdPage() {
   const navigate = useNavigate()
   const { user } = useAuth()
@@ -78,7 +84,7 @@ export function HouseholdPage() {
     try {
       const newCode = await regenerateInviteCode(household.id)
       setHousehold({ ...household, invite_code: newCode })
-    } catch (err) {
+    } catch {
       setError('Failed to regenerate code')
     }
   }
@@ -89,7 +95,7 @@ export function HouseholdPage() {
       await updateHousehold(household.id, { name: householdName.trim() })
       setHousehold({ ...household, name: householdName.trim() })
       setEditing(false)
-    } catch (err) {
+    } catch {
       setError('Failed to update household name')
     }
   }
@@ -103,8 +109,8 @@ export function HouseholdPage() {
       await loadHouseholdData()
       setView('main')
       setInviteCode('')
-    } catch (err: any) {
-      setError(err.message || 'Failed to join household')
+    } catch (err) {
+      setError(getErrorMessage(err, 'Failed to join household'))
     } finally {
       setJoining(false)
     }
@@ -117,8 +123,8 @@ export function HouseholdPage() {
     try {
       await leaveHousehold()
       await loadHouseholdData()
-    } catch (err: any) {
-      setError(err.message || 'Failed to leave household')
+    } catch (err) {
+      setError(getErrorMessage(err, 'Failed to leave household'))
     }
   }
 
@@ -129,8 +135,8 @@ export function HouseholdPage() {
     try {
       await removeHouseholdMember(memberId)
       setMembers(members.filter(m => m.id !== memberId))
-    } catch (err: any) {
-      setError(err.message || 'Failed to remove member')
+    } catch (err) {
+      setError(getErrorMessage(err, 'Failed to remove member'))
     }
   }
 

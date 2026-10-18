@@ -3,10 +3,10 @@ import { ShoppingListPage } from '@/pages/ShoppingListPage'
 import { useDemoStore } from '@/stores/demoStore'
 import { useEffect } from 'react'
 import { addDays, subDays, format } from 'date-fns'
-import type { FoodItem, ShoppingItem } from '@/types'
+import type { FoodItem, ShoppingListItem } from '@/types'
 
 // Helper to create mock shopping items
-const createShoppingItem = (overrides: Partial<ShoppingItem> = {}): ShoppingItem => ({
+const createShoppingItem = (overrides: Partial<ShoppingListItem> = {}): ShoppingListItem => ({
   id: `shop-${Math.random().toString(36).substr(2, 9)}`,
   shoppingListId: 'demo-list',
   name: 'Test Item',
@@ -49,7 +49,7 @@ function StoreInitializer({
   shoppingList = [],
   inventory = []
 }: {
-  shoppingList?: ShoppingItem[]
+  shoppingList?: ShoppingListItem[]
   inventory?: FoodItem[]
 }) {
   useEffect(() => {
@@ -95,7 +95,7 @@ export const Empty: Story = {
 }
 
 // With items in different categories
-const populatedList: ShoppingItem[] = [
+const populatedList: ShoppingListItem[] = [
   createShoppingItem({ id: '1', name: 'Milk', category: 'dairy' }),
   createShoppingItem({ id: '2', name: 'Eggs', category: 'dairy' }),
   createShoppingItem({ id: '3', name: 'Bread', category: 'bakery' }),
@@ -117,7 +117,7 @@ export const WithItems: Story = {
 }
 
 // With some checked items
-const checkedList: ShoppingItem[] = [
+const checkedList: ShoppingListItem[] = [
   createShoppingItem({ id: '1', name: 'Milk', category: 'dairy', isChecked: true }),
   createShoppingItem({ id: '2', name: 'Eggs', category: 'dairy', isChecked: true }),
   createShoppingItem({ id: '3', name: 'Bread', category: 'bakery' }),
@@ -161,7 +161,7 @@ export const WithSuggestions: Story = {
 }
 
 // Mixed: items + suggestions
-const mixedList: ShoppingItem[] = [
+const mixedList: ShoppingListItem[] = [
   createShoppingItem({ id: '1', name: 'Bread', category: 'bakery' }),
   createShoppingItem({ id: '2', name: 'Cheese', category: 'dairy' }),
 ]

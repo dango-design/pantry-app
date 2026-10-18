@@ -19,7 +19,8 @@ const meta = {
 } satisfies Meta<typeof FilterSheet>
 
 export default meta
-type Story = StoryObj<typeof meta>
+// Every story renders a stateful demo wrapper instead of using args
+type Story = StoryObj
 
 // Interactive wrapper
 function FilterSheetDemo({

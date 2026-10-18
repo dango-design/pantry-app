@@ -38,7 +38,7 @@ export const Default: Story = {
 export const ScanGroceries: Story = {
   args: {
     title: 'Scan Groceries',
-    onCapture: (base64) => console.log('Captured groceries image'),
+    onCapture: (_base64) => console.log('Captured groceries image'),
     onCancel: () => console.log('Cancelled'),
   },
 }
@@ -46,7 +46,7 @@ export const ScanGroceries: Story = {
 export const ScanReceipt: Story = {
   args: {
     title: 'Scan Receipt',
-    onCapture: (base64) => console.log('Captured receipt image'),
+    onCapture: (_base64) => console.log('Captured receipt image'),
     onCancel: () => console.log('Cancelled'),
   },
 }

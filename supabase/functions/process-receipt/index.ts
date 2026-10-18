@@ -149,13 +149,15 @@ serve(async (req) => {
     }
 
     // Validate and clean up items
-    const items: ReceiptItem[] = (parsed.items || [])
-      .filter((item: any) =>
-        item.name &&
-        typeof item.name === 'string' &&
-        item.category
+    const items: ReceiptItem[] = ((parsed.items || []) as Partial<ReceiptItem>[])
+      .filter((item): item is Partial<ReceiptItem> & Pick<ReceiptItem, 'name' | 'category'> =>
+        Boolean(
+          item.name &&
+          typeof item.name === 'string' &&
+          item.category
+        )
       )
-      .map((item: any) => ({
+      .map((item) => ({
         name: item.name,
         category: item.category,
         quantity: item.quantity || 1,
