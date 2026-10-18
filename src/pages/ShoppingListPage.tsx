@@ -5,6 +5,7 @@ import { Input, Badge, Button } from '@/components/common'
 import { ItemReviewList, type ReviewItem } from '@/components/smart-input'
 import { useDemoStore, DEMO_HOUSEHOLD, DEMO_USER } from '@/stores/demoStore'
 import { cn } from '@/utils/cn'
+import { formatQuantity } from '@/utils/mealPlan'
 import { CATEGORIES } from '@/utils/constants'
 import { todayDateString } from '@/utils/dates'
 import { calculateFreshnessScore } from '@/utils/freshness'
@@ -253,7 +254,12 @@ export function ShoppingListPage() {
                     >
                       {item.name}
                       {item.quantity && (
-                        <span className="text-gray-500"> ({item.quantity})</span>
+                        <span className="text-gray-500">
+                          {' '}({item.quantityUnit ? formatQuantity(item.quantity, item.quantityUnit) : item.quantity})
+                        </span>
+                      )}
+                      {item.notes && (
+                        <span className="block text-xs text-gray-400">{item.notes}</span>
                       )}
                     </span>
 

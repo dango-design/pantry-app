@@ -1,12 +1,12 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { FoodItem, ShoppingListItem, Household, Recipe, FoodCategory, StorageLocation, QuantityUnit } from '@/types'
-import { toLocalDateString } from '@/utils/dates'
+import type { FoodItem, ShoppingListItem, Household, Recipe, FoodCategory, StorageLocation, QuantityUnit, MealPlanEntry } from '@/types'
+import { dateStringFromToday, toLocalDateString } from '@/utils/dates'
 import { calculateFreshnessScore } from '@/utils/freshness'
 import { roundQuantity } from '@/utils/units'
 
 // Store version - increment this when schema changes to clear old data
-const STORE_VERSION = 3
+const STORE_VERSION = 4
 
 // Unique id for new records. Date.now() alone repeats when several items are
 // added in the same loop (e.g. adding all checked shopping items at once).
@@ -338,11 +338,30 @@ const createDemoShoppingList = (): ShoppingListItem[] => [
   { id: 'shop-4', shoppingListId: 'demo-list', name: 'Chicken Breast', quantity: 2, quantityUnit: 'lb', category: 'meat', isChecked: false, source: 'manual', priority: 'normal', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
 ]
 
+// Demo meal plan around today, using the demo recipes
+const createDemoMealPlan = (): MealPlanEntry[] => {
+  const now = new Date().toISOString()
+  const entries: Array<Pick<MealPlanEntry, 'slot' | 'recipeId' | 'servings' | 'status'> & { daysFromToday: number }> = [
+    { daysFromToday: -1, slot: 'dinner', recipeId: 'demo-recipe-3', servings: 4, status: 'cooked' },
+    { daysFromToday: 0, slot: 'dinner', recipeId: 'demo-recipe-2', servings: 3, status: 'planned' },
+    { daysFromToday: 1, slot: 'breakfast', recipeId: 'demo-recipe-4', servings: 2, status: 'planned' },
+    { daysFromToday: 2, slot: 'dinner', recipeId: 'demo-recipe-5', servings: 4, status: 'planned' },
+  ]
+  return entries.map(({ daysFromToday, ...entry }, index) => ({
+    ...entry,
+    id: `demo-meal-${index + 1}`,
+    date: dateStringFromToday(daysFromToday),
+    createdAt: now,
+    updatedAt: now,
+  }))
+}
+
 interface DemoState {
   isDemoMode: boolean
   inventory: FoodItem[]
   shoppingList: ShoppingListItem[]
   recipes: Recipe[]
+  mealPlan: MealPlanEntry[]
 
   // Actions
   enableDemoMode: () => void
@@ -366,6 +385,11 @@ interface DemoState {
   deleteRecipe: (id: string) => void
   toggleRecipeFavorite: (id: string) => void
   markRecipeCooked: (id: string) => void
+
+  // Meal plan actions
+  addMealPlanEntry: (entry: Omit<MealPlanEntry, 'id' | 'createdAt' | 'updatedAt'>) => MealPlanEntry
+  updateMealPlanEntry: (id: string, updates: Partial<Omit<MealPlanEntry, 'id' | 'createdAt' | 'updatedAt'>>) => void
+  removeMealPlanEntry: (id: string) => MealPlanEntry | null
 }
 
 // Validate and clean inventory data
@@ -398,6 +422,7 @@ export const useDemoStore = create<DemoState>()(
       inventory: [],
       shoppingList: [],
       recipes: [],
+      mealPlan: [],
 
       enableDemoMode: () => {
         set({
@@ -405,6 +430,7 @@ export const useDemoStore = create<DemoState>()(
           inventory: createDemoInventory(),
           shoppingList: createDemoShoppingList(),
           recipes: createDemoRecipes(),
+          mealPlan: createDemoMealPlan(),
         })
       },
 
@@ -414,6 +440,7 @@ export const useDemoStore = create<DemoState>()(
           inventory: [],
           shoppingList: [],
           recipes: [],
+          mealPlan: [],
         })
       },
 
@@ -541,6 +568,7 @@ export const useDemoStore = create<DemoState>()(
       deleteRecipe: (id) => {
         set((state) => ({
           recipes: state.recipes.filter((recipe) => recipe.id !== id),
+          mealPlan: state.mealPlan.filter((entry) => entry.recipeId !== id),
         }))
       },
 
@@ -567,6 +595,38 @@ export const useDemoStore = create<DemoState>()(
               : recipe
           ),
         }))
+      },
+
+      addMealPlanEntry: (entryData) => {
+        const now = new Date().toISOString()
+        const newEntry: MealPlanEntry = {
+          ...entryData,
+          id: `meal-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+          createdAt: now,
+          updatedAt: now,
+        }
+        set((state) => ({
+          mealPlan: [...state.mealPlan, newEntry],
+        }))
+        return newEntry
+      },
+
+      updateMealPlanEntry: (id, updates) => {
+        set((state) => ({
+          mealPlan: state.mealPlan.map((entry) =>
+            entry.id === id
+              ? { ...entry, ...updates, updatedAt: new Date().toISOString() }
+              : entry
+          ),
+        }))
+      },
+
+      removeMealPlanEntry: (id) => {
+        const removed = get().mealPlan.find((entry) => entry.id === id) ?? null
+        set((state) => ({
+          mealPlan: state.mealPlan.filter((entry) => entry.id !== id),
+        }))
+        return removed
       },
     }),
     {

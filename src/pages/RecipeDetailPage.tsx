@@ -1,13 +1,16 @@
 import { useState, useMemo } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { ArrowLeft, Heart, Clock, Users, ChefHat, Edit2, Trash2, CookingPot, ShoppingCart } from 'lucide-react'
+import { ArrowLeft, Heart, Clock, Users, ChefHat, Edit2, Trash2, CookingPot, ShoppingCart, CalendarPlus } from 'lucide-react'
 import { Button, Card, CardContent, Dialog, DialogActions, Snackbar } from '@/components/common'
 import { IngredientMatchList } from '@/components/recipes'
+import { AddToPlanSheet } from '@/components/plan'
 import { useDemoStore } from '@/stores/demoStore'
 import { matchRecipeToInventory, type IngredientMatch } from '@/utils/recipeMatching'
 import { convertQuantity, formatUnit, roundQuantity } from '@/utils/units'
 import { cn } from '@/utils/cn'
 import type { QuantityUnit } from '@/types'
+import { todayDateString } from '@/utils/dates'
+import { formatMealTime, formatRelativeDay, getSlotLabel } from '@/utils/mealPlan'
 
 interface SnackbarState {
   open: boolean
@@ -37,6 +40,8 @@ export function RecipeDetailPage() {
   // Amount used per ingredient index, in the matched pantry item's unit
   const [usedAmounts, setUsedAmounts] = useState<Record<number, string>>({})
   const [snackbar, setSnackbar] = useState<SnackbarState>({ open: false, message: '' })
+  const [showPlanSheet, setShowPlanSheet] = useState(false)
+  const mealPlan = useDemoStore((state) => state.mealPlan)
 
   const recipe = useMemo(() => recipes.find((r) => r.id === id), [recipes, id])
 
@@ -44,6 +49,14 @@ export function RecipeDetailPage() {
     if (!recipe) return null
     return matchRecipeToInventory(recipe, inventory)
   }, [recipe, inventory])
+
+  // Upcoming planned meals for this recipe
+  const upcomingPlans = useMemo(() => {
+    const today = todayDateString()
+    return mealPlan
+      .filter((e) => e.recipeId === id && e.status === 'planned' && e.date >= today)
+      .sort((a, b) => a.date.localeCompare(b.date))
+  }, [mealPlan, id])
 
   if (!recipe) {
     return (
@@ -231,6 +244,26 @@ export function RecipeDetailPage() {
                 ))}
               </div>
             )}
+
+            {/* Meal plan */}
+            <div className="flex flex-wrap items-center gap-2 mt-3">
+              <button
+                onClick={() => setShowPlanSheet(true)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-purple-200 text-sm font-medium text-purple-700 hover:bg-purple-50 transition-colors"
+              >
+                <CalendarPlus className="h-4 w-4" />
+                Plan
+              </button>
+              {upcomingPlans.map((entry) => (
+                <button
+                  key={entry.id}
+                  onClick={() => navigate(`/plan?week=${entry.date}`)}
+                  className="px-2.5 py-1 rounded-full bg-purple-50 text-purple-700 text-xs font-medium hover:bg-purple-100 transition-colors"
+                >
+                  {formatRelativeDay(entry.date)} · {getSlotLabel(entry.slot)}
+                </button>
+              ))}
+            </div>
 
             {/* Match score */}
             {matchResult && (
@@ -420,6 +453,21 @@ export function RecipeDetailPage() {
           <Button onClick={handleCook}>Done Cooking</Button>
         </DialogActions>
       </Dialog>
+
+      {showPlanSheet && (
+        <AddToPlanSheet
+          recipe={recipe}
+          onClose={() => setShowPlanSheet(false)}
+          onAdded={(entry) => {
+            setShowPlanSheet(false)
+            setSnackbar({
+              open: true,
+              message: `Planned for ${formatMealTime(entry.date, entry.slot)}`,
+              undoAction: () => useDemoStore.getState().removeMealPlanEntry(entry.id),
+            })
+          }}
+        />
+      )}
 
       <Snackbar
         open={snackbar.open}

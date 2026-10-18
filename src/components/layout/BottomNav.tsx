@@ -54,6 +54,28 @@ function RecipeIcon({ filled = false, className }: { filled?: boolean; className
   )
 }
 
+function PlanIcon({ filled = false, className }: { filled?: boolean; className?: string }) {
+  return filled ? (
+    <svg className={className} width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+      <rect x="7" y="2" width="2" height="4" rx="1" />
+      <rect x="15" y="2" width="2" height="4" rx="1" />
+      <path d="M5 4h14a2 2 0 012 2v13a2 2 0 01-2 2H5a2 2 0 01-2-2V6a2 2 0 012-2z" />
+      <rect x="3" y="9" width="18" height="1.5" fill="white" />
+      <rect x="6.5" y="13" width="3" height="2.5" rx="0.5" fill="white" />
+      <rect x="10.5" y="13" width="3" height="2.5" rx="0.5" fill="white" />
+      <rect x="14.5" y="13" width="3" height="2.5" rx="0.5" fill="white" opacity="0.7" />
+      <rect x="6.5" y="16.5" width="3" height="2.5" rx="0.5" fill="white" opacity="0.7" />
+    </svg>
+  ) : (
+    <svg className={className} width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="4" width="18" height="17" rx="2" />
+      <line x1="8" y1="2" x2="8" y2="6" />
+      <line x1="16" y1="2" x2="16" y2="6" />
+      <line x1="3" y1="10" x2="21" y2="10" />
+    </svg>
+  )
+}
+
 function CartIcon({ filled = false, className }: { filled?: boolean; className?: string }) {
   // Same icon shape for both states - filled version just has fill instead of stroke
   return (
@@ -138,6 +160,24 @@ export function BottomNav() {
             <Plus className="h-6 w-6 text-white" />
           </div>
         </button>
+
+        {/* Meal Plan */}
+        <NavLink
+          to="/plan"
+          className={({ isActive }) =>
+            cn(
+              'flex flex-col items-center justify-center flex-1 h-full gap-0.5 transition-colors',
+              isActive ? 'text-purple-600' : 'text-gray-400 hover:text-gray-600'
+            )
+          }
+        >
+          {({ isActive }) => (
+            <>
+              <PlanIcon filled={isActive} className="h-6 w-6" />
+              <span className="text-[10px] font-medium">Plan</span>
+            </>
+          )}
+        </NavLink>
 
         {/* Shopping Cart */}
         <NavLink

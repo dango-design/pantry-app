@@ -20,7 +20,7 @@ export interface RecipeMatchResult {
  * Check if a food item name matches a recipe ingredient name.
  * Tries exact match, then substring match, then substitutes.
  */
-function ingredientMatchesItem(ingredient: RecipeIngredient, item: FoodItem): boolean {
+export function ingredientMatchesItem(ingredient: RecipeIngredient, item: FoodItem): boolean {
   const ingredientName = ingredient.name.toLowerCase()
   const itemName = item.name.toLowerCase()
 
