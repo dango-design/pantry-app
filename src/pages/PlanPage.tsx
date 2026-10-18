@@ -220,7 +220,7 @@ export function PlanPage() {
           <button
             onClick={() => setShowShopSheet(true)}
             disabled={shoppableEntries.length === 0}
-            className="w-full flex items-center gap-3 p-3 rounded-xl bg-purple-600 text-white text-left shadow-sm hover:bg-purple-700 transition-colors disabled:bg-gray-200 disabled:text-gray-500 disabled:shadow-none"
+            className="w-full flex items-center gap-3 p-3 rounded-xl bg-primary text-white text-left shadow-sm hover:bg-primary-hover transition-colors disabled:bg-gray-200 disabled:text-gray-500 disabled:shadow-none"
           >
             <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
               <ShoppingCart className="h-5 w-5" />
@@ -245,7 +245,7 @@ export function PlanPage() {
                 aria-label={format(day, 'EEEE, MMMM d')}
                 className={cn(
                   'bg-white rounded-xl border shadow-sm',
-                  isToday ? 'border-purple-300' : 'border-gray-200'
+                  isToday ? 'border-primary/40' : 'border-gray-200'
                 )}
               >
                 <div className={cn('flex items-center gap-2 px-3', isPast && entries.length === 0 ? 'py-2.5' : 'pt-3 pb-1')}>
@@ -256,7 +256,7 @@ export function PlanPage() {
                     {format(day, 'MMM d')}
                   </span>
                   {isToday && (
-                    <span className="px-2 py-0.5 rounded-full bg-purple-100 text-purple-700 text-xs font-medium">
+                    <span className="px-2 py-0.5 rounded-full bg-primary-muted text-primary text-xs font-medium">
                       Today
                     </span>
                   )}
@@ -281,7 +281,7 @@ export function PlanPage() {
                           data-drop-slot={isPast ? undefined : slot}
                           className={cn(
                             'flex gap-3 py-2 -mx-2 px-2 rounded-lg transition-colors',
-                            isDropTarget && 'bg-purple-50 ring-2 ring-inset ring-purple-300'
+                            isDropTarget && 'bg-primary-soft ring-2 ring-inset ring-primary/30'
                           )}
                         >
                           <div className="w-[4.5rem] flex-shrink-0 pt-2">
@@ -290,7 +290,7 @@ export function PlanPage() {
                               <button
                                 onClick={() => setPickerTarget({ date, slot })}
                                 aria-label={`Add another ${label.toLowerCase()} on ${format(day, 'EEEE')}`}
-                                className="mt-1 flex items-center gap-0.5 text-xs font-medium text-purple-600 hover:text-purple-700"
+                                className="mt-1 flex items-center gap-0.5 text-xs font-medium text-primary hover:text-primary-hover"
                               >
                                 <Plus className="h-3 w-3" />
                                 Add
@@ -302,7 +302,7 @@ export function PlanPage() {
                               <button
                                 onClick={() => setPickerTarget({ date, slot })}
                                 aria-label={`Add ${label.toLowerCase()} on ${format(day, 'EEEE')}`}
-                                className="w-full h-9 flex items-center justify-center gap-1 rounded-xl border border-dashed border-gray-300 text-sm text-gray-500 hover:border-purple-300 hover:text-purple-600 hover:bg-purple-50/50 transition-colors"
+                                className="w-full h-9 flex items-center justify-center gap-1 rounded-xl border border-dashed border-gray-300 text-sm text-gray-500 hover:border-primary/40 hover:text-primary hover:bg-primary-soft/50 transition-colors"
                               >
                                 <Plus className="h-4 w-4" />
                                 {isDropTarget ? 'Drop here' : 'Add'}
@@ -364,7 +364,7 @@ export function PlanPage() {
       {/* What's being dragged follows the pointer, just above it so a finger doesn't hide it */}
       {drag && (
         <div
-          className="fixed z-50 pointer-events-none max-w-[14rem] truncate px-3 py-2 rounded-xl bg-white border border-purple-200 shadow-lg text-sm font-medium text-gray-900"
+          className="fixed z-50 pointer-events-none max-w-[14rem] truncate px-3 py-2 rounded-xl bg-white border border-primary-muted shadow-lg text-sm font-medium text-gray-900"
           style={{ left: drag.x, top: drag.y, transform: 'translate(-50%, calc(-100% - 0.75rem)) rotate(-2deg)' }}
         >
           {drag.label}

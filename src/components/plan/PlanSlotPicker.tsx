@@ -74,18 +74,18 @@ export function PlanSlotPicker({ date, slot, onDateChange, onSlotChange, ignoreE
                   className={cn(
                     'flex flex-col items-center w-14 pt-2 pb-1.5 rounded-xl border text-xs transition-all',
                     isSelected
-                      ? 'bg-purple-600 text-white border-transparent'
+                      ? 'bg-primary text-white border-transparent'
                       : 'bg-white text-gray-600 border-gray-300 hover:border-gray-400'
                   )}
                 >
                   <span className="font-medium">{d.weekday}</span>
-                  <span className={cn('mt-0.5', isSelected ? 'text-purple-100' : 'text-gray-400')}>{d.label}</span>
+                  <span className={cn('mt-0.5', isSelected ? 'text-white/70' : 'text-gray-400')}>{d.label}</span>
                   {/* One dot per meal already planned that day */}
                   <span className="flex gap-0.5 h-1.5 mt-1" aria-hidden="true">
                     {Array.from({ length: Math.min(meals, 3) }, (_, i) => (
                       <span
                         key={i}
-                        className={cn('w-1 h-1 rounded-full', isSelected ? 'bg-purple-200' : 'bg-purple-400')}
+                        className={cn('w-1 h-1 rounded-full', isSelected ? 'bg-white/70' : 'bg-primary/40')}
                       />
                     ))}
                   </span>
@@ -108,7 +108,7 @@ export function PlanSlotPicker({ date, slot, onDateChange, onSlotChange, ignoreE
               className={cn(
                 'px-4 py-1.5 rounded-full text-sm font-medium transition-all border',
                 slot === s.key
-                  ? 'bg-purple-600 text-white border-transparent'
+                  ? 'bg-primary text-white border-transparent'
                   : 'bg-white text-gray-600 border-gray-300 hover:border-gray-400'
               )}
             >

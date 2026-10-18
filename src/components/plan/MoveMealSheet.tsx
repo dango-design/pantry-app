@@ -33,7 +33,7 @@ export function MoveMealSheet({ entry, recipe, onClose, onMove }: MoveMealSheetP
         <button
           onClick={() => onMove(date, slot)}
           disabled={unchanged}
-          className="w-full py-3 bg-purple-600 text-white font-medium rounded-lg hover:bg-purple-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:pointer-events-none"
+          className="w-full py-3 bg-primary text-white font-medium rounded-lg hover:bg-primary-hover transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:pointer-events-none"
         >
           <ArrowRightLeft className="h-5 w-5" />
           {unchanged ? 'Pick a new day or meal' : `Move to ${formatMealTime(date, slot)}`}

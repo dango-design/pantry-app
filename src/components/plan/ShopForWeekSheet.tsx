@@ -55,7 +55,7 @@ export function ShopForWeekSheet({ title, mealCount, lines, onClose, onConfirm }
           <span
             className={cn(
               'mt-0.5 w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors',
-              isSelected ? 'bg-purple-600 border-purple-600' : 'border-gray-300'
+              isSelected ? 'bg-primary border-primary' : 'border-gray-300'
             )}
           >
             {isSelected && <Check className="h-3 w-3 text-white" strokeWidth={3} />}
@@ -111,7 +111,7 @@ export function ShopForWeekSheet({ title, mealCount, lines, onClose, onConfirm }
         <button
           onClick={() => onConfirm(selectedLines)}
           disabled={selectedLines.length === 0}
-          className="w-full py-3 bg-purple-600 text-white font-medium rounded-lg hover:bg-purple-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:pointer-events-none"
+          className="w-full py-3 bg-primary text-white font-medium rounded-lg hover:bg-primary-hover transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:pointer-events-none"
         >
           <ShoppingCart className="h-5 w-5" />
           {selectedLines.length > 0

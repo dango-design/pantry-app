@@ -365,7 +365,7 @@ export function AddItemPage() {
             <div className="flex gap-2">
               <button
                 onClick={() => setSmartInputMode('photo')}
-                className="flex-1 flex items-center justify-center gap-2 py-3 bg-purple-50 text-purple-700 rounded-xl hover:bg-purple-100 transition-colors"
+                className="flex-1 flex items-center justify-center gap-2 py-3 bg-primary-soft text-primary rounded-xl hover:bg-primary-muted transition-colors"
               >
                 <Camera className="h-5 w-5" />
                 <span className="font-medium">Photo</span>
@@ -405,7 +405,7 @@ export function AddItemPage() {
                     <button
                       key={item}
                       onClick={() => handleQuickAdd(item)}
-                      className="px-3 py-1.5 bg-purple-50 text-purple-700 rounded-full text-sm font-medium hover:bg-purple-100 transition-colors"
+                      className="px-3 py-1.5 bg-primary-soft text-primary rounded-full text-sm font-medium hover:bg-primary-muted transition-colors"
                     >
                       {item}
                     </button>
@@ -455,7 +455,7 @@ export function AddItemPage() {
                   min="0.01"
                   step="any"
                   inputMode="decimal"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                 />
               </div>
               <div className="flex-1">
@@ -492,7 +492,7 @@ export function AddItemPage() {
                     setCategory(newCategory)
                     updateEstimate({ category: newCategory })
                   }}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base appearance-none focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base appearance-none focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-white"
                 >
                   {Object.entries(CATEGORIES).map(([key, config]) => (
                     <option key={key} value={key}>
@@ -517,7 +517,7 @@ export function AddItemPage() {
                     setStorageLocation(newLocation)
                     updateEstimate({ storageLocation: newLocation })
                   }}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base appearance-none focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base appearance-none focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-white"
                 >
                   {Object.entries(STORAGE_LOCATIONS).map(([key, config]) => (
                     <option key={key} value={key}>
@@ -541,7 +541,7 @@ export function AddItemPage() {
                   setPurchaseDate(e.target.value)
                   if (e.target.value) updateEstimate({ purchaseDate: e.target.value })
                 }}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-white"
               />
             </div>
 
@@ -583,7 +583,7 @@ export function AddItemPage() {
               onClick={handleSubmit}
               loading={loading}
               disabled={!isValid}
-              className="flex-1 bg-purple-600 hover:bg-purple-700"
+              className="flex-1 bg-primary hover:bg-primary-hover"
             >
               Save
             </Button>

@@ -66,7 +66,7 @@ export function MealPlanEntryCard({
   return (
     <div
       className={cn(
-        'flex rounded-xl bg-[#F7F2FA] py-2 pr-3 transition-opacity',
+        'flex rounded-xl bg-primary-soft py-2 pr-3 transition-opacity',
         canMove ? 'pl-0.5' : 'pl-3',
         entry.status === 'skipped' && 'opacity-60',
         isDragging && 'opacity-40'

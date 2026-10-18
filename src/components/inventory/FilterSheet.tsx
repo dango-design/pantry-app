@@ -281,13 +281,11 @@ function FilterChip({ label, selected, onClick, color }: FilterChipProps) {
       className={cn(
         'px-3 py-1.5 rounded-full text-sm font-medium transition-all border',
         selected
-          ? 'text-white border-transparent'
+          ? 'bg-primary text-white border-transparent'
           : 'bg-white text-gray-600 border-gray-300 hover:border-gray-400'
       )}
-      style={selected ? {
-        backgroundColor: color || '#8B5CF6',
-        borderColor: color || '#8B5CF6'
-      } : undefined}
+      // Category/location chips pass their own color; the rest use the primary token
+      style={selected && color ? { backgroundColor: color, borderColor: color } : undefined}
     >
       {label}
     </button>

@@ -36,7 +36,7 @@ export function AddToPlanSheet({ recipe, onClose, onAdded }: AddToPlanSheetProps
       footer={
         <button
           onClick={handleAdd}
-          className="w-full py-3 bg-purple-600 text-white font-medium rounded-lg hover:bg-purple-700 transition-colors flex items-center justify-center gap-2"
+          className="w-full py-3 bg-primary text-white font-medium rounded-lg hover:bg-primary-hover transition-colors flex items-center justify-center gap-2"
         >
           <CalendarPlus className="h-5 w-5" />
           Add to plan

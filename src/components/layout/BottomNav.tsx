@@ -167,7 +167,7 @@ export function BottomNav() {
           className={({ isActive }) =>
             cn(
               'flex flex-col items-center justify-center flex-1 h-full gap-0.5 transition-colors',
-              isActive ? 'text-purple-600' : 'text-gray-400 hover:text-gray-600'
+              isActive ? 'text-primary' : 'text-gray-400 hover:text-gray-600'
             )
           }
         >

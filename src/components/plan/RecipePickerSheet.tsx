@@ -54,7 +54,7 @@ export function RecipePickerSheet({ date, slot, onClose, onPick }: RecipePickerS
           <p className="text-sm">Add a recipe, then plan it here</p>
           <button
             onClick={() => navigate('/recipe/new')}
-            className="mt-4 px-6 py-2 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 transition-colors"
+            className="mt-4 px-6 py-2 bg-primary text-white rounded-lg font-medium hover:bg-primary-hover transition-colors"
           >
             Add Recipe
           </button>
@@ -69,7 +69,7 @@ export function RecipePickerSheet({ date, slot, onClose, onPick }: RecipePickerS
                 placeholder="Search Recipes"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full h-10 pl-10 pr-4 bg-white border border-gray-200 rounded-lg text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                className="w-full h-10 pl-10 pr-4 bg-white border border-gray-200 rounded-lg text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
               />
             </div>
             <p className="text-xs text-gray-500 mt-2">Recipes that use food expiring soon come first</p>
@@ -108,7 +108,7 @@ export function RecipePickerSheet({ date, slot, onClose, onPick }: RecipePickerS
                       <span className={cn('px-2 py-0.5 rounded-full text-xs font-medium flex-shrink-0', getMatchColor(matchScore))}>
                         {matchScore}%
                       </span>
-                      <Plus className="h-5 w-5 text-purple-600 flex-shrink-0" />
+                      <Plus className="h-5 w-5 text-primary flex-shrink-0" />
                     </button>
                   </li>
                 )

@@ -249,7 +249,7 @@ export function RecipeDetailPage() {
             <div className="flex flex-wrap items-center gap-2 mt-3">
               <button
                 onClick={() => setShowPlanSheet(true)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-purple-200 text-sm font-medium text-purple-700 hover:bg-purple-50 transition-colors"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-primary-muted text-sm font-medium text-primary hover:bg-primary-soft transition-colors"
               >
                 <CalendarPlus className="h-4 w-4" />
                 Plan
@@ -258,7 +258,7 @@ export function RecipeDetailPage() {
                 <button
                   key={entry.id}
                   onClick={() => navigate(`/plan?week=${entry.date}`)}
-                  className="px-2.5 py-1 rounded-full bg-purple-50 text-purple-700 text-xs font-medium hover:bg-purple-100 transition-colors"
+                  className="px-2.5 py-1 rounded-full bg-primary-soft text-primary text-xs font-medium hover:bg-primary-muted transition-colors"
                 >
                   {formatRelativeDay(entry.date)} · {getSlotLabel(entry.slot)}
                 </button>
@@ -435,7 +435,7 @@ export function RecipeDetailPage() {
                     value={usedAmounts[index] ?? ''}
                     onChange={(e) => setUsedAmounts({ ...usedAmounts, [index]: e.target.value })}
                     aria-label={`Amount of ${pantryItem.name} used, in ${pantryUnit}`}
-                    className="w-20 px-2 py-1.5 border border-gray-300 rounded-lg text-sm text-right focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="w-20 px-2 py-1.5 border border-gray-300 rounded-lg text-sm text-right focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                   />
                   <span className="w-10 text-sm text-gray-500">{pantryUnit}</span>
                 </div>
