@@ -4,6 +4,8 @@ import { Button, Input } from '@/components/common'
 import { CATEGORIES, QUANTITY_UNITS, STORAGE_LOCATIONS } from '@/utils/constants'
 import { FoodThumbnail } from '@/components/icons'
 import { cn } from '@/utils/cn'
+import { formatDateString } from '@/utils/dates'
+import { estimateExpirationDate } from '@/utils/foodDatabase'
 import type { FoodCategory, StorageLocation, QuantityUnit } from '@/types'
 
 interface ReviewItem {
@@ -14,6 +16,8 @@ interface ReviewItem {
   quantityUnit: QuantityUnit
   storageLocation: StorageLocation
   brand?: string
+  expirationDate?: string
+  expirationEdited?: boolean
   selected: boolean
 }
 
@@ -23,6 +27,7 @@ interface ItemReviewListProps {
   onConfirm: (items: ReviewItem[]) => void
   onCancel: () => void
   title?: string
+  description?: string
   loading?: boolean
 }
 
@@ -32,6 +37,7 @@ export function ItemReviewList({
   onConfirm,
   onCancel,
   title = 'Review Items',
+  description = 'Review the detected items. Tap to select/deselect, or edit details as needed.',
   loading = false,
 }: ItemReviewListProps) {
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -56,6 +62,16 @@ export function ItemReviewList({
     )
   }
 
+  // Keep an estimated expiration in step with the item's name, category and storage,
+  // unless the user picked the date themselves
+  const updateDetails = (item: ReviewItem, updates: Partial<ReviewItem>) => {
+    const next = { ...item, ...updates }
+    if (next.expirationDate && !next.expirationEdited) {
+      next.expirationDate = estimateExpirationDate(next.name, next.category, next.storageLocation)
+    }
+    updateItem(item.id, next)
+  }
+
   const selectedCount = items.filter(item => item.selected).length
 
   const handleConfirm = () => {
@@ -77,9 +93,7 @@ export function ItemReviewList({
 
       {/* Instructions */}
       <div className="flex-shrink-0 px-4 py-3 bg-blue-50 border-b border-blue-100">
-        <p className="text-sm text-blue-800">
-          Review the detected items. Tap to select/deselect, or edit details as needed.
-        </p>
+        <p className="text-sm text-blue-800">{description}</p>
       </div>
 
       {/* Items list */}
@@ -134,6 +148,10 @@ export function ItemReviewList({
                         {' '}&middot;{' '}
                         {CATEGORIES[item.category]?.label || item.category}
                       </p>
+                      <p className="text-xs text-gray-500">
+                        {STORAGE_LOCATIONS[item.storageLocation]?.label || item.storageLocation}
+                        {item.expirationDate && ` · Expires ${formatDateString(item.expirationDate)}`}
+                      </p>
                     </div>
 
                     <button
@@ -158,7 +176,7 @@ export function ItemReviewList({
                         <label className="text-xs text-gray-500 mb-1 block">Name</label>
                         <Input
                           value={item.name}
-                          onChange={(e) => updateItem(item.id, { name: e.target.value })}
+                          onChange={(e) => updateDetails(item, { name: e.target.value })}
                         />
                       </div>
 
@@ -194,7 +212,7 @@ export function ItemReviewList({
                           <div className="relative">
                             <select
                               value={item.category}
-                              onChange={(e) => updateItem(item.id, { category: e.target.value as FoodCategory })}
+                              onChange={(e) => updateDetails(item, { category: e.target.value as FoodCategory })}
                               className="w-full px-3 py-2 border border-gray-300 rounded-lg appearance-none bg-white"
                             >
                               {Object.entries(CATEGORIES).map(([key, config]) => (
@@ -209,7 +227,7 @@ export function ItemReviewList({
                           <div className="relative">
                             <select
                               value={item.storageLocation}
-                              onChange={(e) => updateItem(item.id, { storageLocation: e.target.value as StorageLocation })}
+                              onChange={(e) => updateDetails(item, { storageLocation: e.target.value as StorageLocation })}
                               className="w-full px-3 py-2 border border-gray-300 rounded-lg appearance-none bg-white"
                             >
                               {Object.entries(STORAGE_LOCATIONS).map(([key, config]) => (
@@ -220,6 +238,21 @@ export function ItemReviewList({
                           </div>
                         </div>
                       </div>
+
+                      {item.expirationDate !== undefined && (
+                        <div>
+                          <label className="text-xs text-gray-500 mb-1 block">Expiration Date</label>
+                          <input
+                            type="date"
+                            value={item.expirationDate}
+                            onChange={(e) => updateItem(item.id, { expirationDate: e.target.value, expirationEdited: true })}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white"
+                          />
+                          {!item.expirationEdited && (
+                            <p className="text-xs text-gray-500 mt-1">Estimated based on item type and storage</p>
+                          )}
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>

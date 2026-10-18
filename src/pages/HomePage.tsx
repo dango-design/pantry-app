@@ -26,7 +26,7 @@ export function HomePage() {
   const activeItems = useMemo(() => {
     return inventory
       .filter((item) => item.status === 'active')
-      .sort((a, b) => new Date(a.expirationDate).getTime() - new Date(b.expirationDate).getTime())
+      .sort((a, b) => a.expirationDate.localeCompare(b.expirationDate))
   }, [inventory])
 
   // Get expiring items (within 7 days)

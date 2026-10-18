@@ -1,12 +1,40 @@
 import { useState, useMemo } from 'react'
 import { Plus, Lightbulb, Trash2 } from 'lucide-react'
 import { Header } from '@/components/layout'
-import { Input, Badge, Button, Dialog, DialogActions } from '@/components/common'
+import { Input, Badge, Button } from '@/components/common'
+import { ItemReviewList, type ReviewItem } from '@/components/smart-input'
 import { useDemoStore, DEMO_HOUSEHOLD, DEMO_USER } from '@/stores/demoStore'
 import { cn } from '@/utils/cn'
 import { CATEGORIES } from '@/utils/constants'
-import { getDaysUntilExpiration } from '@/utils/freshness'
-import type { FoodCategory } from '@/types'
+import { todayDateString } from '@/utils/dates'
+import { calculateFreshnessScore } from '@/utils/freshness'
+import { estimateExpirationDate, getDefaultStorageLocation, lookupFood } from '@/utils/foodDatabase'
+import { isDiscreteUnit } from '@/utils/units'
+import type { FoodCategory, FoodItem, ShoppingListItem } from '@/types'
+
+// Low when at or below a quarter of what was bought,
+// or down to the last one of several (e.g. 1 of 6 eggs)
+function isLowStock(item: FoodItem): boolean {
+  if (!(item.originalQuantity > 0)) return false
+  if (item.quantity <= item.originalQuantity * 0.25) return true
+  return isDiscreteUnit(item.quantityUnit) && item.originalQuantity > 1 && item.quantity <= 1
+}
+
+function toReviewItem(item: ShoppingListItem): ReviewItem {
+  const food = lookupFood(item.name)
+  const category = item.category && item.category !== 'other' ? item.category : food?.category ?? 'other'
+  const storageLocation = getDefaultStorageLocation(item.name, category)
+  return {
+    id: item.id,
+    name: item.name,
+    category,
+    quantity: item.quantity || 1,
+    quantityUnit: item.quantityUnit || food?.unit || 'count',
+    storageLocation,
+    expirationDate: estimateExpirationDate(item.name, category, storageLocation),
+    selected: true,
+  }
+}
 
 export function ShoppingListPage() {
   const {
@@ -15,50 +43,42 @@ export function ShoppingListPage() {
     addShoppingItem,
     toggleShoppingItem,
     removeShoppingItem,
-    clearCheckedItems,
     addItem: addInventoryItem,
   } = useDemoStore()
 
   const [newItemName, setNewItemName] = useState('')
-  const [showAddToInventoryDialog, setShowAddToInventoryDialog] = useState(false)
+  const [reviewItems, setReviewItems] = useState<ReviewItem[] | null>(null)
 
-  // Generate suggestions from inventory
+  // Suggest restocking items that are running low
   const suggestions = useMemo(() => {
     const activeItems = inventory.filter((item) => item.status === 'active')
 
-    // Items low on stock (quantity < 2)
-    const lowStock = activeItems
-      .filter((item) => item.quantity < 2)
-      .map((item) => ({
-        name: item.name,
-        category: item.category,
-        source: 'low_stock' as const,
-        reason: 'low stock',
-      }))
-
-    // Items expiring soon
-    const expiring = activeItems
-      .filter((item) => getDaysUntilExpiration(item.expirationDate) <= 3)
-      .map((item) => ({
-        name: item.name,
-        category: item.category,
-        source: 'expiring' as const,
-        reason: 'expiring soon',
-      }))
+    // Group by name: having a fresh one alongside an almost-empty one isn't low
+    const byName = new Map<string, FoodItem[]>()
+    for (const item of activeItems) {
+      const key = item.name.toLowerCase()
+      byName.set(key, [...(byName.get(key) || []), item])
+    }
 
     // Filter out items already on the shopping list
     const existingNames = new Set(shoppingList.map((i) => i.name.toLowerCase()))
-    return [...lowStock, ...expiring].filter(
-      (s) => !existingNames.has(s.name.toLowerCase())
-    )
+    return [...byName.entries()]
+      .filter(([key, items]) => !existingNames.has(key) && items.every(isLowStock))
+      .map(([, items]) => ({
+        name: items[0].name,
+        category: items[0].category,
+        source: 'low_stock' as const,
+        reason: 'low stock',
+      }))
   }, [inventory, shoppingList])
 
   const handleAddItem = () => {
-    if (!newItemName.trim()) return
+    const name = newItemName.trim()
+    if (!name) return
     addShoppingItem({
       shoppingListId: 'demo-list',
-      name: newItemName.trim(),
-      category: 'other',
+      name,
+      category: lookupFood(name)?.category ?? 'other',
       isChecked: false,
       source: 'manual',
       priority: 'normal',
@@ -66,7 +86,7 @@ export function ShoppingListPage() {
     setNewItemName('')
   }
 
-  const handleAcceptSuggestion = (suggestion: { name: string; category: FoodCategory; source: 'low_stock' | 'expiring' }) => {
+  const handleAcceptSuggestion = (suggestion: { name: string; category: FoodCategory; source: 'low_stock' }) => {
     addShoppingItem({
       shoppingListId: 'demo-list',
       name: suggestion.name,
@@ -77,31 +97,39 @@ export function ShoppingListPage() {
     })
   }
 
-  const handleAddCheckedToInventory = () => {
-    const checkedItems = clearCheckedItems()
+  // Let the user confirm location and expiry for each checked item before adding
+  const handleReviewChecked = () => {
+    setReviewItems(shoppingList.filter((item) => item.isChecked).map(toReviewItem))
+  }
 
-    // Add each to inventory
-    checkedItems.forEach((item) => {
+  const handleAddReviewedToInventory = (items: ReviewItem[]) => {
+    const purchaseDate = todayDateString()
+
+    for (const item of items) {
+      const expirationDate = item.expirationDate ||
+        estimateExpirationDate(item.name, item.category, item.storageLocation)
       addInventoryItem({
         householdId: DEMO_HOUSEHOLD.id,
         name: item.name,
-        category: item.category || 'other',
-        quantity: item.quantity || 1,
-        quantityUnit: item.quantityUnit || 'count',
-        originalQuantity: item.quantity || 1,
-        storageLocation: 'refrigerator',
-        purchaseDate: new Date().toISOString().split('T')[0],
-        expirationDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-        expirationSource: 'calculated',
-        freshnessScore: 100,
+        category: item.category,
+        quantity: item.quantity,
+        quantityUnit: item.quantityUnit,
+        originalQuantity: item.quantity,
+        storageLocation: item.storageLocation,
+        purchaseDate,
+        expirationDate,
+        expirationSource: item.expirationEdited ? 'manual' : 'calculated',
+        freshnessScore: calculateFreshnessScore(purchaseDate, expirationDate),
         tags: [],
         addedBy: DEMO_USER.id,
         addedVia: 'manual',
         status: 'active',
       })
-    })
+      // Only items that made it into the pantry leave the list
+      removeShoppingItem(item.id)
+    }
 
-    setShowAddToInventoryDialog(false)
+    setReviewItems(null)
   }
 
   // Group items by category
@@ -260,7 +288,7 @@ export function ShoppingListPage() {
             </span>
             <Button
               size="sm"
-              onClick={() => setShowAddToInventoryDialog(true)}
+              onClick={handleReviewChecked}
             >
               Add to Pantry
             </Button>
@@ -268,22 +296,17 @@ export function ShoppingListPage() {
         </div>
       )}
 
-      {/* Add to inventory dialog */}
-      <Dialog
-        open={showAddToInventoryDialog}
-        onClose={() => setShowAddToInventoryDialog(false)}
-        title="Add to Pantry"
-        description={`Add ${checkedCount} checked item${checkedCount > 1 ? 's' : ''} to your pantry inventory?`}
-      >
-        <DialogActions>
-          <Button variant="secondary" onClick={() => setShowAddToInventoryDialog(false)}>
-            Cancel
-          </Button>
-          <Button onClick={handleAddCheckedToInventory}>
-            Add to Pantry
-          </Button>
-        </DialogActions>
-      </Dialog>
+      {/* Review checked items before adding to inventory */}
+      {reviewItems && (
+        <ItemReviewList
+          items={reviewItems}
+          onItemsChange={setReviewItems}
+          onConfirm={handleAddReviewedToInventory}
+          onCancel={() => setReviewItems(null)}
+          title="Add to Pantry"
+          description="Check where each item goes and when it expires. Tap the pencil to change details."
+        />
+      )}
     </div>
   )
 }

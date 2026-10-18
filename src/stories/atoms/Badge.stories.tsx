@@ -70,7 +70,7 @@ export const Small: Story = {
   },
 }
 
-export const AllVariants: Story = {
+export const AllVariants: StoryObj = {
   render: () => (
     <div className="flex flex-wrap gap-2">
       <Badge variant="default">Default</Badge>
@@ -82,7 +82,7 @@ export const AllVariants: Story = {
   ),
 }
 
-export const AllSizes: Story = {
+export const AllSizes: StoryObj = {
   render: () => (
     <div className="flex items-center gap-2">
       <Badge size="sm" variant="info">Small</Badge>
@@ -91,7 +91,7 @@ export const AllSizes: Story = {
   ),
 }
 
-export const UseCases: Story = {
+export const UseCases: StoryObj = {
   render: () => (
     <div className="space-y-4">
       <div className="flex items-center gap-2">

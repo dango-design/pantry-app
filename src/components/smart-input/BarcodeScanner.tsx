@@ -8,6 +8,11 @@ interface BarcodeScannerProps {
   onCancel: () => void
 }
 
+// BarcodeDetector is not in TypeScript lib yet
+interface BarcodeDetectorLike {
+  detect(source: HTMLVideoElement): Promise<Array<{ rawValue: string }>>
+}
+
 export function BarcodeScanner({ onScan, onCancel }: BarcodeScannerProps) {
   const [mode, setMode] = useState<'select' | 'camera' | 'manual'>('select')
   const [manualCode, setManualCode] = useState('')
@@ -16,7 +21,7 @@ export function BarcodeScanner({ onScan, onCancel }: BarcodeScannerProps) {
   const [stream, setStream] = useState<MediaStream | null>(null)
 
   const videoRef = useRef<HTMLVideoElement>(null)
-  const detectorRef = useRef<any>(null)
+  const detectorRef = useRef<BarcodeDetectorLike | null>(null)
   const scanIntervalRef = useRef<NodeJS.Timeout | null>(null)
 
   // Check if BarcodeDetector API is available
@@ -75,7 +80,7 @@ export function BarcodeScanner({ onScan, onCancel }: BarcodeScannerProps) {
 
       // Try to use BarcodeDetector API if available
       if (hasBarcodeDetector) {
-        // @ts-ignore - BarcodeDetector is not in TypeScript lib yet
+        // @ts-expect-error - BarcodeDetector is not in TypeScript lib yet
         detectorRef.current = new window.BarcodeDetector({
           formats: ['ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_128', 'code_39'],
         })

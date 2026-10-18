@@ -1,6 +1,7 @@
 import { supabase } from './supabase'
 import type { Tables, InsertTables, UpdateTables } from '@/types/database'
 import { getUserHouseholdId, addFoodItem } from './inventoryApi'
+import { todayDateString, dateStringFromToday } from '@/utils/dates'
 
 export type ShoppingListRow = Tables<'shopping_lists'>
 export type ShoppingListItemRow = Tables<'shopping_list_items'>
@@ -203,9 +204,8 @@ export async function moveCheckedToInventory(listId: string): Promise<number> {
   if (!checkedItems || checkedItems.length === 0) return 0
 
   // Add each to inventory
-  const today = new Date().toISOString().split('T')[0]
-  const defaultExpiration = new Date()
-  defaultExpiration.setDate(defaultExpiration.getDate() + 14) // Default 2 weeks
+  const today = todayDateString()
+  const defaultExpiration = dateStringFromToday(14) // Default 2 weeks
 
   for (const item of checkedItems) {
     try {
@@ -217,7 +217,7 @@ export async function moveCheckedToInventory(listId: string): Promise<number> {
         original_quantity: item.quantity || 1,
         storage_location: 'refrigerator', // Default
         purchase_date: today,
-        expiration_date: defaultExpiration.toISOString().split('T')[0],
+        expiration_date: defaultExpiration,
         expiration_source: 'calculated',
         added_via: 'manual',
         tags: [],

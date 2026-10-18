@@ -1,4 +1,5 @@
 import type { Recipe, RecipeIngredient, FoodItem } from '@/types'
+import { getDaysUntilExpiration } from './freshness'
 
 export interface IngredientMatch {
   ingredient: RecipeIngredient
@@ -46,10 +47,7 @@ function ingredientMatchesItem(ingredient: RecipeIngredient, item: FoodItem): bo
  * Check if a food item is expiring soon (within 3 days)
  */
 function isExpiringSoon(item: FoodItem): boolean {
-  const now = new Date()
-  const expDate = new Date(item.expirationDate)
-  const daysUntil = Math.ceil((expDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
-  return daysUntil <= 3
+  return getDaysUntilExpiration(item.expirationDate) <= 3
 }
 
 /**

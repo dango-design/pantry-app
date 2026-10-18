@@ -1,11 +1,13 @@
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { ArrowLeft, Heart, Clock, Users, ChefHat, Edit2, Trash2, CookingPot, ShoppingCart } from 'lucide-react'
 import { Button, Card, CardContent, Dialog, DialogActions, Snackbar } from '@/components/common'
 import { IngredientMatchList } from '@/components/recipes'
 import { useDemoStore } from '@/stores/demoStore'
-import { matchRecipeToInventory } from '@/utils/recipeMatching'
+import { matchRecipeToInventory, type IngredientMatch } from '@/utils/recipeMatching'
+import { convertQuantity, formatUnit, roundQuantity } from '@/utils/units'
 import { cn } from '@/utils/cn'
+import type { QuantityUnit } from '@/types'
 
 interface SnackbarState {
   open: boolean
@@ -13,17 +15,27 @@ interface SnackbarState {
   undoAction?: () => void
 }
 
+// How much of the matched pantry item an ingredient uses, in the pantry item's unit.
+// null when the units can't be converted (e.g. 1 cup of spinach from a 1 pack item).
+function getPantryAmount(match: IngredientMatch): number | null {
+  if (!match.matchedItem) return null
+  const converted = convertQuantity(match.ingredient.quantity, match.ingredient.unit, match.matchedItem.quantityUnit)
+  if (converted === null) return null
+  return roundQuantity(Math.min(converted, match.matchedItem.quantity))
+}
+
 export function RecipeDetailPage() {
   const navigate = useNavigate()
   const { id } = useParams<{ id: string }>()
   const {
     recipes, inventory, toggleRecipeFavorite, markRecipeCooked,
-    deleteRecipe, useItem, addShoppingItem, updateItem,
+    deleteRecipe, consumeItem, addShoppingItem, updateItem,
   } = useDemoStore()
 
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const [showCookDialog, setShowCookDialog] = useState(false)
-  const [checkedIngredients, setCheckedIngredients] = useState<Set<number>>(new Set())
+  // Amount used per ingredient index, in the matched pantry item's unit
+  const [usedAmounts, setUsedAmounts] = useState<Record<number, string>>({})
   const [snackbar, setSnackbar] = useState<SnackbarState>({ open: false, message: '' })
 
   const recipe = useMemo(() => recipes.find((r) => r.id === id), [recipes, id])
@@ -51,39 +63,34 @@ export function RecipeDetailPage() {
     navigate('/recipes')
   }
 
-  // Initialize cook dialog: pre-check all available ingredients
+  // Initialize cook dialog: prefill amounts only where the recipe unit converts
+  // to the pantry unit. Otherwise leave it empty so nothing is deducted by guesswork.
   const handleOpenCookDialog = () => {
     if (!matchResult) return
-    const checked = new Set<number>()
-    recipe.ingredients.forEach((_, index) => {
-      const isAvailable = matchResult.availableIngredients.some(
-        (a) => a.ingredient === recipe.ingredients[index]
-      )
-      if (isAvailable) checked.add(index)
-    })
-    setCheckedIngredients(checked)
+    const amounts: Record<number, string> = {}
+    for (const match of matchResult.availableIngredients) {
+      const amount = getPantryAmount(match)
+      amounts[recipe.ingredients.indexOf(match.ingredient)] = amount === null ? '' : String(amount)
+    }
+    setUsedAmounts(amounts)
     setShowCookDialog(true)
   }
 
-  const handleCook = useCallback(() => {
+  const handleCook = () => {
     if (!matchResult) return
 
-    // Track what was consumed for undo
-    const consumedItems: Array<{ id: string; previousQuantity: number }> = []
+    // Quantities before cooking, for undo
+    const previousQuantities = new Map<string, number>()
 
-    // Deduct checked ingredients from inventory
-    for (const index of checkedIngredients) {
-      const ingredient = recipe.ingredients[index]
-      const match = matchResult.availableIngredients.find(
-        (a) => a.ingredient === ingredient
-      )
-      if (match?.matchedItem) {
-        consumedItems.push({
-          id: match.matchedItem.id,
-          previousQuantity: match.matchedItem.quantity,
-        })
-        useItem(match.matchedItem.id, ingredient.quantity)
+    // Deduct the amounts used from inventory
+    for (const match of matchResult.availableIngredients) {
+      if (!match.matchedItem) continue
+      const amount = Number(usedAmounts[recipe.ingredients.indexOf(match.ingredient)])
+      if (!(amount > 0)) continue
+      if (!previousQuantities.has(match.matchedItem.id)) {
+        previousQuantities.set(match.matchedItem.id, match.matchedItem.quantity)
       }
+      consumeItem(match.matchedItem.id, amount)
     }
 
     markRecipeCooked(recipe.id)
@@ -94,8 +101,8 @@ export function RecipeDetailPage() {
       message: `Marked "${recipe.name}" as cooked!`,
       undoAction: () => {
         // Restore consumed inventory items
-        for (const item of consumedItems) {
-          updateItem(item.id, { quantity: item.previousQuantity, status: 'active', consumedAt: undefined })
+        for (const [itemId, previousQuantity] of previousQuantities) {
+          updateItem(itemId, { quantity: previousQuantity, status: 'active', consumedAt: undefined })
         }
         // Undo the cooked count
         useDemoStore.getState().updateRecipe(recipe.id, {
@@ -104,9 +111,9 @@ export function RecipeDetailPage() {
         })
       },
     })
-  }, [recipe, matchResult, checkedIngredients, useItem, markRecipeCooked, updateItem])
+  }
 
-  const handleAddMissingToList = useCallback(() => {
+  const handleAddMissingToList = () => {
     if (!matchResult) return
     let count = 0
     for (const missing of matchResult.missingIngredients) {
@@ -115,7 +122,7 @@ export function RecipeDetailPage() {
         shoppingListId: 'demo-list',
         name: missing.ingredient.name,
         quantity: missing.ingredient.quantity,
-        quantityUnit: missing.ingredient.unit as any,
+        quantityUnit: missing.ingredient.unit,
         isChecked: false,
         source: 'recipe',
         priority: 'normal',
@@ -126,20 +133,20 @@ export function RecipeDetailPage() {
       open: true,
       message: `Added ${count} item${count !== 1 ? 's' : ''} to shopping list`,
     })
-  }, [matchResult, addShoppingItem])
+  }
 
-  const handleAddSingleToList = useCallback((name: string, quantity: number, unit: string) => {
+  const handleAddSingleToList = (name: string, quantity: number, unit: string) => {
     addShoppingItem({
       shoppingListId: 'demo-list',
       name,
       quantity,
-      quantityUnit: unit as any,
+      quantityUnit: unit as QuantityUnit,
       isChecked: false,
       source: 'recipe',
       priority: 'normal',
     })
     setSnackbar({ open: true, message: `${name} added to shopping list` })
-  }, [addShoppingItem])
+  }
 
   const requiredMissingCount = matchResult
     ? matchResult.missingIngredients.filter((m) => !m.ingredient.isOptional).length
@@ -356,41 +363,55 @@ export function RecipeDetailPage() {
         open={showCookDialog}
         onClose={() => setShowCookDialog(false)}
         title="I Made This!"
-        description="Which ingredients did you use? We'll deduct them from your pantry."
+        description="How much did you use? We'll deduct it from your pantry."
       >
-        <div className="space-y-2 max-h-60 overflow-y-auto">
+        <div className="space-y-1 max-h-80 overflow-y-auto">
           {recipe.ingredients.map((ingredient, index) => {
-            const isAvailable = matchResult?.availableIngredients.some(
+            const match = matchResult?.availableIngredients.find(
               (a) => a.ingredient === ingredient
             )
+            const pantryItem = match?.matchedItem
+            const ingredientLabel = `${ingredient.quantity} ${ingredient.unit} ${ingredient.name}`
+
+            if (!match || !pantryItem) {
+              return (
+                <div key={index} className="py-2 text-sm text-gray-400">
+                  {ingredientLabel} (not in pantry)
+                </div>
+              )
+            }
+
+            const pantryUnit = formatUnit(pantryItem.quantityUnit)
+            const isConvertible = getPantryAmount(match) !== null
             return (
-              <label
-                key={index}
-                className={cn(
-                  'flex items-center gap-3 py-2 px-2 rounded-lg cursor-pointer',
-                  !isAvailable && 'opacity-50'
+              <div key={index} className="py-2">
+                <div className="flex items-center gap-3">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm text-gray-900">{ingredientLabel}</p>
+                    <p className="text-xs text-gray-500 truncate">
+                      Pantry: {pantryItem.name} · {pantryItem.quantity} {pantryUnit}
+                    </p>
+                  </div>
+                  <input
+                    type="number"
+                    inputMode="decimal"
+                    min={0}
+                    max={pantryItem.quantity}
+                    step="any"
+                    placeholder="0"
+                    value={usedAmounts[index] ?? ''}
+                    onChange={(e) => setUsedAmounts({ ...usedAmounts, [index]: e.target.value })}
+                    aria-label={`Amount of ${pantryItem.name} used, in ${pantryUnit}`}
+                    className="w-20 px-2 py-1.5 border border-gray-300 rounded-lg text-sm text-right focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  />
+                  <span className="w-10 text-sm text-gray-500">{pantryUnit}</span>
+                </div>
+                {!isConvertible && (
+                  <p className="text-xs text-amber-700 mt-1">
+                    Recipe is in {ingredient.unit}, pantry is in {pantryUnit}. Enter how much you used.
+                  </p>
                 )}
-              >
-                <input
-                  type="checkbox"
-                  checked={checkedIngredients.has(index)}
-                  disabled={!isAvailable}
-                  onChange={(e) => {
-                    const newSet = new Set(checkedIngredients)
-                    if (e.target.checked) {
-                      newSet.add(index)
-                    } else {
-                      newSet.delete(index)
-                    }
-                    setCheckedIngredients(newSet)
-                  }}
-                  className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary"
-                />
-                <span className="text-sm">
-                  {ingredient.quantity} {ingredient.unit} {ingredient.name}
-                  {!isAvailable && ' (not in pantry)'}
-                </span>
-              </label>
+              </div>
             )
           })}
         </div>

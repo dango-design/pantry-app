@@ -100,7 +100,7 @@ export function RecipeFormPage() {
     setIngredients(ingredients.filter((_, i) => i !== index))
   }
 
-  const handleIngredientChange = (index: number, field: keyof IngredientRow, value: any) => {
+  const handleIngredientChange = (index: number, field: keyof IngredientRow, value: IngredientRow[keyof IngredientRow]) => {
     setIngredients(ingredients.map((ing, i) => (i === index ? { ...ing, [field]: value } : ing)))
   }
 

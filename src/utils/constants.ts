@@ -61,6 +61,22 @@ export const QUANTITY_UNITS: Record<QuantityUnit, { label: string; shortLabel: s
   dozen: { label: 'Dozen', shortLabel: 'dz' },
 }
 
+// Default storage location by category
+export const DEFAULT_STORAGE_LOCATIONS: Record<FoodCategory, StorageLocation> = {
+  produce: 'refrigerator',
+  dairy: 'refrigerator',
+  meat: 'refrigerator',
+  seafood: 'refrigerator',
+  bakery: 'counter',
+  frozen: 'freezer',
+  pantry: 'pantry',
+  beverages: 'refrigerator',
+  condiments: 'refrigerator',
+  snacks: 'pantry',
+  prepared: 'refrigerator',
+  other: 'refrigerator',
+}
+
 // Default expiration days by category and storage location
 export const DEFAULT_EXPIRATION_DAYS: Record<FoodCategory, Record<string, number>> = {
   produce: { refrigerator: 7, counter: 5, freezer: 180 },
