@@ -47,6 +47,10 @@ export default {
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],
       },
+      screens: {
+        // Devices with a mouse or trackpad (not touch-first), for hover-only affordances like drag grips
+        'can-hover': { raw: '(hover: hover) and (pointer: fine)' },
+      },
     },
   },
   plugins: [],

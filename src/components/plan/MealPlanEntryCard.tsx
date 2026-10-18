@@ -17,8 +17,10 @@ interface MealPlanEntryCardProps {
   /** Open the move sheet */
   onMove: () => void
   onMoveToDate: (date: string) => void
-  /** Pointer handlers for dragging the card by its grip (see useMealDrag) */
+  /** Mouse: pointer handlers for dragging the card by its grip (see useMealDrag) */
   dragHandleProps?: HTMLAttributes<HTMLElement>
+  /** Touch: press-and-hold handlers for the whole card (see useMealDrag) */
+  cardProps?: HTMLAttributes<HTMLElement>
   isDragging?: boolean
 }
 
@@ -32,6 +34,7 @@ export function MealPlanEntryCard({
   onMove,
   onMoveToDate,
   dragHandleProps,
+  cardProps,
   isDragging = false,
 }: MealPlanEntryCardProps) {
   const navigate = useNavigate()
@@ -64,21 +67,26 @@ export function MealPlanEntryCard({
   ]
 
   return (
+    // Touch: press and hold anywhere on a movable card to drag it. No text selection
+    // or iOS callout, so the hold isn't taken over by the browser.
     <div
+      {...(canMove ? cardProps : undefined)}
       className={cn(
-        'flex gap-1.5 rounded-xl bg-primary-soft p-3 transition-opacity',
-        canMove && 'pl-1.5',
+        'group flex gap-1.5 rounded-xl bg-primary-soft p-3 transition-opacity',
+        canMove && 'can-hover:pl-1.5 select-none [-webkit-touch-callout:none]',
         entry.status === 'skipped' && 'opacity-60',
         isDragging && 'opacity-40'
       )}
     >
-      {/* Grip sits beside the title line; it spans the card's height so it stays easy to grab */}
+      {/* Mouse only: a grip beside the title line, shown on hover (touch uses press-and-hold).
+          It spans the card's height so it stays easy to grab. */}
       {canMove && (
         <button
           {...dragHandleProps}
+          data-no-drag
           aria-label={`Move ${recipe.name}`}
-          title="Drag to move, or tap for more options"
-          className="w-5 -my-3 py-3 flex-shrink-0 self-stretch flex items-start justify-center rounded-lg text-gray-400 hover:text-gray-600 cursor-grab active:cursor-grabbing touch-none select-none"
+          title="Drag to move, or click for more options"
+          className="hidden can-hover:flex w-5 -my-3 py-3 flex-shrink-0 self-stretch items-start justify-center rounded-lg text-gray-400 hover:text-gray-600 opacity-0 group-hover:opacity-100 focus-visible:opacity-100 transition-opacity cursor-grab active:cursor-grabbing touch-none select-none"
         >
           <GripVertical className="h-4 w-4 mt-0.5" />
         </button>
@@ -122,7 +130,7 @@ export function MealPlanEntryCard({
             </div>
           </button>
 
-          <div className="relative -mr-1.5 -mt-1.5">
+          <div className="relative -mr-1.5 -mt-1.5" data-no-drag>
             <button
               onClick={() => setShowMenu(!showMenu)}
               aria-label={`Options for ${recipe.name}`}
@@ -158,7 +166,7 @@ export function MealPlanEntryCard({
         </div>
 
         {isPlanned ? (
-          <div className="mt-2.5">
+          <div className="mt-2.5" data-no-drag>
             <ServingsStepper value={entry.servings} onChange={onServingsChange} />
           </div>
         ) : (

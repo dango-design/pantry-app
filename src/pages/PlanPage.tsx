@@ -161,7 +161,7 @@ export function PlanPage() {
     })
   }
 
-  const { drag, getHandleProps } = useMealDrag((entryId, target) => {
+  const { drag, getHandleProps, getCardProps } = useMealDrag((entryId, target) => {
     const entry = mealPlan.find((e) => e.id === entryId)
     if (entry) moveEntry(entry, target.date, target.slot)
   })
@@ -304,6 +304,7 @@ export function PlanPage() {
                                   onMove={() => setMoveTarget(entry)}
                                   onMoveToDate={(newDate) => moveEntry(entry, newDate, entry.slot)}
                                   dragHandleProps={getHandleProps(entry.id, recipe.name, () => setMoveTarget(entry))}
+                                  cardProps={getCardProps(entry.id, recipe.name, () => setMoveTarget(entry))}
                                   isDragging={drag?.entryId === entry.id}
                                 />
                               )
