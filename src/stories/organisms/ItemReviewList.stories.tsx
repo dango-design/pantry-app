@@ -17,6 +17,8 @@ const meta = {
 } satisfies Meta<typeof ItemReviewList>
 
 export default meta
+// Every story renders a stateful demo wrapper instead of using args
+type Story = StoryObj
 
 // Sample detected items
 const sampleItems: ReviewItem[] = [
@@ -80,7 +82,7 @@ function ItemReviewListDemo({
   return <ItemReviewList {...props} items={items} onItemsChange={setItems} />
 }
 
-export const MultipleItems: StoryObj = {
+export const MultipleItems: Story = {
   render: () => (
     <ItemReviewListDemo
       initialItems={sampleItems}
@@ -90,7 +92,7 @@ export const MultipleItems: StoryObj = {
   ),
 }
 
-export const SingleItem: StoryObj = {
+export const SingleItem: Story = {
   render: () => (
     <ItemReviewListDemo
       initialItems={[sampleItems[0]]}
@@ -100,7 +102,7 @@ export const SingleItem: StoryObj = {
   ),
 }
 
-export const NoItems: StoryObj = {
+export const NoItems: Story = {
   render: () => (
     <ItemReviewListDemo
       initialItems={[]}
@@ -110,7 +112,7 @@ export const NoItems: StoryObj = {
   ),
 }
 
-export const Loading: StoryObj = {
+export const Loading: Story = {
   render: () => (
     <ItemReviewListDemo
       initialItems={sampleItems}
@@ -121,7 +123,7 @@ export const Loading: StoryObj = {
   ),
 }
 
-export const FromReceipt: StoryObj = {
+export const FromReceipt: Story = {
   render: () => (
     <ItemReviewListDemo
       initialItems={[

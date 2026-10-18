@@ -70,6 +70,7 @@ export const Small: Story = {
   },
 }
 
+// Showcase stories render their own Badges and take no args
 export const AllVariants: StoryObj = {
   render: () => (
     <div className="flex flex-wrap gap-2">

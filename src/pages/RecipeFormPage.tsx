@@ -100,7 +100,7 @@ export function RecipeFormPage() {
     setIngredients(ingredients.filter((_, i) => i !== index))
   }
 
-  const handleIngredientChange = (index: number, field: keyof IngredientRow, value: IngredientRow[keyof IngredientRow]) => {
+  const handleIngredientChange = <K extends keyof IngredientRow>(index: number, field: K, value: IngredientRow[K]) => {
     setIngredients(ingredients.map((ing, i) => (i === index ? { ...ing, [field]: value } : ing)))
   }
 
@@ -289,7 +289,7 @@ export function RecipeFormPage() {
                         />
                         <select
                           value={ing.unit}
-                          onChange={(e) => handleIngredientChange(index, 'unit', e.target.value)}
+                          onChange={(e) => handleIngredientChange(index, 'unit', e.target.value as QuantityUnit)}
                           className="w-20 px-2 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary bg-white"
                         >
                           <option value="count">ct</option>

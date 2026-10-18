@@ -19,6 +19,8 @@ const meta = {
 } satisfies Meta<typeof FilterSheet>
 
 export default meta
+// Every story renders a stateful demo wrapper instead of using args
+type Story = StoryObj
 
 // Interactive wrapper
 function FilterSheetDemo({
@@ -68,11 +70,11 @@ function FilterSheetDemo({
   )
 }
 
-export const Default: StoryObj = {
+export const Default: Story = {
   render: () => <FilterSheetDemo startOpen={true} />,
 }
 
-export const WithFiltersApplied: StoryObj = {
+export const WithFiltersApplied: Story = {
   render: () => (
     <FilterSheetDemo
       startOpen={true}
@@ -83,11 +85,11 @@ export const WithFiltersApplied: StoryObj = {
   ),
 }
 
-export const Interactive: StoryObj = {
+export const Interactive: Story = {
   render: () => <FilterSheetDemo startOpen={false} />,
 }
 
-export const CategoryFiltersOnly: StoryObj = {
+export const CategoryFiltersOnly: Story = {
   render: () => (
     <FilterSheetDemo
       startOpen={true}
@@ -96,7 +98,7 @@ export const CategoryFiltersOnly: StoryObj = {
   ),
 }
 
-export const ExpirationFilterOnly: StoryObj = {
+export const ExpirationFilterOnly: Story = {
   render: () => (
     <FilterSheetDemo
       startOpen={true}

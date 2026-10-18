@@ -62,7 +62,7 @@ export const ShortDuration: Story = {
   },
 }
 
-// Interactive demo showing snackbar trigger
+// Interactive demo showing snackbar trigger (manages its own state, so it takes no args)
 export const Interactive: StoryObj = {
   render: function InteractiveSnackbar() {
     const [snackbar, setSnackbar] = useState<{

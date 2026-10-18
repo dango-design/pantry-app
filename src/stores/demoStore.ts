@@ -632,7 +632,7 @@ export const useDemoStore = create<DemoState>()(
     {
       name: 'pantry-demo-store',
       version: STORE_VERSION,
-      migrate: (persistedState, version) => {
+      migrate: (persistedState: unknown, version: number) => {
         // If version doesn't match, reset to fresh state
         if (version !== STORE_VERSION) {
           console.log('Store version mismatch, resetting data')
@@ -645,15 +645,15 @@ export const useDemoStore = create<DemoState>()(
         }
 
         // Validate and clean existing data
-        const state = persistedState as DemoState
+        const state = persistedState as Partial<DemoState> | undefined
         if (state) {
           state.inventory = validateInventory(state.inventory || [])
         }
 
-        return state
+        return state as DemoState
       },
       // Custom merge to validate data on load
-      merge: (persistedState, currentState) => {
+      merge: (persistedState: unknown, currentState: DemoState) => {
         if (!persistedState) return currentState
         const state = persistedState as Partial<DemoState>
 
