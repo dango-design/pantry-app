@@ -3,12 +3,14 @@ import { useSearchParams } from 'react-router-dom'
 import { format, isValid, parseISO } from 'date-fns'
 import { ChevronLeft, ChevronRight, Plus, ShoppingCart } from 'lucide-react'
 import { Snackbar } from '@/components/common'
-import { MealPlanEntryCard, RecipePickerSheet, ShopForWeekSheet } from '@/components/plan'
+import { MealPlanEntryCard, MoveMealSheet, RecipePickerSheet, ShopForWeekSheet } from '@/components/plan'
+import { useMealDrag } from '@/components/plan/useMealDrag'
 import { useDemoStore } from '@/stores/demoStore'
 import { toLocalDateString, todayDateString } from '@/utils/dates'
 import {
   MEAL_SLOTS,
   buildShoppingPlan,
+  formatMealTime,
   formatWeekRange,
   getDefaultServings,
   getShopTitle,
@@ -42,6 +44,7 @@ export function PlanPage() {
   } = useDemoStore()
 
   const [pickerTarget, setPickerTarget] = useState<{ date: string; slot: MealSlot } | null>(null)
+  const [moveTarget, setMoveTarget] = useState<MealPlanEntry | null>(null)
   const [showShopSheet, setShowShopSheet] = useState(false)
   const [snackbar, setSnackbar] = useState<SnackbarState>({ open: false, message: '' })
 
@@ -145,6 +148,23 @@ export function PlanPage() {
       undoAction: () => addMealPlanEntry({ date, slot, recipeId, servings, status }),
     })
   }
+
+  // Move a meal to another day/slot. Skipped meals become planned again.
+  const moveEntry = (entry: MealPlanEntry, date: string, slot: MealSlot) => {
+    if (entry.date === date && entry.slot === slot) return
+    const previous = { date: entry.date, slot: entry.slot, status: entry.status }
+    updateMealPlanEntry(entry.id, { date, slot, status: 'planned' })
+    setSnackbar({
+      open: true,
+      message: `Moved to ${formatMealTime(date, slot)}`,
+      undoAction: () => updateMealPlanEntry(entry.id, previous),
+    })
+  }
+
+  const { drag, getHandleProps } = useMealDrag((entryId, target) => {
+    const entry = mealPlan.find((e) => e.id === entryId)
+    if (entry) moveEntry(entry, target.date, target.slot)
+  })
 
   const handleAddToList = (lines: ShopLine[]) => {
     const added = lines.map((line) => addShoppingItem(toShoppingListItem(line)))
@@ -251,9 +271,19 @@ export function PlanPage() {
                       const slotEntries = entries.filter((e) => e.slot === slot)
                       // Past days only show what was planned
                       if (isPast && slotEntries.length === 0) return null
+                      const isDropTarget = drag?.target?.date === date && drag.target.slot === slot
 
                       return (
-                        <div key={slot} className="flex gap-3 py-2">
+                        <div
+                          key={slot}
+                          // Meals can be dragged onto today and later
+                          data-drop-date={isPast ? undefined : date}
+                          data-drop-slot={isPast ? undefined : slot}
+                          className={cn(
+                            'flex gap-3 py-2 -mx-2 px-2 rounded-lg transition-colors',
+                            isDropTarget && 'bg-purple-50 ring-2 ring-inset ring-purple-300'
+                          )}
+                        >
                           <div className="w-[4.5rem] flex-shrink-0 pt-2">
                             <p className="text-xs font-medium uppercase tracking-wide text-gray-500">{label}</p>
                             {slotEntries.length > 0 && !isPast && (
@@ -275,7 +305,7 @@ export function PlanPage() {
                                 className="w-full h-9 flex items-center justify-center gap-1 rounded-xl border border-dashed border-gray-300 text-sm text-gray-500 hover:border-purple-300 hover:text-purple-600 hover:bg-purple-50/50 transition-colors"
                               >
                                 <Plus className="h-4 w-4" />
-                                Add
+                                {isDropTarget ? 'Drop here' : 'Add'}
                               </button>
                             ) : (
                               slotEntries.map((entry) => {
@@ -290,6 +320,10 @@ export function PlanPage() {
                                     onServingsChange={(servings) => updateMealPlanEntry(entry.id, { servings })}
                                     onStatusChange={(status) => updateMealPlanEntry(entry.id, { status })}
                                     onRemove={() => handleRemove(entry)}
+                                    onMove={() => setMoveTarget(entry)}
+                                    onMoveToDate={(newDate) => moveEntry(entry, newDate, entry.slot)}
+                                    dragHandleProps={getHandleProps(entry.id, recipe.name, () => setMoveTarget(entry))}
+                                    isDragging={drag?.entryId === entry.id}
                                   />
                                 )
                               })
@@ -313,6 +347,28 @@ export function PlanPage() {
           onClose={() => setPickerTarget(null)}
           onPick={handlePick}
         />
+      )}
+
+      {moveTarget && recipesById.get(moveTarget.recipeId) && (
+        <MoveMealSheet
+          entry={moveTarget}
+          recipe={recipesById.get(moveTarget.recipeId)!}
+          onClose={() => setMoveTarget(null)}
+          onMove={(date, slot) => {
+            moveEntry(moveTarget, date, slot)
+            setMoveTarget(null)
+          }}
+        />
+      )}
+
+      {/* What's being dragged follows the pointer, just above it so a finger doesn't hide it */}
+      {drag && (
+        <div
+          className="fixed z-50 pointer-events-none max-w-[14rem] truncate px-3 py-2 rounded-xl bg-white border border-purple-200 shadow-lg text-sm font-medium text-gray-900"
+          style={{ left: drag.x, top: drag.y, transform: 'translate(-50%, calc(-100% - 0.75rem)) rotate(-2deg)' }}
+        >
+          {drag.label}
+        </div>
       )}
 
       {showShopSheet && (

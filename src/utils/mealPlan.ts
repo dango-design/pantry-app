@@ -10,7 +10,7 @@ import type {
   ShoppingListItem,
 } from '@/types'
 import { QUANTITY_UNITS } from './constants'
-import { toLocalDateString } from './dates'
+import { toLocalDateString, todayDateString } from './dates'
 import { ingredientMatchesItem } from './recipeMatching'
 
 export const MEAL_SLOTS: { key: MealSlot; label: string }[] = [
@@ -72,6 +72,25 @@ export function formatRelativeDay(dateString: string, today = new Date()): strin
   if (days === 1) return 'Tomorrow'
   if (days === -1) return 'Yesterday'
   return format(parseISO(dateString), 'EEE, MMM d')
+}
+
+// formatRelativeDay for the middle of a sentence: "tomorrow", "Tue, Oct 20"
+export function formatRelativeDayInline(dateString: string, today = new Date()): string {
+  const day = formatRelativeDay(dateString, today)
+  return /^(Today|Tomorrow|Yesterday)$/.test(day) ? day.toLowerCase() : day
+}
+
+// "dinner tomorrow", "lunch on Tue, Oct 20"
+export function formatMealTime(dateString: string, slot: MealSlot, today = new Date()): string {
+  const meal = getSlotLabel(slot).toLowerCase()
+  const day = formatRelativeDay(dateString, today)
+  return /^(Today|Tomorrow|Yesterday)$/.test(day) ? `${meal} ${day.toLowerCase()}` : `${meal} on ${day}`
+}
+
+// The day after a meal, but never in the past: a missed meal moves to today
+export function getNextPlanDay(date: string, today = todayDateString()): string {
+  const next = toLocalDateString(addDays(parseISO(date), 1))
+  return next > today ? next : today
 }
 
 // ---------------------------------------------------------------------------

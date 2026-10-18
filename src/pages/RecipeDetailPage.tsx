@@ -8,7 +8,7 @@ import { useDemoStore } from '@/stores/demoStore'
 import { matchRecipeToInventory } from '@/utils/recipeMatching'
 import { cn } from '@/utils/cn'
 import { todayDateString } from '@/utils/dates'
-import { formatRelativeDay, getSlotLabel } from '@/utils/mealPlan'
+import { formatMealTime, formatRelativeDay, getSlotLabel } from '@/utils/mealPlan'
 
 interface SnackbarState {
   open: boolean
@@ -441,7 +441,7 @@ export function RecipeDetailPage() {
             setShowPlanSheet(false)
             setSnackbar({
               open: true,
-              message: `Planned for ${formatRelativeDay(entry.date)} · ${getSlotLabel(entry.slot)}`,
+              message: `Planned for ${formatMealTime(entry.date, entry.slot)}`,
               undoAction: () => useDemoStore.getState().removeMealPlanEntry(entry.id),
             })
           }}
