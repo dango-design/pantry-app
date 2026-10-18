@@ -17,7 +17,8 @@ const meta = {
 } satisfies Meta<typeof ItemReviewList>
 
 export default meta
-type Story = StoryObj<typeof meta>
+// Every story renders a stateful demo wrapper instead of using args
+type Story = StoryObj
 
 // Sample detected items
 const sampleItems: ReviewItem[] = [

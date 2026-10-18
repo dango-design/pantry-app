@@ -17,7 +17,7 @@ interface SnackbarState {
 export function ItemDetailPage() {
   const navigate = useNavigate()
   const { id } = useParams<{ id: string }>()
-  const { inventory, deleteItem, useItem, updateItem, addShoppingItem } = useDemoStore()
+  const { inventory, deleteItem, consumeItem, updateItem, addShoppingItem } = useDemoStore()
 
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const [showUseDialog, setShowUseDialog] = useState(false)
@@ -28,38 +28,11 @@ export function ItemDetailPage() {
     return inventory.find((i) => i.id === id)
   }, [inventory, id])
 
-  if (!item) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-gray-500 mb-4">Item not found</p>
-          <Button onClick={() => navigate('/')}>Go Home</Button>
-        </div>
-      </div>
-    )
-  }
-
-  const category = CATEGORIES[item.category] || CATEGORIES.other
-  const location = STORAGE_LOCATIONS[item.storageLocation] || { label: item.storageLocation, color: '#6B7280' }
-  const freshnessLevel = getFreshnessLevel(item.expirationDate, item.freshnessScore)
-  const unitLabel = QUANTITY_UNITS[item.quantityUnit]?.shortLabel || ''
-  const FoodIcon = getFoodIcon(item.name)
-
-
-  const handleUse = () => {
-    useItem(item.id, useQuantity)
-    setShowUseDialog(false)
-
-    // If fully consumed, go back
-    if (item.quantity - useQuantity <= 0) {
-      navigate('/')
-    }
-  }
-
+  // Hooks must run before the not-found early return
   const handleMarkUsed = useCallback(() => {
     if (!item) return
     const previousQuantity = item.quantity
-    useItem(item.id, item.quantity) // Sets quantity to 0
+    consumeItem(item.id, item.quantity) // Sets quantity to 0
 
     setSnackbar({
       open: true,
@@ -71,12 +44,12 @@ export function ItemDetailPage() {
 
     // Navigate back after a short delay
     setTimeout(() => navigate('/'), 300)
-  }, [item, useItem, updateItem, navigate])
+  }, [item, consumeItem, updateItem, navigate])
 
   const handleAddToGroceryList = useCallback(() => {
     if (!item) return
     const previousQuantity = item.quantity
-    useItem(item.id, item.quantity) // Sets quantity to 0
+    consumeItem(item.id, item.quantity) // Sets quantity to 0
 
     // Add to shopping list
     const newShoppingItem = addShoppingItem({
@@ -102,7 +75,35 @@ export function ItemDetailPage() {
 
     // Navigate back after a short delay
     setTimeout(() => navigate('/'), 300)
-  }, [item, useItem, updateItem, addShoppingItem, navigate])
+  }, [item, consumeItem, updateItem, addShoppingItem, navigate])
+
+  if (!item) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-gray-500 mb-4">Item not found</p>
+          <Button onClick={() => navigate('/')}>Go Home</Button>
+        </div>
+      </div>
+    )
+  }
+
+  const category = CATEGORIES[item.category] || CATEGORIES.other
+  const location = STORAGE_LOCATIONS[item.storageLocation] || { label: item.storageLocation, color: '#6B7280' }
+  const freshnessLevel = getFreshnessLevel(item.expirationDate, item.freshnessScore)
+  const unitLabel = QUANTITY_UNITS[item.quantityUnit]?.shortLabel || ''
+  const FoodIcon = getFoodIcon(item.name)
+
+
+  const handleUse = () => {
+    consumeItem(item.id, useQuantity)
+    setShowUseDialog(false)
+
+    // If fully consumed, go back
+    if (item.quantity - useQuantity <= 0) {
+      navigate('/')
+    }
+  }
 
   const handleRemove = () => {
     if (!item) return

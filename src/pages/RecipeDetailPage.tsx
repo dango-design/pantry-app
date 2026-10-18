@@ -6,6 +6,7 @@ import { IngredientMatchList } from '@/components/recipes'
 import { useDemoStore } from '@/stores/demoStore'
 import { matchRecipeToInventory } from '@/utils/recipeMatching'
 import { cn } from '@/utils/cn'
+import type { QuantityUnit } from '@/types'
 
 interface SnackbarState {
   open: boolean
@@ -18,7 +19,7 @@ export function RecipeDetailPage() {
   const { id } = useParams<{ id: string }>()
   const {
     recipes, inventory, toggleRecipeFavorite, markRecipeCooked,
-    deleteRecipe, useItem, addShoppingItem, updateItem,
+    deleteRecipe, consumeItem, addShoppingItem, updateItem,
   } = useDemoStore()
 
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
@@ -32,6 +33,83 @@ export function RecipeDetailPage() {
     if (!recipe) return null
     return matchRecipeToInventory(recipe, inventory)
   }, [recipe, inventory])
+
+  // Hooks must run before the not-found early return
+  const handleCook = useCallback(() => {
+    if (!recipe || !matchResult) return
+
+    // Track what was consumed for undo
+    const consumedItems: Array<{ id: string; previousQuantity: number }> = []
+
+    // Deduct checked ingredients from inventory
+    for (const index of checkedIngredients) {
+      const ingredient = recipe.ingredients[index]
+      const match = matchResult.availableIngredients.find(
+        (a) => a.ingredient === ingredient
+      )
+      if (match?.matchedItem) {
+        consumedItems.push({
+          id: match.matchedItem.id,
+          previousQuantity: match.matchedItem.quantity,
+        })
+        consumeItem(match.matchedItem.id, ingredient.quantity)
+      }
+    }
+
+    markRecipeCooked(recipe.id)
+    setShowCookDialog(false)
+
+    setSnackbar({
+      open: true,
+      message: `Marked "${recipe.name}" as cooked!`,
+      undoAction: () => {
+        // Restore consumed inventory items
+        for (const item of consumedItems) {
+          updateItem(item.id, { quantity: item.previousQuantity, status: 'active', consumedAt: undefined })
+        }
+        // Undo the cooked count
+        useDemoStore.getState().updateRecipe(recipe.id, {
+          timesCooked: Math.max(0, recipe.timesCooked),
+          lastCookedAt: recipe.lastCookedAt,
+        })
+      },
+    })
+  }, [recipe, matchResult, checkedIngredients, consumeItem, markRecipeCooked, updateItem])
+
+  const handleAddMissingToList = useCallback(() => {
+    if (!matchResult) return
+    let count = 0
+    for (const missing of matchResult.missingIngredients) {
+      if (missing.ingredient.isOptional) continue
+      addShoppingItem({
+        shoppingListId: 'demo-list',
+        name: missing.ingredient.name,
+        quantity: missing.ingredient.quantity,
+        quantityUnit: missing.ingredient.unit,
+        isChecked: false,
+        source: 'recipe',
+        priority: 'normal',
+      })
+      count++
+    }
+    setSnackbar({
+      open: true,
+      message: `Added ${count} item${count !== 1 ? 's' : ''} to shopping list`,
+    })
+  }, [matchResult, addShoppingItem])
+
+  const handleAddSingleToList = useCallback((name: string, quantity: number, unit: string) => {
+    addShoppingItem({
+      shoppingListId: 'demo-list',
+      name,
+      quantity,
+      quantityUnit: unit as QuantityUnit,
+      isChecked: false,
+      source: 'recipe',
+      priority: 'normal',
+    })
+    setSnackbar({ open: true, message: `${name} added to shopping list` })
+  }, [addShoppingItem])
 
   if (!recipe) {
     return (
@@ -64,82 +142,6 @@ export function RecipeDetailPage() {
     setCheckedIngredients(checked)
     setShowCookDialog(true)
   }
-
-  const handleCook = useCallback(() => {
-    if (!matchResult) return
-
-    // Track what was consumed for undo
-    const consumedItems: Array<{ id: string; previousQuantity: number }> = []
-
-    // Deduct checked ingredients from inventory
-    for (const index of checkedIngredients) {
-      const ingredient = recipe.ingredients[index]
-      const match = matchResult.availableIngredients.find(
-        (a) => a.ingredient === ingredient
-      )
-      if (match?.matchedItem) {
-        consumedItems.push({
-          id: match.matchedItem.id,
-          previousQuantity: match.matchedItem.quantity,
-        })
-        useItem(match.matchedItem.id, ingredient.quantity)
-      }
-    }
-
-    markRecipeCooked(recipe.id)
-    setShowCookDialog(false)
-
-    setSnackbar({
-      open: true,
-      message: `Marked "${recipe.name}" as cooked!`,
-      undoAction: () => {
-        // Restore consumed inventory items
-        for (const item of consumedItems) {
-          updateItem(item.id, { quantity: item.previousQuantity, status: 'active', consumedAt: undefined })
-        }
-        // Undo the cooked count
-        useDemoStore.getState().updateRecipe(recipe.id, {
-          timesCooked: Math.max(0, recipe.timesCooked),
-          lastCookedAt: recipe.lastCookedAt,
-        })
-      },
-    })
-  }, [recipe, matchResult, checkedIngredients, useItem, markRecipeCooked, updateItem])
-
-  const handleAddMissingToList = useCallback(() => {
-    if (!matchResult) return
-    let count = 0
-    for (const missing of matchResult.missingIngredients) {
-      if (missing.ingredient.isOptional) continue
-      addShoppingItem({
-        shoppingListId: 'demo-list',
-        name: missing.ingredient.name,
-        quantity: missing.ingredient.quantity,
-        quantityUnit: missing.ingredient.unit as any,
-        isChecked: false,
-        source: 'recipe',
-        priority: 'normal',
-      })
-      count++
-    }
-    setSnackbar({
-      open: true,
-      message: `Added ${count} item${count !== 1 ? 's' : ''} to shopping list`,
-    })
-  }, [matchResult, addShoppingItem])
-
-  const handleAddSingleToList = useCallback((name: string, quantity: number, unit: string) => {
-    addShoppingItem({
-      shoppingListId: 'demo-list',
-      name,
-      quantity,
-      quantityUnit: unit as any,
-      isChecked: false,
-      source: 'recipe',
-      priority: 'normal',
-    })
-    setSnackbar({ open: true, message: `${name} added to shopping list` })
-  }, [addShoppingItem])
 
   const requiredMissingCount = matchResult
     ? matchResult.missingIngredients.filter((m) => !m.ingredient.isOptional).length
