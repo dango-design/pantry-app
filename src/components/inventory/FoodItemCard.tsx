@@ -27,12 +27,12 @@ const CATEGORY_STRIP_COLORS: Record<FoodCategory, string> = {
   other: '#b8bcc4',
 }
 
-// M3 design tokens
+// Card color tokens (M3 roles, neutral values: white card, zinc-gray outline and media panel)
 const M3 = {
   onSurface: '#1D1B20',
-  surface: '#FEF7FF',
-  outlineVariant: '#CAC4D0',
-  surfaceContainerHigh: '#ECE6F0',
+  surface: '#FFFFFF',
+  outlineVariant: '#E4E4E7',
+  surfaceContainerHigh: '#F4F4F5',
 }
 
 interface FoodItemCardProps {
