@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { Search, SlidersHorizontal, ArrowUpDown, Check, Settings } from 'lucide-react'
 import { FoodItemCard } from '@/components/inventory'
 import { FilterSheet, type ExpirationFilter } from '@/components/inventory/FilterSheet'
+import { TonightBanner } from '@/components/plan'
 import { Snackbar } from '@/components/common'
 import { useDemoStore } from '@/stores/demoStore'
 import { cn } from '@/utils/cn'
@@ -302,6 +303,8 @@ export function InventoryPage() {
 
         {/* Content */}
         <div className="px-4 pt-2 space-y-2">
+          <TonightBanner />
+
           {filteredInventory.length === 0 ? (
             <div className="text-center py-16 text-gray-500">
               <p className="text-lg font-medium mb-1">No items found</p>

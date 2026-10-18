@@ -4,6 +4,7 @@ import { Header } from '@/components/layout'
 import { Input, Badge, Button, Dialog, DialogActions } from '@/components/common'
 import { useDemoStore, DEMO_HOUSEHOLD, DEMO_USER } from '@/stores/demoStore'
 import { cn } from '@/utils/cn'
+import { formatQuantity } from '@/utils/mealPlan'
 import { CATEGORIES } from '@/utils/constants'
 import { getDaysUntilExpiration } from '@/utils/freshness'
 import type { FoodCategory } from '@/types'
@@ -225,7 +226,12 @@ export function ShoppingListPage() {
                     >
                       {item.name}
                       {item.quantity && (
-                        <span className="text-gray-500"> ({item.quantity})</span>
+                        <span className="text-gray-500">
+                          {' '}({item.quantityUnit ? formatQuantity(item.quantity, item.quantityUnit) : item.quantity})
+                        </span>
+                      )}
+                      {item.notes && (
+                        <span className="block text-xs text-gray-400">{item.notes}</span>
                       )}
                     </span>
 
