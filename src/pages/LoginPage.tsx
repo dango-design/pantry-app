@@ -57,7 +57,7 @@ export function LoginPage() {
         {/* Demo Login Button */}
         <button
           onClick={handleDemoLogin}
-          className="w-full mb-6 p-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl font-medium flex items-center justify-center gap-2 hover:from-green-600 hover:to-emerald-700 transition-all shadow-lg hover:shadow-xl"
+          className="w-full mb-6 p-4 bg-primary text-white rounded-xl font-medium flex items-center justify-center gap-2 hover:bg-primary-hover transition-colors"
         >
           <Play className="h-5 w-5" />
           Try Demo (No Account Needed)
@@ -98,7 +98,7 @@ export function LoginPage() {
           <div className="text-right">
             <Link
               to="/forgot-password"
-              className="text-sm text-blue-600 hover:text-blue-700"
+              className="text-sm text-primary font-medium hover:underline"
             >
               Forgot password?
             </Link>
@@ -111,7 +111,7 @@ export function LoginPage() {
 
         <p className="mt-6 text-center text-sm text-gray-500">
           Don't have an account?{' '}
-          <Link to="/signup" className="text-blue-600 hover:text-blue-700 font-medium">
+          <Link to="/signup" className="text-primary font-medium hover:underline">
             Sign up
           </Link>
         </p>

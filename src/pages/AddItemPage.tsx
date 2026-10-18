@@ -6,7 +6,7 @@ import { Button } from '@/components/common'
 import { PhotoCapture, BarcodeScanner, ItemReviewList, type ReviewItem } from '@/components/smart-input'
 import { useDemoStore, DEMO_HOUSEHOLD, DEMO_USER } from '@/stores/demoStore'
 import { CATEGORIES, QUANTITY_UNITS, STORAGE_LOCATIONS } from '@/utils/constants'
-import { getFoodIcon } from '@/components/icons'
+import { FoodThumbnail } from '@/components/icons'
 import {
   processGroceryImage,
   processReceipt,
@@ -127,9 +127,6 @@ export function AddItemPage() {
   const [purchaseDate, setPurchaseDate] = useState(format(new Date(), 'yyyy-MM-dd'))
   const [expirationDate, setExpirationDate] = useState(format(addDays(new Date(), 7), 'yyyy-MM-dd'))
   const [isEstimated, setIsEstimated] = useState(true)
-
-  // Get food icon for current name
-  const FoodIcon = getFoodIcon(name)
 
   // Autofill when name changes
   useEffect(() => {
@@ -375,21 +372,21 @@ export function AddItemPage() {
           <div className="flex gap-2">
             <button
               onClick={() => setSmartInputMode('photo')}
-              className="flex-1 flex items-center justify-center gap-2 py-3 bg-purple-50 text-purple-700 rounded-xl hover:bg-purple-100 transition-colors"
+              className="flex-1 flex items-center justify-center gap-2 py-3 bg-primary-soft text-primary rounded-xl hover:bg-primary-muted transition-colors"
             >
               <Camera className="h-5 w-5" />
               <span className="font-medium">Photo</span>
             </button>
             <button
               onClick={() => setSmartInputMode('barcode')}
-              className="flex-1 flex items-center justify-center gap-2 py-3 bg-blue-50 text-blue-700 rounded-xl hover:bg-blue-100 transition-colors"
+              className="flex-1 flex items-center justify-center gap-2 py-3 bg-primary-soft text-primary rounded-xl hover:bg-primary-muted transition-colors"
             >
               <Barcode className="h-5 w-5" />
               <span className="font-medium">Barcode</span>
             </button>
             <button
               onClick={() => setSmartInputMode('receipt')}
-              className="flex-1 flex items-center justify-center gap-2 py-3 bg-green-50 text-green-700 rounded-xl hover:bg-green-100 transition-colors"
+              className="flex-1 flex items-center justify-center gap-2 py-3 bg-primary-soft text-primary rounded-xl hover:bg-primary-muted transition-colors"
             >
               <Receipt className="h-5 w-5" />
               <span className="font-medium">Receipt</span>
@@ -399,9 +396,7 @@ export function AddItemPage() {
 
         {/* Food Icon Preview */}
         <div className="bg-gray-100 py-6 flex items-center justify-center">
-          <div className="w-20 h-20 flex items-center justify-center">
-            <FoodIcon size={72} />
-          </div>
+          <FoodThumbnail name={name} category={category} iconSize={36} className="w-20 h-20 rounded-2xl" />
         </div>
 
         {/* Form */}
@@ -415,7 +410,7 @@ export function AddItemPage() {
                   <button
                     key={item}
                     onClick={() => handleQuickAdd(item)}
-                    className="px-3 py-1.5 bg-purple-50 text-purple-700 rounded-full text-sm font-medium hover:bg-purple-100 transition-colors"
+                    className="px-3 py-1.5 bg-primary-soft text-primary rounded-full text-sm font-medium hover:bg-primary-muted transition-colors"
                   >
                     {item}
                   </button>
@@ -432,7 +427,7 @@ export function AddItemPage() {
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                 placeholder="e.g. Chicken Breast"
               />
             </div>
@@ -446,7 +441,7 @@ export function AddItemPage() {
                 type="text"
                 value={brand}
                 onChange={(e) => setBrand(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                 placeholder="Optional"
               />
             </div>
@@ -463,7 +458,7 @@ export function AddItemPage() {
                   onChange={(e) => setQuantity(Number(e.target.value) || 1)}
                   min="0.01"
                   step="0.01"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                 />
               </div>
               <div className="flex-1">
@@ -474,7 +469,7 @@ export function AddItemPage() {
                   <select
                     value={unit}
                     onChange={(e) => setUnit(e.target.value as QuantityUnit)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base appearance-none focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base appearance-none focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-white"
                   >
                     {Object.entries(QUANTITY_UNITS).map(([key, config]) => (
                       <option key={key} value={key}>
@@ -496,7 +491,7 @@ export function AddItemPage() {
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value as FoodCategory)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base appearance-none focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base appearance-none focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-white"
                 >
                   {Object.entries(CATEGORIES).map(([key, config]) => (
                     <option key={key} value={key}>
@@ -517,7 +512,7 @@ export function AddItemPage() {
                 <select
                   value={storageLocation}
                   onChange={(e) => setStorageLocation(e.target.value as StorageLocation)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base appearance-none focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base appearance-none focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-white"
                 >
                   {Object.entries(STORAGE_LOCATIONS).map(([key, config]) => (
                     <option key={key} value={key}>
@@ -538,7 +533,7 @@ export function AddItemPage() {
                 type="date"
                 value={purchaseDate}
                 onChange={(e) => setPurchaseDate(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-white"
               />
             </div>
 
@@ -554,7 +549,7 @@ export function AddItemPage() {
                   setExpirationDate(e.target.value)
                   setIsEstimated(false)
                 }}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-white"
               />
               {isEstimated && (
                 <p className="text-xs text-gray-500 mt-1">Estimated based on item type</p>
@@ -580,7 +575,7 @@ export function AddItemPage() {
               onClick={handleSubmit}
               loading={loading}
               disabled={!name.trim()}
-              className="flex-1 bg-purple-600 hover:bg-purple-700"
+              className="flex-1 bg-primary hover:bg-primary-hover"
             >
               Save
             </Button>

@@ -58,7 +58,7 @@ export function Snackbar({
                 setIsVisible(false)
                 setTimeout(onClose, 200)
               }}
-              className="text-purple-400 font-medium text-sm hover:text-purple-300 transition-colors"
+              className="text-white font-medium text-sm hover:text-gray-300 transition-colors"
             >
               Undo
             </button>

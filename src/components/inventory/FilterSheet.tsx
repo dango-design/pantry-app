@@ -170,7 +170,7 @@ export function FilterSheet({
             {activeFilterCount > 0 && (
               <button
                 onClick={onReset}
-                className="text-sm text-purple-600 font-medium"
+                className="text-sm text-primary font-medium"
               >
                 Reset
               </button>
@@ -238,13 +238,13 @@ export function FilterSheet({
                   className={cn(
                     'w-full flex items-center justify-between px-4 py-3 rounded-lg text-left',
                     expirationFilter === option.key
-                      ? 'bg-purple-50 text-purple-700'
+                      ? 'bg-primary-soft text-primary'
                       : 'hover:bg-gray-50 text-gray-700'
                   )}
                 >
                   <span className="text-sm">{option.label}</span>
                   {expirationFilter === option.key && (
-                    <Check className="h-4 w-4 text-purple-600" />
+                    <Check className="h-4 w-4 text-primary" />
                   )}
                 </button>
               ))}
@@ -256,7 +256,7 @@ export function FilterSheet({
         <div className="p-4 border-t border-gray-100 safe-area-bottom">
           <button
             onClick={onClose}
-            className="w-full py-3 bg-purple-600 text-white font-medium rounded-lg hover:bg-purple-700 transition-colors"
+            className="w-full py-3 bg-primary text-white font-medium rounded-lg hover:bg-primary-hover transition-colors"
           >
             Apply Filters
             {activeFilterCount > 0 && ` (${activeFilterCount})`}

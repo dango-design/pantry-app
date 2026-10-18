@@ -235,7 +235,7 @@ export function RecipeFormPage() {
         <div className="bg-white border-b border-gray-100 px-4 py-3">
           <button
             onClick={() => setShowImportDialog(true)}
-            className="w-full flex items-center justify-center gap-2 py-3 bg-purple-50 text-purple-700 rounded-xl hover:bg-purple-100 transition-colors"
+            className="w-full flex items-center justify-center gap-2 py-3 bg-primary-soft text-primary rounded-xl hover:bg-primary-muted transition-colors"
           >
             <Link className="h-5 w-5" />
             <span className="font-medium">Import from URL</span>
@@ -254,7 +254,7 @@ export function RecipeFormPage() {
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                 placeholder="e.g. Chicken Stir-Fry"
               />
             </div>
@@ -266,7 +266,7 @@ export function RecipeFormPage() {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 rows={2}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
                 placeholder="Brief description..."
               />
             </div>
@@ -283,14 +283,14 @@ export function RecipeFormPage() {
                           type="number"
                           value={ing.quantity}
                           onChange={(e) => handleIngredientChange(index, 'quantity', Number(e.target.value) || 0)}
-                          className="w-16 px-2 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                          className="w-16 px-2 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                           min="0"
                           step="0.25"
                         />
                         <select
                           value={ing.unit}
                           onChange={(e) => handleIngredientChange(index, 'unit', e.target.value)}
-                          className="w-20 px-2 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white"
+                          className="w-20 px-2 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary bg-white"
                         >
                           <option value="count">ct</option>
                           <option value="cup">cup</option>
@@ -308,7 +308,7 @@ export function RecipeFormPage() {
                           type="text"
                           value={ing.name}
                           onChange={(e) => handleIngredientChange(index, 'name', e.target.value)}
-                          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                           placeholder="Ingredient name"
                         />
                       </div>
@@ -317,7 +317,7 @@ export function RecipeFormPage() {
                           type="text"
                           value={ing.preparation}
                           onChange={(e) => handleIngredientChange(index, 'preparation', e.target.value)}
-                          className="flex-1 px-3 py-1.5 border border-gray-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-purple-500"
+                          className="flex-1 px-3 py-1.5 border border-gray-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-primary"
                           placeholder="Prep (e.g. diced)"
                         />
                         <label className="flex items-center gap-1 text-xs text-gray-500 whitespace-nowrap">
@@ -325,7 +325,7 @@ export function RecipeFormPage() {
                             type="checkbox"
                             checked={ing.isOptional}
                             onChange={(e) => handleIngredientChange(index, 'isOptional', e.target.checked)}
-                            className="w-3.5 h-3.5 rounded border-gray-300 text-purple-600"
+                            className="w-3.5 h-3.5 rounded border-gray-300 text-primary"
                           />
                           Optional
                         </label>
@@ -342,7 +342,7 @@ export function RecipeFormPage() {
               </div>
               <button
                 onClick={handleAddIngredient}
-                className="mt-2 flex items-center gap-1 text-sm text-purple-600 font-medium hover:text-purple-700"
+                className="mt-2 flex items-center gap-1 text-sm text-primary font-medium hover:text-primary-hover"
               >
                 <Plus className="h-4 w-4" /> Add ingredient
               </button>
@@ -354,14 +354,14 @@ export function RecipeFormPage() {
               <div className="space-y-2">
                 {instructions.map((step, index) => (
                   <div key={index} className="flex items-start gap-2">
-                    <span className="flex-shrink-0 w-6 h-6 bg-purple-100 text-purple-700 rounded-full flex items-center justify-center text-xs font-medium mt-2">
+                    <span className="flex-shrink-0 w-6 h-6 bg-primary-muted text-primary rounded-full flex items-center justify-center text-xs font-medium mt-2">
                       {index + 1}
                     </span>
                     <textarea
                       value={step}
                       onChange={(e) => handleInstructionChange(index, e.target.value)}
                       rows={2}
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary resize-none"
                       placeholder={`Step ${index + 1}...`}
                     />
                     <button
@@ -375,7 +375,7 @@ export function RecipeFormPage() {
               </div>
               <button
                 onClick={handleAddInstruction}
-                className="mt-2 flex items-center gap-1 text-sm text-purple-600 font-medium hover:text-purple-700"
+                className="mt-2 flex items-center gap-1 text-sm text-primary font-medium hover:text-primary-hover"
               >
                 <Plus className="h-4 w-4" /> Add step
               </button>
@@ -389,7 +389,7 @@ export function RecipeFormPage() {
                   type="number"
                   value={prepTime}
                   onChange={(e) => setPrepTime(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-primary"
                   min="0"
                 />
               </div>
@@ -399,7 +399,7 @@ export function RecipeFormPage() {
                   type="number"
                   value={cookTime}
                   onChange={(e) => setCookTime(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-primary"
                   min="0"
                 />
               </div>
@@ -409,7 +409,7 @@ export function RecipeFormPage() {
                   type="number"
                   value={servings}
                   onChange={(e) => setServings(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-primary"
                   min="1"
                 />
               </div>
@@ -422,7 +422,7 @@ export function RecipeFormPage() {
                 <select
                   value={difficulty}
                   onChange={(e) => setDifficulty(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-primary bg-white"
                 >
                   {DIFFICULTY_OPTIONS.map((opt) => (
                     <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -435,7 +435,7 @@ export function RecipeFormPage() {
                   type="text"
                   value={cuisine}
                   onChange={(e) => setCuisine(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-primary"
                   placeholder="e.g. Italian"
                 />
               </div>
@@ -448,7 +448,7 @@ export function RecipeFormPage() {
                 type="text"
                 value={tags}
                 onChange={(e) => setTags(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-primary"
                 placeholder="dinner, quick, comfort food"
               />
               <p className="text-xs text-gray-400 mt-1">Comma-separated</p>
@@ -465,7 +465,7 @@ export function RecipeFormPage() {
                     onClick={() => handleDietaryToggle(opt.key)}
                     className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-all ${
                       dietaryInfo.has(opt.key)
-                        ? 'bg-purple-600 text-white border-transparent'
+                        ? 'bg-primary text-white border-transparent'
                         : 'bg-white text-gray-600 border-gray-300'
                     }`}
                   >
@@ -482,7 +482,7 @@ export function RecipeFormPage() {
                 type="url"
                 value={imageUrl}
                 onChange={(e) => setImageUrl(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-primary"
                 placeholder="https://..."
               />
             </div>
@@ -494,7 +494,7 @@ export function RecipeFormPage() {
                 type="url"
                 value={sourceUrl}
                 onChange={(e) => setSourceUrl(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-primary"
                 placeholder="https://..."
               />
             </div>
@@ -506,7 +506,7 @@ export function RecipeFormPage() {
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 rows={3}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-primary resize-none"
                 placeholder="Personal notes about this recipe..."
               />
             </div>
@@ -525,7 +525,7 @@ export function RecipeFormPage() {
             <Button
               onClick={handleSubmit}
               disabled={!name.trim()}
-              className="flex-1 bg-purple-600 hover:bg-purple-700"
+              className="flex-1 bg-primary hover:bg-primary-hover"
             >
               {isEditing ? 'Save Changes' : 'Create Recipe'}
             </Button>
@@ -544,7 +544,7 @@ export function RecipeFormPage() {
           type="url"
           value={importUrl}
           onChange={(e) => setImportUrl(e.target.value)}
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-purple-500"
+          className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-primary"
           placeholder="https://example.com/recipe"
         />
         <DialogActions>

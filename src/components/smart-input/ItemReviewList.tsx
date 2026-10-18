@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Check, X, Edit2, Trash2, ChevronDown } from 'lucide-react'
 import { Button, Input } from '@/components/common'
 import { CATEGORIES, QUANTITY_UNITS, STORAGE_LOCATIONS } from '@/utils/constants'
-import { getFoodIcon } from '@/components/icons'
+import { FoodThumbnail } from '@/components/icons'
 import { cn } from '@/utils/cn'
 import type { FoodCategory, StorageLocation, QuantityUnit } from '@/types'
 
@@ -91,7 +91,6 @@ export function ItemReviewList({
         ) : (
           <div className="p-4 space-y-3">
             {items.map(item => {
-              const FoodIcon = getFoodIcon(item.name)
               const isEditing = editingId === item.id
 
               return (
@@ -99,7 +98,7 @@ export function ItemReviewList({
                   key={item.id}
                   className={cn(
                     'bg-white rounded-xl border-2 transition-colors',
-                    item.selected ? 'border-purple-500' : 'border-transparent'
+                    item.selected ? 'border-primary' : 'border-transparent'
                   )}
                 >
                   {/* Main row */}
@@ -109,16 +108,19 @@ export function ItemReviewList({
                       className={cn(
                         'w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0',
                         item.selected
-                          ? 'bg-purple-600 border-purple-600'
+                          ? 'bg-primary border-primary'
                           : 'border-gray-300'
                       )}
                     >
                       {item.selected && <Check className="h-4 w-4 text-white" />}
                     </button>
 
-                    <div className="w-10 h-10 flex items-center justify-center flex-shrink-0">
-                      <FoodIcon size={36} />
-                    </div>
+                    <FoodThumbnail
+                      name={item.name}
+                      category={item.category}
+                      iconSize={20}
+                      className="w-10 h-10 rounded-lg flex-shrink-0"
+                    />
 
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-gray-900 truncate">
@@ -244,7 +246,7 @@ export function ItemReviewList({
             onClick={handleConfirm}
             loading={loading}
             disabled={selectedCount === 0}
-            className="flex-1 bg-purple-600 hover:bg-purple-700"
+            className="flex-1 bg-primary hover:bg-primary-hover"
           >
             Add {selectedCount} {selectedCount === 1 ? 'Item' : 'Items'}
           </Button>

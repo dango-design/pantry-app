@@ -99,7 +99,7 @@ export function BottomNav() {
           className={({ isActive }) =>
             cn(
               'flex flex-col items-center justify-center flex-1 h-full gap-0.5 transition-colors',
-              isActive ? 'text-purple-600' : 'text-gray-400 hover:text-gray-600'
+              isActive ? 'text-primary' : 'text-gray-400 hover:text-gray-600'
             )
           }
         >
@@ -117,7 +117,7 @@ export function BottomNav() {
           className={({ isActive }) =>
             cn(
               'flex flex-col items-center justify-center flex-1 h-full gap-0.5 transition-colors',
-              isActive ? 'text-purple-600' : 'text-gray-400 hover:text-gray-600'
+              isActive ? 'text-primary' : 'text-gray-400 hover:text-gray-600'
             )
           }
         >
@@ -134,7 +134,7 @@ export function BottomNav() {
           onClick={() => navigate('/add')}
           className="flex flex-col items-center justify-center flex-1 h-full"
         >
-          <div className="w-11 h-11 bg-purple-600 rounded-full flex items-center justify-center shadow-md hover:bg-purple-700 active:scale-95 transition-all">
+          <div className="w-11 h-11 bg-primary rounded-full flex items-center justify-center shadow-md hover:bg-primary-hover active:scale-95 transition-all">
             <Plus className="h-6 w-6 text-white" />
           </div>
         </button>
@@ -145,7 +145,7 @@ export function BottomNav() {
           className={({ isActive }) =>
             cn(
               'flex flex-col items-center justify-center flex-1 h-full gap-0.5 transition-colors',
-              isActive ? 'text-purple-600' : 'text-gray-400 hover:text-gray-600'
+              isActive ? 'text-primary' : 'text-gray-400 hover:text-gray-600'
             )
           }
         >

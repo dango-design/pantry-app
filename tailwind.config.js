@@ -7,6 +7,13 @@ export default {
   theme: {
     extend: {
       colors: {
+        // Brand primary (ink). Change these to re-theme buttons, chips, focus rings and the add button.
+        primary: {
+          DEFAULT: '#18181B', // zinc-900: filled buttons, selected chips, active nav
+          hover: '#3F3F46', // zinc-700: hover on filled primary, hover on primary text
+          soft: '#F4F4F5', // zinc-100: tinted backgrounds (tags, quick-add tiles)
+          muted: '#E4E4E7', // zinc-200: hover on soft backgrounds, step badges
+        },
         // Category colors (from Figma/spec)
         category: {
           produce: '#22C55E',

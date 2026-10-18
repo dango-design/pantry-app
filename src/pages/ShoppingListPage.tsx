@@ -135,7 +135,7 @@ export function ShoppingListPage() {
           />
           <button
             onClick={handleAddItem}
-            className="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="p-2 bg-primary text-white rounded-lg hover:bg-primary-hover transition-colors"
           >
             <Plus className="h-5 w-5" />
           </button>
@@ -196,7 +196,7 @@ export function ShoppingListPage() {
                       className={cn(
                         'w-5 h-5 rounded border-2 flex items-center justify-center transition-colors flex-shrink-0',
                         item.isChecked
-                          ? 'bg-blue-600 border-blue-600'
+                          ? 'bg-primary border-primary'
                           : 'border-gray-300 hover:border-gray-400'
                       )}
                     >

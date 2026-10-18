@@ -3,9 +3,9 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { ArrowLeft, Minus, Plus, Clock, MapPin, Tag, ShoppingCart, CheckCircle2 } from 'lucide-react'
 import { Button, Card, CardContent, Dialog, DialogActions, Snackbar } from '@/components/common'
 import { useDemoStore } from '@/stores/demoStore'
-import { CATEGORIES, STORAGE_LOCATIONS, QUANTITY_UNITS } from '@/utils/constants'
+import { CATEGORIES, CATEGORY_TONES, STORAGE_LOCATIONS, QUANTITY_UNITS } from '@/utils/constants'
 import { formatExpirationText, getFreshnessLevel, FRESHNESS_COLORS } from '@/utils/freshness'
-import { getFoodIcon } from '@/components/icons'
+import { FoodThumbnail } from '@/components/icons'
 
 // Snackbar state type
 interface SnackbarState {
@@ -43,7 +43,7 @@ export function ItemDetailPage() {
   const location = STORAGE_LOCATIONS[item.storageLocation] || { label: item.storageLocation, color: '#6B7280' }
   const freshnessLevel = getFreshnessLevel(item.expirationDate, item.freshnessScore)
   const unitLabel = QUANTITY_UNITS[item.quantityUnit]?.shortLabel || ''
-  const FoodIcon = getFoodIcon(item.name)
+  const tone = CATEGORY_TONES[item.category] || CATEGORY_TONES.other
 
 
   const handleUse = () => {
@@ -134,7 +134,7 @@ export function ItemDetailPage() {
               {/* Category indicator */}
               <div
                 className="w-2 h-20 rounded-full flex-shrink-0"
-                style={{ backgroundColor: category.color }}
+                style={{ backgroundColor: tone.strip }}
               />
 
               <div className="flex-1">
@@ -172,7 +172,13 @@ export function ItemDetailPage() {
 
               {/* Food Icon */}
               <div className="flex-shrink-0">
-                <FoodIcon size={64} />
+                <FoodThumbnail
+                  name={item.name}
+                  category={item.category}
+                  imageUrl={item.imageUrl}
+                  iconSize={32}
+                  className="w-16 h-16 rounded-xl"
+                />
               </div>
             </div>
           </CardContent>
@@ -246,7 +252,7 @@ export function ItemDetailPage() {
           {/* Secondary action: Mark as Used */}
           <Button
             onClick={handleMarkUsed}
-            className="w-full bg-purple-600 hover:bg-purple-700"
+            className="w-full bg-primary hover:bg-primary-hover"
             size="lg"
           >
             <CheckCircle2 className="h-5 w-5 mr-2" />

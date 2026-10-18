@@ -144,7 +144,7 @@ export function RecipeFilterSheet({
           <h2 className="text-lg font-semibold text-gray-900">Recipe Filters</h2>
           <div className="flex items-center gap-3">
             {activeFilterCount > 0 && (
-              <button onClick={onReset} className="text-sm text-purple-600 font-medium">
+              <button onClick={onReset} className="text-sm text-primary font-medium">
                 Reset
               </button>
             )}
@@ -166,7 +166,7 @@ export function RecipeFilterSheet({
                   className={cn(
                     'px-3 py-1.5 rounded-full text-sm font-medium transition-all border',
                     cuisine === c
-                      ? 'bg-purple-600 text-white border-transparent'
+                      ? 'bg-primary text-white border-transparent'
                       : 'bg-white text-gray-600 border-gray-300 hover:border-gray-400'
                   )}
                 >
@@ -187,12 +187,12 @@ export function RecipeFilterSheet({
                   className={cn(
                     'w-full flex items-center justify-between px-4 py-3 rounded-lg text-left',
                     difficulty === option.key
-                      ? 'bg-purple-50 text-purple-700'
+                      ? 'bg-primary-soft text-primary'
                       : 'hover:bg-gray-50 text-gray-700'
                   )}
                 >
                   <span className="text-sm">{option.label}</span>
-                  {difficulty === option.key && <Check className="h-4 w-4 text-purple-600" />}
+                  {difficulty === option.key && <Check className="h-4 w-4 text-primary" />}
                 </button>
               ))}
             </div>
@@ -209,7 +209,7 @@ export function RecipeFilterSheet({
                   className={cn(
                     'px-3 py-1.5 rounded-full text-sm font-medium transition-all border',
                     dietaryFilters.has(option.key)
-                      ? 'bg-purple-600 text-white border-transparent'
+                      ? 'bg-primary text-white border-transparent'
                       : 'bg-white text-gray-600 border-gray-300 hover:border-gray-400'
                   )}
                 >
@@ -230,7 +230,7 @@ export function RecipeFilterSheet({
                   className={cn(
                     'px-3 py-1.5 rounded-full text-sm font-medium transition-all border',
                     maxCookTime === option.key
-                      ? 'bg-purple-600 text-white border-transparent'
+                      ? 'bg-primary text-white border-transparent'
                       : 'bg-white text-gray-600 border-gray-300 hover:border-gray-400'
                   )}
                 >
@@ -244,7 +244,7 @@ export function RecipeFilterSheet({
         <div className="p-4 border-t border-gray-100 safe-area-bottom">
           <button
             onClick={onClose}
-            className="w-full py-3 bg-purple-600 text-white font-medium rounded-lg hover:bg-purple-700 transition-colors"
+            className="w-full py-3 bg-primary text-white font-medium rounded-lg hover:bg-primary-hover transition-colors"
           >
             Apply Filters{activeFilterCount > 0 && ` (${activeFilterCount})`}
           </button>

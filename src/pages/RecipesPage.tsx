@@ -131,12 +131,12 @@ export function RecipesPage() {
                 placeholder="Search Recipes"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full h-10 pl-10 pr-4 bg-white border border-gray-200 rounded-lg text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                className="w-full h-10 pl-10 pr-4 bg-white border border-gray-200 rounded-lg text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
               />
             </div>
             <button
               onClick={handleAiSuggest}
-              className="w-10 h-10 flex items-center justify-center text-purple-600 hover:text-purple-700"
+              className="w-10 h-10 flex items-center justify-center text-primary hover:text-primary-hover"
               title="AI Suggest"
             >
               <Sparkles className="h-5 w-5" />
@@ -157,7 +157,7 @@ export function RecipesPage() {
             >
               <SlidersHorizontal className="h-4 w-4" />
               {activeFilterCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-4 h-4 bg-purple-600 text-white text-xs rounded-full flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 w-4 h-4 bg-primary text-white text-xs rounded-full flex items-center justify-center">
                   {activeFilterCount}
                 </span>
               )}
@@ -172,7 +172,7 @@ export function RecipesPage() {
                     className={cn(
                       'flex-shrink-0 px-4 py-1.5 rounded-full text-sm font-medium transition-all border',
                       quickFilter === chip.key
-                        ? 'bg-purple-600 text-white border-transparent'
+                        ? 'bg-primary text-white border-transparent'
                         : 'bg-white text-gray-600 border-gray-300 hover:border-gray-400'
                     )}
                   >
@@ -203,7 +203,7 @@ export function RecipesPage() {
               {recipes.length === 0 && (
                 <button
                   onClick={() => navigate('/recipe/new')}
-                  className="mt-4 px-6 py-2 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 transition-colors"
+                  className="mt-4 px-6 py-2 bg-primary text-white rounded-lg font-medium hover:bg-primary-hover transition-colors"
                 >
                   Add Recipe
                 </button>

@@ -213,7 +213,7 @@ export function RecipeDetailPage() {
             {(recipe.cuisine || recipe.tags.length > 0) && (
               <div className="flex flex-wrap gap-1.5 mt-3">
                 {recipe.cuisine && (
-                  <span className="px-2 py-0.5 bg-purple-50 text-purple-700 rounded-full text-xs font-medium">
+                  <span className="px-2 py-0.5 bg-primary-soft text-primary rounded-full text-xs font-medium">
                     {recipe.cuisine}
                   </span>
                 )}
@@ -281,7 +281,7 @@ export function RecipeDetailPage() {
             <ol className="space-y-3">
               {recipe.instructions.map((step, index) => (
                 <li key={index} className="flex gap-3">
-                  <span className="flex-shrink-0 w-6 h-6 bg-purple-100 text-purple-700 rounded-full flex items-center justify-center text-xs font-medium">
+                  <span className="flex-shrink-0 w-6 h-6 bg-primary-muted text-primary rounded-full flex items-center justify-center text-xs font-medium">
                     {index + 1}
                   </span>
                   <p className="text-sm text-gray-700 leading-relaxed pt-0.5">{step}</p>
@@ -310,7 +310,7 @@ export function RecipeDetailPage() {
         <div className="flex gap-3 max-w-lg mx-auto">
           <Button
             onClick={handleOpenCookDialog}
-            className="flex-1 bg-purple-600 hover:bg-purple-700"
+            className="flex-1 bg-primary hover:bg-primary-hover"
             size="lg"
           >
             <CookingPot className="h-5 w-5 mr-2" />
@@ -384,7 +384,7 @@ export function RecipeDetailPage() {
                     }
                     setCheckedIngredients(newSet)
                   }}
-                  className="w-4 h-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                  className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary"
                 />
                 <span className="text-sm">
                   {ingredient.quantity} {ingredient.unit} {ingredient.name}
