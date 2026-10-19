@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { format, isValid, parseISO } from 'date-fns'
 import { ChevronLeft, ChevronRight, Plus, ShoppingCart } from 'lucide-react'
@@ -65,6 +65,20 @@ export function PlanPage() {
     const isThisWeek = toLocalDateString(start) === toLocalDateString(getWeekStart(new Date()))
     setSearchParams(isThisWeek ? {} : { week: toLocalDateString(start) }, { replace: true })
   }
+
+  // /plan?add=yyyy-MM-dd&slot=dinner (from the Add sheet) opens the recipe picker for
+  // that slot on its week, then drops the params so going back doesn't reopen it
+  useEffect(() => {
+    const date = searchParams.get('add')
+    const slot = searchParams.get('slot')
+    if (!date) return
+    const parsed = parseISO(date)
+    const target = isValid(parsed) && MEAL_SLOTS.some((s) => s.key === slot) ? { date, slot: slot as MealSlot } : null
+    if (target) setPickerTarget(target)
+    const start = toLocalDateString(getWeekStart(isValid(parsed) ? parsed : new Date()))
+    const isThisWeek = start === toLocalDateString(getWeekStart(new Date()))
+    setSearchParams(isThisWeek ? {} : { week: start }, { replace: true })
+  }, [searchParams, setSearchParams])
 
   const recipesById = useMemo(() => new Map(recipes.map((r) => [r.id, r])), [recipes])
 

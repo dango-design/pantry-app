@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { MoreVertical, ChevronDown, Camera, Barcode, Receipt, Loader2 } from 'lucide-react'
 import { Button } from '@/components/common'
 import { PhotoCapture, BarcodeScanner, ItemReviewList, type ReviewItem } from '@/components/smart-input'
@@ -58,8 +58,13 @@ export function AddItemPage() {
   const editingItem = isEditing ? inventory.find((i) => i.id === id) : undefined
   const [loading, setLoading] = useState(false)
 
-  // Smart input state
-  const [smartInputMode, setSmartInputMode] = useState<SmartInputMode>(null)
+  // Smart input state. /add?mode=barcode (or photo, receipt) opens that scanner
+  // straight away, e.g. from the Add sheet's shortcuts.
+  const [searchParams] = useSearchParams()
+  const [smartInputMode, setSmartInputMode] = useState<SmartInputMode>(() => {
+    const mode = searchParams.get('mode')
+    return !isEditing && (mode === 'photo' || mode === 'barcode' || mode === 'receipt') ? mode : null
+  })
   const [reviewItems, setReviewItems] = useState<ReviewItem[]>([])
   const [processingImage, setProcessingImage] = useState(false)
 

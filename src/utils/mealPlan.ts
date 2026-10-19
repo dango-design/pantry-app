@@ -93,6 +93,26 @@ export function getNextPlanDay(date: string, today = todayDateString()): string 
   return next > today ? next : today
 }
 
+/**
+ * The first meal slot from now on with nothing planned (a skipped meal leaves
+ * its slot open), looking two weeks ahead. Today starts at the current meal:
+ * breakfast until 10:30, lunch until 3pm, then dinner.
+ */
+export function getNextOpenSlot(entries: MealPlanEntry[], now = new Date()): { date: string; slot: MealSlot } {
+  const taken = new Set(entries.filter((e) => e.status !== 'skipped').map((e) => `${e.date}:${e.slot}`))
+  const hour = now.getHours() + now.getMinutes() / 60
+  const firstSlotToday = hour < 10.5 ? 0 : hour < 15 ? 1 : 2
+
+  for (let day = 0; day < 14; day++) {
+    const date = toLocalDateString(addDays(now, day))
+    for (let i = day === 0 ? firstSlotToday : 0; i < MEAL_SLOTS.length; i++) {
+      const slot = MEAL_SLOTS[i].key
+      if (!taken.has(`${date}:${slot}`)) return { date, slot }
+    }
+  }
+  return { date: toLocalDateString(addDays(now, 14)), slot: 'dinner' }
+}
+
 // ---------------------------------------------------------------------------
 // Servings
 // ---------------------------------------------------------------------------

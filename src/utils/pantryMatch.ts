@@ -47,6 +47,12 @@ export function isLowStock(item: FoodItem): boolean {
   return isDiscreteUnit(item.quantityUnit) && item.originalQuantity > 1 && item.quantity <= 1
 }
 
+/** A pantry item in stock and not running low: worth flagging before buying more */
+export function findStockedInPantry(name: string, inventory: FoodItem[]): FoodItem | undefined {
+  const match = findInPantry(name, inventory)
+  return match && !isLowStock(match) ? match : undefined
+}
+
 const LOCATION_PHRASES: Record<string, string> = {
   refrigerator: 'in the fridge',
   freezer: 'in the freezer',

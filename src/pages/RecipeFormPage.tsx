@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { ArrowLeft, Plus, X, Link, Loader2 } from 'lucide-react'
 import { Button, Dialog, DialogActions, Snackbar } from '@/components/common'
 import { useDemoStore, DEMO_USER, DEMO_HOUSEHOLD } from '@/stores/demoStore'
@@ -55,8 +55,9 @@ export function RecipeFormPage() {
   const [sourceUrl, setSourceUrl] = useState('')
   const [notes, setNotes] = useState('')
 
-  // Import dialog
-  const [showImportDialog, setShowImportDialog] = useState(false)
+  // Import dialog. /recipe/new?import=1 opens it straight away (from the Add sheet).
+  const [searchParams] = useSearchParams()
+  const [showImportDialog, setShowImportDialog] = useState(() => !isEditing && searchParams.get('import') === '1')
   const [importUrl, setImportUrl] = useState('')
   const [importing, setImporting] = useState(false)
   const [snackbar, setSnackbar] = useState({ open: false, message: '' })

@@ -1,8 +1,9 @@
-import type { ComponentType } from 'react'
-import { NavLink, useNavigate } from 'react-router-dom'
+import { useCallback, useEffect, useState, type ComponentType } from 'react'
+import { NavLink, useLocation } from 'react-router-dom'
 import { Plus } from 'lucide-react'
 import { PantryIcon } from '@/components/icons'
 import { cn } from '@/utils/cn'
+import { AddSheet } from './AddSheet'
 
 // Outline tab icons. The active tab is marked by color and an underline, not a filled icon,
 // so the filled add button stays the one solid shape in the bar.
@@ -77,28 +78,47 @@ function TabLink({ to, label, Icon }: TabLinkProps) {
 }
 
 export function BottomNav() {
-  const navigate = useNavigate()
+  const { pathname } = useLocation()
+  const [addOpen, setAddOpen] = useState(false)
+  const closeAdd = useCallback(() => setAddOpen(false), [])
+
+  // Switching tabs while the Add sheet is open closes it
+  useEffect(() => {
+    setAddOpen(false)
+  }, [pathname])
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 z-40 safe-area-bottom">
-      <div className="flex items-center justify-around h-16 max-w-lg mx-auto">
-        <TabLink to="/" label="Pantry" Icon={PantryIcon} />
-        <TabLink to="/recipes" label="Recipes" Icon={RecipeIcon} />
+    <>
+      <AddSheet open={addOpen} onClose={closeAdd} />
 
-        {/* Add Button */}
-        <button
-          onClick={() => navigate('/add')}
-          aria-label="Add item"
-          className="flex flex-col items-center justify-center flex-1 h-full"
-        >
-          <div className="w-11 h-11 bg-primary rounded-full flex items-center justify-center shadow-md hover:bg-primary-hover active:scale-95 transition-all">
-            <Plus className="h-6 w-6 text-white" />
-          </div>
-        </button>
+      {/* Above the Add sheet's backdrop while it's open, so the + (now ×) closes it */}
+      <nav
+        className={cn(
+          'fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 safe-area-bottom',
+          addOpen ? 'z-[52]' : 'z-40'
+        )}
+      >
+        <div className="flex items-center justify-around h-16 max-w-lg mx-auto">
+          <TabLink to="/" label="Pantry" Icon={PantryIcon} />
+          <TabLink to="/recipes" label="Recipes" Icon={RecipeIcon} />
 
-        <TabLink to="/plan" label="Plan" Icon={PlanIcon} />
-        <TabLink to="/shopping" label="Shopping" Icon={CartIcon} />
-      </div>
-    </nav>
+          {/* Add button: opens the Add sheet */}
+          <button
+            onClick={() => setAddOpen((open) => !open)}
+            aria-label={addOpen ? 'Close add menu' : 'Add'}
+            aria-expanded={addOpen}
+            aria-haspopup="dialog"
+            className="flex flex-col items-center justify-center flex-1 h-full"
+          >
+            <div className="w-11 h-11 bg-primary rounded-full flex items-center justify-center shadow-md hover:bg-primary-hover active:scale-95 transition-all">
+              <Plus className={cn('h-6 w-6 text-white transition-transform duration-200', addOpen && 'rotate-45')} />
+            </div>
+          </button>
+
+          <TabLink to="/plan" label="Plan" Icon={PlanIcon} />
+          <TabLink to="/shopping" label="Shopping" Icon={CartIcon} />
+        </div>
+      </nav>
+    </>
   )
 }
