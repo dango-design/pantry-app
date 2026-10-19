@@ -63,7 +63,7 @@ export function RecipeDetailPage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <p className="text-gray-500 mb-4">Recipe not found</p>
-          <Button onClick={() => navigate('/recipes')}>Go to Recipes</Button>
+          <Button onClick={() => navigate('/recipes')}>Go to recipes</Button>
         </div>
       </div>
     )
@@ -354,7 +354,7 @@ export function RecipeDetailPage() {
             size="lg"
           >
             <CookingPot className="h-5 w-5 mr-2" />
-            I Made This
+            I made this
           </Button>
           {requiredMissingCount > 0 && (
             <Button
@@ -364,7 +364,7 @@ export function RecipeDetailPage() {
               className="flex-1"
             >
               <ShoppingCart className="h-5 w-5 mr-2" />
-              Add Missing ({requiredMissingCount})
+              Add missing ({requiredMissingCount})
             </Button>
           )}
           <Button
@@ -382,7 +382,7 @@ export function RecipeDetailPage() {
       <Dialog
         open={showDeleteDialog}
         onClose={() => setShowDeleteDialog(false)}
-        title="Delete Recipe"
+        title="Delete recipe"
         description={`Are you sure you want to delete "${recipe.name}"? This cannot be undone.`}
       >
         <DialogActions>
@@ -395,7 +395,7 @@ export function RecipeDetailPage() {
       <Dialog
         open={showCookDialog}
         onClose={() => setShowCookDialog(false)}
-        title="I Made This!"
+        title="I made this!"
         description="How much did you use? We'll deduct it from your pantry."
       >
         <div className="space-y-1 max-h-80 overflow-y-auto">
@@ -450,7 +450,7 @@ export function RecipeDetailPage() {
         </div>
         <DialogActions>
           <Button variant="secondary" onClick={() => setShowCookDialog(false)}>Cancel</Button>
-          <Button onClick={handleCook}>Done Cooking</Button>
+          <Button onClick={handleCook}>Done cooking</Button>
         </DialogActions>
       </Dialog>
 

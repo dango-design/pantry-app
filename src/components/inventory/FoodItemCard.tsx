@@ -284,14 +284,14 @@ export function FoodItemCard({
           <button
             onClick={handleAddToCart}
             className="w-14 flex items-center justify-center bg-teal-500 text-white hover:bg-teal-600 transition-colors"
-            title="Add to Grocery List & Remove from Pantry"
+            title="Add to grocery list & remove from pantry"
           >
             <ShoppingCart className="h-5 w-5" />
           </button>
           <button
             onClick={handleMarkUsed}
             className="w-14 flex items-center justify-center bg-red-500 text-white hover:bg-red-600 transition-colors"
-            title="Remove from Pantry"
+            title="Remove from pantry"
           >
             <Trash2 className="h-5 w-5" />
           </button>

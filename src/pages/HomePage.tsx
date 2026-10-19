@@ -71,7 +71,7 @@ export function HomePage() {
         {/* Demo Mode Banner */}
         {isDemoMode && (
           <div className="bg-gradient-to-r from-green-500 to-emerald-600 text-white p-3 rounded-xl text-sm flex items-center justify-between">
-            <span>Demo Mode - Changes are saved locally</span>
+            <span>Demo mode - changes are saved locally</span>
             <Badge variant="success" size="sm" className="bg-white/20 text-white">
               {activeItems.length} items
             </Badge>
@@ -84,7 +84,7 @@ export function HomePage() {
           className="w-full p-4 border-2 border-dashed border-gray-300 rounded-xl text-gray-500 hover:border-blue-400 hover:text-blue-600 hover:bg-blue-50 transition-colors flex items-center justify-center gap-2"
         >
           <Plus className="h-5 w-5" />
-          Add Food Items
+          Add food items
         </button>
 
         {/* Expiring Soon Section */}
@@ -167,7 +167,7 @@ export function HomePage() {
                 className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
               >
                 <Plus className="h-4 w-4" />
-                Add Items
+                Add items
               </button>
             </CardContent>
           </Card>

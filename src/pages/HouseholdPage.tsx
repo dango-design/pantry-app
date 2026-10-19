@@ -179,7 +179,7 @@ export function HouseholdPage() {
             <button onClick={() => setView('main')} className="p-2 -ml-2">
               <ArrowLeft className="h-5 w-5" />
             </button>
-            <h1 className="text-lg font-semibold">Join Household</h1>
+            <h1 className="text-lg font-semibold">Join household</h1>
           </div>
         </header>
 
@@ -190,7 +190,7 @@ export function HouseholdPage() {
                 Enter the invite code shared by a household member to join their household.
               </p>
               <Input
-                label="Invite Code"
+                label="Invite code"
                 value={inviteCode}
                 onChange={(e) => setInviteCode(e.target.value.toUpperCase())}
                 placeholder="e.g., ABC12345"
@@ -202,7 +202,7 @@ export function HouseholdPage() {
                 disabled={joining || !inviteCode.trim()}
                 className="w-full"
               >
-                {joining ? 'Joining...' : 'Join Household'}
+                {joining ? 'Joining...' : 'Join household'}
               </Button>
             </CardContent>
           </Card>
@@ -233,7 +233,7 @@ export function HouseholdPage() {
           </div>
         )}
 
-        {/* Household Name */}
+        {/* Household name */}
         <Card>
           <CardContent className="p-4">
             {editing ? (
@@ -258,7 +258,7 @@ export function HouseholdPage() {
             ) : (
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-500">Household Name</p>
+                  <p className="text-sm text-gray-500">Household name</p>
                   <p className="font-medium text-lg">{household?.name}</p>
                 </div>
                 {isOwner && (
@@ -271,12 +271,12 @@ export function HouseholdPage() {
           </CardContent>
         </Card>
 
-        {/* Invite Code */}
+        {/* Invite code */}
         <Card>
           <CardContent className="p-4 space-y-3">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-500">Invite Code</p>
+                <p className="text-sm text-gray-500">Invite code</p>
                 <p className="font-mono text-xl font-semibold tracking-wider">
                   {household?.invite_code}
                 </p>
@@ -375,7 +375,7 @@ export function HouseholdPage() {
                 <UserPlus className="h-5 w-5 text-blue-600" />
               </div>
               <div className="flex-1 text-left">
-                <p className="font-medium">Join Another Household</p>
+                <p className="font-medium">Join another household</p>
                 <p className="text-sm text-gray-500">
                   Use an invite code to join a different household
                 </p>
@@ -390,7 +390,7 @@ export function HouseholdPage() {
                   <LogOut className="h-5 w-5 text-red-600" />
                 </div>
                 <div className="flex-1 text-left">
-                  <p className="font-medium">Leave Household</p>
+                  <p className="font-medium">Leave household</p>
                   <p className="text-sm text-red-400">
                     Create a new personal household
                   </p>

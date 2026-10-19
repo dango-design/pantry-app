@@ -10,9 +10,9 @@ export type ExpirationFilter = 'all' | 'expired' | 'today' | 'week' | 'month'
 export const EXPIRATION_OPTIONS: { key: ExpirationFilter; label: string }[] = [
   { key: 'all', label: 'All' },
   { key: 'expired', label: 'Expired' },
-  { key: 'today', label: 'Expiring Today' },
-  { key: 'week', label: 'Within 7 Days' },
-  { key: 'month', label: 'Within 30 Days' },
+  { key: 'today', label: 'Expiring today' },
+  { key: 'week', label: 'Within 7 days' },
+  { key: 'month', label: 'Within 30 days' },
 ]
 
 interface FilterSheetProps {
@@ -188,7 +188,7 @@ export function FilterSheet({
         <div className="overflow-y-auto p-4 space-y-6 max-h-[calc(85vh-100px)]">
           {/* Category Section */}
           <div>
-            <h3 className="text-sm font-medium text-gray-700 mb-3">Type of Food</h3>
+            <h3 className="text-sm font-medium text-gray-700 mb-3">Type of food</h3>
             <div className="flex flex-wrap gap-2">
               <FilterChip
                 label="All"
@@ -258,7 +258,7 @@ export function FilterSheet({
             onClick={onClose}
             className="w-full py-3 bg-primary text-white font-medium rounded-lg hover:bg-primary-hover transition-colors"
           >
-            Apply Filters
+            Apply filters
             {activeFilterCount > 0 && ` (${activeFilterCount})`}
           </button>
         </div>

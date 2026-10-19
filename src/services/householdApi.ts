@@ -197,7 +197,7 @@ export async function leaveHousehold(): Promise<void> {
   const { data: newHousehold, error: householdError } = await supabase
     .from('households')
     .insert({
-      name: 'My Household',
+      name: 'My household',
       owner_id: user.id,
       invite_code: generateInviteCode(),
     })
@@ -223,7 +223,7 @@ export async function leaveHousehold(): Promise<void> {
     .from('shopping_lists')
     .insert({
       household_id: newHousehold.id,
-      name: 'Shopping List',
+      name: 'Shopping list',
       is_default: true,
     })
 }
@@ -253,7 +253,7 @@ export async function removeHouseholdMember(memberId: string): Promise<void> {
 
   // Cannot remove yourself as owner
   if (member.user_id === user.id) {
-    throw new Error('Cannot remove yourself. Use "Leave Household" instead.')
+    throw new Error('Cannot remove yourself. Use "Leave household" instead.')
   }
 
   // Remove the member

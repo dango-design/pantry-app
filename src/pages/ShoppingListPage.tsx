@@ -148,7 +148,7 @@ export function ShoppingListPage() {
   return (
     <div className="min-h-screen pb-24">
       <Header
-        title="Shopping List"
+        title="Shopping list"
         showSearch={false}
         showAdd={false}
       />
@@ -207,7 +207,7 @@ export function ShoppingListPage() {
                   className="w-4 h-4 rounded"
                   style={{ backgroundColor: categoryConfig?.color || '#6B7280' }}
                 />
-                <span className="text-sm font-medium text-gray-700 uppercase">
+                <span className="text-sm font-medium text-gray-700">
                   {categoryConfig?.label || category}
                 </span>
               </div>
@@ -296,7 +296,7 @@ export function ShoppingListPage() {
               size="sm"
               onClick={handleReviewChecked}
             >
-              Add to Pantry
+              Add to pantry
             </Button>
           </div>
         </div>
@@ -309,7 +309,7 @@ export function ShoppingListPage() {
           onItemsChange={setReviewItems}
           onConfirm={handleAddReviewedToInventory}
           onCancel={() => setReviewItems(null)}
-          title="Add to Pantry"
+          title="Add to pantry"
           description="Check where each item goes and when it expires. Tap the pencil to change details."
         />
       )}

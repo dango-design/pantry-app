@@ -60,7 +60,7 @@ export function LoginPage() {
           className="w-full mb-6 p-4 bg-primary text-white rounded-xl font-medium flex items-center justify-center gap-2 hover:bg-primary-hover transition-colors"
         >
           <Play className="h-5 w-5" />
-          Try Demo (No Account Needed)
+          Try demo (no account needed)
         </button>
 
         <div className="relative mb-6">

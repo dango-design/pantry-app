@@ -43,7 +43,7 @@ export const Default: Story = {
 
 export const ShoppingList: Story = {
   args: {
-    title: 'Shopping List',
+    title: 'Shopping list',
     showSearch: false,
   },
 }
@@ -58,13 +58,13 @@ export const Settings: Story = {
 
 export const CustomTitle: Story = {
   args: {
-    title: 'My Custom Page',
+    title: 'My custom page',
   },
 }
 
 export const NoActions: Story = {
   args: {
-    title: 'Simple Header',
+    title: 'Simple header',
     showSearch: false,
     showAdd: false,
   },

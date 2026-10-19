@@ -29,7 +29,7 @@ type Story = StoryObj<typeof meta>
 
 export const Default: Story = {
   args: {
-    title: 'Take Photo',
+    title: 'Take photo',
     onCapture: (base64) => console.log('Captured image:', base64.substring(0, 50) + '...'),
     onCancel: () => console.log('Cancelled'),
   },
@@ -37,7 +37,7 @@ export const Default: Story = {
 
 export const ScanGroceries: Story = {
   args: {
-    title: 'Scan Groceries',
+    title: 'Scan groceries',
     onCapture: (_base64) => console.log('Captured groceries image'),
     onCancel: () => console.log('Cancelled'),
   },
@@ -45,7 +45,7 @@ export const ScanGroceries: Story = {
 
 export const ScanReceipt: Story = {
   args: {
-    title: 'Scan Receipt',
+    title: 'Scan receipt',
     onCapture: (_base64) => console.log('Captured receipt image'),
     onCancel: () => console.log('Cancelled'),
   },

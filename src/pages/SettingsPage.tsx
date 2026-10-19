@@ -124,18 +124,18 @@ export function SettingsPage() {
           <CardContent className="p-2">
             <SettingItem
               icon={HelpCircle}
-              label="Help & Support"
+              label="Help & support"
               description="FAQs and contact support"
             />
           </CardContent>
         </Card>
 
-        {/* Sign Out */}
+        {/* Sign out */}
         <Card>
           <CardContent className="p-2">
             <SettingItem
               icon={LogOut}
-              label="Sign Out"
+              label="Sign out"
               onClick={handleSignOut}
               danger
             />

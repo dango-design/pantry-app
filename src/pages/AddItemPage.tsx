@@ -286,7 +286,7 @@ export function AddItemPage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <p className="text-gray-500 mb-4">Item not found</p>
-          <Button onClick={() => navigate('/')}>Go Home</Button>
+          <Button onClick={() => navigate('/')}>Go home</Button>
         </div>
       </div>
     )
@@ -298,7 +298,7 @@ export function AddItemPage() {
       <PhotoCapture
         onCapture={handlePhotoCapture}
         onCancel={() => setSmartInputMode(null)}
-        title="Scan Groceries"
+        title="Scan groceries"
       />
     )
   }
@@ -308,7 +308,7 @@ export function AddItemPage() {
       <PhotoCapture
         onCapture={handleReceiptCapture}
         onCancel={() => setSmartInputMode(null)}
-        title="Scan Receipt"
+        title="Scan receipt"
       />
     )
   }
@@ -352,7 +352,7 @@ export function AddItemPage() {
       <div className="max-w-lg mx-auto flex flex-col flex-1 w-full">
         {/* Header */}
         <header className="bg-white px-4 py-4 flex items-center justify-between">
-          <h1 className="text-lg font-semibold text-gray-900">{isEditing ? 'Edit Item' : 'Add Item'}</h1>
+          <h1 className="text-lg font-semibold text-gray-900">{isEditing ? 'Edit item' : 'Add item'}</h1>
           <button className="p-2 text-gray-500 hover:text-gray-700">
             <MoreVertical className="h-5 w-5" />
           </button>
@@ -417,7 +417,7 @@ export function AddItemPage() {
             {/* Name Field */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Name of Item <span className="text-red-500">*</span>
+                Name of item <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
@@ -529,10 +529,10 @@ export function AddItemPage() {
               </div>
             </div>
 
-            {/* Purchase Date */}
+            {/* Purchase date */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Purchase Date
+                Purchase date
               </label>
               <input
                 type="date"
@@ -545,10 +545,10 @@ export function AddItemPage() {
               />
             </div>
 
-            {/* Expiration Date */}
+            {/* Expiration date */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Expiration Date <span className="text-red-500">*</span>
+                Expiration date <span className="text-red-500">*</span>
               </label>
               <input
                 type="date"

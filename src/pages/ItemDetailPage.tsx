@@ -34,7 +34,7 @@ export function ItemDetailPage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <p className="text-gray-500 mb-4">Item not found</p>
-          <Button onClick={() => navigate('/')}>Go Home</Button>
+          <Button onClick={() => navigate('/')}>Go home</Button>
         </div>
       </div>
     )
@@ -120,7 +120,7 @@ export function ItemDetailPage() {
           >
             <ArrowLeft className="h-5 w-5" />
           </button>
-          <h1 className="text-lg font-semibold text-gray-900">Item Details</h1>
+          <h1 className="text-lg font-semibold text-gray-900">Item details</h1>
           <button
             onClick={() => navigate(`/item/${item.id}/edit`)}
             className="p-2 -mr-2 text-gray-500 hover:text-gray-700"
@@ -244,27 +244,27 @@ export function ItemDetailPage() {
 
         {/* Actions */}
         <div className="space-y-3">
-          {/* Primary action: Add to Grocery List */}
+          {/* Primary action: Add to grocery list */}
           <Button
             onClick={handleAddToGroceryList}
             className="w-full bg-teal-500 hover:bg-teal-600"
             size="lg"
           >
             <ShoppingCart className="h-5 w-5 mr-2" />
-            Add to Grocery List
+            Add to grocery list
           </Button>
 
-          {/* Secondary action: Mark as Used */}
+          {/* Secondary action: Mark as used */}
           <Button
             onClick={handleMarkUsed}
             className="w-full bg-primary hover:bg-primary-hover"
             size="lg"
           >
             <CheckCircle2 className="h-5 w-5 mr-2" />
-            Mark as Used
+            Mark as used
           </Button>
 
-          {/* Tertiary actions: Used Some / Remove */}
+          {/* Tertiary actions: Used some / Remove */}
           <div className="flex gap-3">
             <Button
               onClick={() => setShowUseDialog(true)}
@@ -272,7 +272,7 @@ export function ItemDetailPage() {
               className="flex-1"
               size="lg"
             >
-              Used Some
+              Used some
             </Button>
             <Button
               onClick={() => setShowDeleteDialog(true)}
@@ -290,7 +290,7 @@ export function ItemDetailPage() {
       <Dialog
         open={showDeleteDialog}
         onClose={() => setShowDeleteDialog(false)}
-        title="Remove Item"
+        title="Remove item"
         description="Are you sure you want to remove this item from your pantry? This action cannot be undone."
       >
         <DialogActions>
@@ -303,11 +303,11 @@ export function ItemDetailPage() {
         </DialogActions>
       </Dialog>
 
-      {/* Use Item Dialog */}
+      {/* Use item Dialog */}
       <Dialog
         open={showUseDialog}
         onClose={() => setShowUseDialog(false)}
-        title="Use Item"
+        title="Use item"
         description={`How much ${item.name} did you use?`}
       >
         <div className="flex items-center justify-center gap-4 py-4">

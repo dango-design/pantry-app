@@ -84,13 +84,13 @@ export const Interactive: StoryObj = {
       <div className="space-y-4">
         <div className="flex flex-wrap gap-2">
           <Button onClick={() => showSnackbar('Item saved successfully', false)}>
-            Show Info Snackbar
+            Show info snackbar
           </Button>
           <Button onClick={() => showSnackbar('Item deleted', true)}>
-            Show with Undo
+            Show with undo
           </Button>
           <Button onClick={() => showSnackbar('Added to grocery list', true)}>
-            Show Another
+            Show another
           </Button>
         </div>
         <p className="text-sm text-gray-500">

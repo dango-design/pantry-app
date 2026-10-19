@@ -286,7 +286,7 @@ export function PlanPage() {
                         >
                           {/* Label lines up with the dashed Add button, or with the first card's title */}
                           <div className={cn('w-[4.5rem] flex-shrink-0', slotEntries.length > 0 ? 'pt-3.5' : 'pt-2.5')}>
-                            <p className="text-xs font-medium uppercase tracking-wide text-gray-500">{label}</p>
+                            <p className="text-xs font-medium text-gray-500">{label}</p>
                           </div>
                           <div className="flex-1 min-w-0 space-y-2">
                             {slotEntries.map((entry) => {

@@ -13,7 +13,7 @@ type QuickFilter = 'all' | 'can_cook' | 'almost' | 'quick' | 'favorites'
 
 const QUICK_FILTER_CHIPS: { key: QuickFilter; label: string }[] = [
   { key: 'all', label: 'All' },
-  { key: 'can_cook', label: 'Can Cook' },
+  { key: 'can_cook', label: 'Can cook' },
   { key: 'almost', label: 'Almost' },
   { key: 'quick', label: 'Quick' },
   { key: 'favorites', label: 'Favorites' },
@@ -128,7 +128,7 @@ export function RecipesPage() {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
               <input
                 type="text"
-                placeholder="Search Recipes"
+                placeholder="Search recipes"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full h-10 pl-10 pr-4 bg-white border border-gray-200 rounded-lg text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
@@ -137,7 +137,7 @@ export function RecipesPage() {
             <button
               onClick={handleAiSuggest}
               className="w-10 h-10 flex items-center justify-center text-primary hover:text-primary-hover"
-              title="AI Suggest"
+              title="AI suggest"
             >
               <Sparkles className="h-5 w-5" />
             </button>
@@ -205,7 +205,7 @@ export function RecipesPage() {
                   onClick={() => navigate('/recipe/new')}
                   className="mt-4 px-6 py-2 bg-primary text-white rounded-lg font-medium hover:bg-primary-hover transition-colors"
                 >
-                  Add Recipe
+                  Add recipe
                 </button>
               )}
             </div>

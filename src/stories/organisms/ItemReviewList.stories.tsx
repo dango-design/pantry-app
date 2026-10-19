@@ -167,7 +167,7 @@ export const FromReceipt: Story = {
       ]}
       onConfirm={(items) => console.log('Confirmed items:', items)}
       onCancel={() => console.log('Cancelled')}
-      title="Review Receipt Items"
+      title="Review receipt items"
     />
   ),
 }

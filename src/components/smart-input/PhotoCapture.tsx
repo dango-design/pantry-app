@@ -8,7 +8,7 @@ interface PhotoCaptureProps {
   title?: string
 }
 
-export function PhotoCapture({ onCapture, onCancel, title = 'Take Photo' }: PhotoCaptureProps) {
+export function PhotoCapture({ onCapture, onCancel, title = 'Take photo' }: PhotoCaptureProps) {
   const [mode, setMode] = useState<'select' | 'camera' | 'preview'>('select')
   const [stream, setStream] = useState<MediaStream | null>(null)
   const [capturedImage, setCapturedImage] = useState<string | null>(null)
@@ -142,7 +142,7 @@ export function PhotoCapture({ onCapture, onCancel, title = 'Take Photo' }: Phot
               <Camera className="h-7 w-7 text-primary" />
             </div>
             <div className="text-left">
-              <p className="text-white font-medium">Take Photo</p>
+              <p className="text-white font-medium">Take photo</p>
               <p className="text-white/60 text-sm">Use your camera</p>
             </div>
           </button>
@@ -155,7 +155,7 @@ export function PhotoCapture({ onCapture, onCancel, title = 'Take Photo' }: Phot
               <Upload className="h-7 w-7 text-white" />
             </div>
             <div className="text-left">
-              <p className="text-white font-medium">Upload Photo</p>
+              <p className="text-white font-medium">Upload photo</p>
               <p className="text-white/60 text-sm">Choose from gallery</p>
             </div>
           </button>
@@ -219,7 +219,7 @@ export function PhotoCapture({ onCapture, onCancel, title = 'Take Photo' }: Phot
                 onClick={handleConfirm}
                 className="flex-1 bg-primary hover:bg-primary-hover"
               >
-                Use Photo
+                Use photo
               </Button>
             </div>
           </div>

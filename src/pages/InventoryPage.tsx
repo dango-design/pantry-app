@@ -27,8 +27,8 @@ const CATEGORY_CHIPS: { key: FoodCategory | 'all'; label: string; color: string 
 // Sort options
 type SortOption = 'expiration' | 'category' | 'location' | 'name'
 const SORT_OPTIONS: { key: SortOption; label: string }[] = [
-  { key: 'expiration', label: 'Expiration Date' },
-  { key: 'category', label: 'Type of Food' },
+  { key: 'expiration', label: 'Expiration date' },
+  { key: 'category', label: 'Type of food' },
   { key: 'location', label: 'Location' },
   { key: 'name', label: 'Name' },
 ]
@@ -209,7 +209,7 @@ export function InventoryPage() {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
               <input
                 type="text"
-                placeholder="Search Pantry"
+                placeholder="Search pantry"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full h-10 pl-10 pr-4 bg-white border border-gray-200 rounded-lg text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"

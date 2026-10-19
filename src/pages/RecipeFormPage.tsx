@@ -16,10 +16,10 @@ const DIFFICULTY_OPTIONS = [
 const DIETARY_OPTIONS: { key: DietaryRestriction; label: string }[] = [
   { key: 'vegetarian', label: 'Vegetarian' },
   { key: 'vegan', label: 'Vegan' },
-  { key: 'gluten_free', label: 'Gluten-Free' },
-  { key: 'dairy_free', label: 'Dairy-Free' },
-  { key: 'nut_free', label: 'Nut-Free' },
-  { key: 'low_carb', label: 'Low Carb' },
+  { key: 'gluten_free', label: 'Gluten-free' },
+  { key: 'dairy_free', label: 'Dairy-free' },
+  { key: 'nut_free', label: 'Nut-free' },
+  { key: 'low_carb', label: 'Low carb' },
   { key: 'keto', label: 'Keto' },
 ]
 
@@ -225,7 +225,7 @@ export function RecipeFormPage() {
               <ArrowLeft className="h-5 w-5" />
             </button>
             <h1 className="text-lg font-semibold text-gray-900">
-              {isEditing ? 'Edit Recipe' : 'New Recipe'}
+              {isEditing ? 'Edit recipe' : 'New recipe'}
             </h1>
             <div className="w-9" />
           </div>
@@ -248,7 +248,7 @@ export function RecipeFormPage() {
             {/* Name */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Recipe Name <span className="text-red-500">*</span>
+                Recipe name <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
@@ -454,9 +454,9 @@ export function RecipeFormPage() {
               <p className="text-xs text-gray-400 mt-1">Comma-separated</p>
             </div>
 
-            {/* Dietary Info */}
+            {/* Dietary info */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Dietary Info</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Dietary info</label>
               <div className="flex flex-wrap gap-2">
                 {DIETARY_OPTIONS.map((opt) => (
                   <button
@@ -527,7 +527,7 @@ export function RecipeFormPage() {
               disabled={!name.trim()}
               className="flex-1 bg-primary hover:bg-primary-hover"
             >
-              {isEditing ? 'Save Changes' : 'Create Recipe'}
+              {isEditing ? 'Save changes' : 'Create recipe'}
             </Button>
           </div>
         </div>
@@ -537,7 +537,7 @@ export function RecipeFormPage() {
       <Dialog
         open={showImportDialog}
         onClose={() => setShowImportDialog(false)}
-        title="Import Recipe from URL"
+        title="Import recipe from URL"
         description="Paste a recipe URL and we'll extract the details automatically."
       >
         <input

@@ -131,7 +131,7 @@ export function BarcodeScanner({ onScan, onCancel }: BarcodeScannerProps) {
         <button onClick={handleCancel} className="p-2 text-white">
           <X className="h-6 w-6" />
         </button>
-        <h2 className="text-white font-medium">Scan Barcode</h2>
+        <h2 className="text-white font-medium">Scan barcode</h2>
         <div className="w-10" />
       </div>
 
@@ -152,7 +152,7 @@ export function BarcodeScanner({ onScan, onCancel }: BarcodeScannerProps) {
               <Camera className="h-7 w-7 text-primary" />
             </div>
             <div className="text-left">
-              <p className="text-white font-medium">Scan with Camera</p>
+              <p className="text-white font-medium">Scan with camera</p>
               <p className="text-white/60 text-sm">
                 {hasBarcodeDetector ? 'Auto-detect barcode' : 'Capture barcode image'}
               </p>
@@ -167,7 +167,7 @@ export function BarcodeScanner({ onScan, onCancel }: BarcodeScannerProps) {
               <Keyboard className="h-7 w-7 text-white" />
             </div>
             <div className="text-left">
-              <p className="text-white font-medium">Enter Manually</p>
+              <p className="text-white font-medium">Enter manually</p>
               <p className="text-white/60 text-sm">Type the barcode number</p>
             </div>
           </button>
@@ -222,7 +222,7 @@ export function BarcodeScanner({ onScan, onCancel }: BarcodeScannerProps) {
                 onClick={() => setMode('manual')}
                 className="w-full bg-primary hover:bg-primary-hover"
               >
-                Enter Manually
+                Enter manually
               </Button>
             )}
           </div>

@@ -36,7 +36,7 @@ export function ItemReviewList({
   onItemsChange,
   onConfirm,
   onCancel,
-  title = 'Review Items',
+  title = 'Review items',
   description = 'Review the detected items. Tap to select/deselect, or edit details as needed.',
   loading = false,
 }: ItemReviewListProps) {
@@ -241,7 +241,7 @@ export function ItemReviewList({
 
                       {item.expirationDate !== undefined && (
                         <div>
-                          <label className="text-xs text-gray-500 mb-1 block">Expiration Date</label>
+                          <label className="text-xs text-gray-500 mb-1 block">Expiration date</label>
                           <input
                             type="date"
                             value={item.expirationDate}

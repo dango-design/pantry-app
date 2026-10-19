@@ -90,7 +90,7 @@ export const LocationIcons: Story = {
         { Icon: FreezerIcon, name: 'Freezer' },
         { Icon: PantryIcon, name: 'Pantry' },
         { Icon: CounterIcon, name: 'Counter' },
-        { Icon: SpiceRackIcon, name: 'Spice Rack' },
+        { Icon: SpiceRackIcon, name: 'Spice rack' },
       ].map(({ Icon, name }) => (
         <div key={name} className="flex flex-col items-center gap-2">
           <Icon size={24} className="text-gray-600" />

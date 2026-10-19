@@ -39,7 +39,7 @@ export const STORAGE_LOCATIONS: Record<StorageLocation, { label: string; color: 
   freezer: { label: 'Freezer', color: '#6366F1', icon: 'snowflake' },
   pantry: { label: 'Pantry', color: '#8B5CF6', icon: 'archive' },
   counter: { label: 'Counter', color: '#F59E0B', icon: 'layout-grid' },
-  spice_rack: { label: 'Spice Rack', color: '#EC4899', icon: 'flame' },
+  spice_rack: { label: 'Spice rack', color: '#EC4899', icon: 'flame' },
 }
 
 // Quantity units with labels

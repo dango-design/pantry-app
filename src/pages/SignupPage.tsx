@@ -121,7 +121,7 @@ export function SignupPage() {
           />
 
           <Input
-            label="Confirm Password"
+            label="Confirm password"
             type="password"
             placeholder="••••••••"
             error={errors.confirmPassword?.message}
