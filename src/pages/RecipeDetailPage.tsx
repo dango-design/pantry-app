@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { ArrowLeft, Heart, Clock, Users, ChefHat, Edit2, Trash2, CookingPot, ShoppingCart, CalendarPlus } from 'lucide-react'
+import { ArrowLeft, Heart, Clock, Users, ChefHat, Edit2, Trash2, CookingPot, ShoppingCart, CalendarDays, Plus } from 'lucide-react'
 import { Button, Card, CardContent, Dialog, DialogActions, Snackbar } from '@/components/common'
 import { IngredientMatchList, IngredientRing } from '@/components/recipes'
 import { AddToPlanSheet } from '@/components/plan'
@@ -10,7 +10,13 @@ import { convertQuantity, formatUnit, roundQuantity } from '@/utils/units'
 import { cn } from '@/utils/cn'
 import type { QuantityUnit } from '@/types'
 import { todayDateString } from '@/utils/dates'
-import { formatMealTime, formatRelativeDay, getSlotLabel } from '@/utils/mealPlan'
+import { formatMealTime } from '@/utils/mealPlan'
+import { CATEGORY_TONES } from '@/utils/constants'
+
+// "dinner today" -> "Dinner today"
+function capitalize(text: string): string {
+  return text.charAt(0).toUpperCase() + text.slice(1)
+}
 
 interface SnackbarState {
   open: boolean
@@ -257,26 +263,6 @@ export function RecipeDetailPage() {
               </div>
             )}
 
-            {/* Meal plan */}
-            <div className="flex flex-wrap items-center gap-2 mt-3">
-              <button
-                onClick={() => setShowPlanSheet(true)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-primary-muted text-sm font-medium text-primary hover:bg-primary-soft transition-colors"
-              >
-                <CalendarPlus className="h-4 w-4" />
-                Plan
-              </button>
-              {upcomingPlans.map((entry) => (
-                <button
-                  key={entry.id}
-                  onClick={() => navigate(`/plan?week=${entry.date}`)}
-                  className="px-2.5 py-1 rounded-full bg-primary-soft text-primary text-xs font-medium hover:bg-primary-muted transition-colors"
-                >
-                  {formatRelativeDay(entry.date)} · {getSlotLabel(entry.slot)}
-                </button>
-              ))}
-            </div>
-
             {/* How many required ingredients are in the pantry (the list below shows which) */}
             {matchResult && (() => {
               const { have, total } = countRequiredIngredients(matchResult)
@@ -296,6 +282,48 @@ export function RecipeDetailPage() {
                 {recipe.lastCookedAt && ` · Last: ${new Date(recipe.lastCookedAt).toLocaleDateString()}`}
               </p>
             )}
+          </CardContent>
+        </Card>
+
+        {/* Meal plan: when this recipe is next planned (links to that week), and a way to plan it */}
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <span
+                className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+                style={{ backgroundColor: CATEGORY_TONES.dairy.tint, color: CATEGORY_TONES.dairy.ink }}
+              >
+                <CalendarDays className="h-5 w-5" />
+              </span>
+              {upcomingPlans.length > 0 ? (
+                <button
+                  onClick={() => navigate(`/plan?week=${upcomingPlans[0].date}`)}
+                  className="flex-1 min-w-0 text-left"
+                >
+                  {/* Short enough to sit beside the button on a 360px phone; wraps rather than truncates */}
+                  <span className="block font-medium text-gray-900">
+                    {capitalize(formatMealTime(upcomingPlans[0].date, upcomingPlans[0].slot))}
+                  </span>
+                  <span className="block text-sm text-gray-500">
+                    {upcomingPlans.length > 1 && `+${upcomingPlans.length - 1} more · `}View in plan ›
+                  </span>
+                </button>
+              ) : (
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium text-gray-900">Not planned</p>
+                  <p className="text-sm text-gray-500">Pick a day</p>
+                </div>
+              )}
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => setShowPlanSheet(true)}
+                className="flex-shrink-0 whitespace-nowrap"
+              >
+                <Plus className="h-4 w-4 mr-1" />
+                {upcomingPlans.length > 0 ? 'Plan again' : 'Add to plan'}
+              </Button>
+            </div>
           </CardContent>
         </Card>
 
