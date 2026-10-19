@@ -2,10 +2,10 @@ import { useState, useMemo } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { ArrowLeft, Heart, Clock, Users, ChefHat, Edit2, Trash2, CookingPot, ShoppingCart, CalendarPlus } from 'lucide-react'
 import { Button, Card, CardContent, Dialog, DialogActions, Snackbar } from '@/components/common'
-import { IngredientMatchList } from '@/components/recipes'
+import { IngredientMatchList, IngredientRing } from '@/components/recipes'
 import { AddToPlanSheet } from '@/components/plan'
 import { useDemoStore } from '@/stores/demoStore'
-import { matchRecipeToInventory, type IngredientMatch } from '@/utils/recipeMatching'
+import { countRequiredIngredients, matchRecipeToInventory, type IngredientMatch } from '@/utils/recipeMatching'
 import { convertQuantity, formatUnit, roundQuantity } from '@/utils/units'
 import { cn } from '@/utils/cn'
 import type { QuantityUnit } from '@/types'
@@ -265,29 +265,18 @@ export function RecipeDetailPage() {
               ))}
             </div>
 
-            {/* Match score */}
-            {matchResult && (
-              <div className="mt-3 flex items-center gap-2">
-                <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
-                  <div
-                    className="h-full rounded-full transition-all"
-                    style={{
-                      width: `${matchResult.matchScore}%`,
-                      backgroundColor: matchResult.matchScore === 100
-                        ? '#22C55E'
-                        : matchResult.matchScore >= 80
-                          ? '#F59E0B'
-                          : matchResult.matchScore >= 50
-                            ? '#F97316'
-                            : '#9CA3AF',
-                    }}
-                  />
+            {/* How many required ingredients are in the pantry (the list below shows which) */}
+            {matchResult && (() => {
+              const { have, total } = countRequiredIngredients(matchResult)
+              return (
+                <div className="mt-3 flex items-center gap-3">
+                  <IngredientRing have={have} total={total} size={44} />
+                  <p className="text-sm text-gray-600">
+                    {have >= total ? 'All ingredients in your pantry' : `${have} of ${total} ingredients in your pantry`}
+                  </p>
                 </div>
-                <span className="text-sm font-medium text-gray-600">
-                  {matchResult.matchScore}% match
-                </span>
-              </div>
-            )}
+              )
+            })()}
 
             {recipe.timesCooked > 0 && (
               <p className="text-xs text-gray-400 mt-2">

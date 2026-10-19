@@ -1,21 +1,14 @@
 import { useNavigate } from 'react-router-dom'
 import { Clock, Users, Heart, ChefHat } from 'lucide-react'
 import { Card, CardContent } from '@/components/common'
-import { cn } from '@/utils/cn'
 import type { Recipe } from '@/types'
-import type { RecipeMatchResult } from '@/utils/recipeMatching'
+import { countRequiredIngredients, type RecipeMatchResult } from '@/utils/recipeMatching'
+import { IngredientRing } from './IngredientRing'
 
 interface RecipeCardProps {
   recipe: Recipe
   matchResult?: RecipeMatchResult
   onCook?: () => void
-}
-
-function getMatchColor(score: number): string {
-  if (score === 100) return 'bg-green-100 text-green-700'
-  if (score >= 80) return 'bg-amber-100 text-amber-700'
-  if (score >= 50) return 'bg-orange-100 text-orange-700'
-  return 'bg-gray-100 text-gray-600'
 }
 
 function getDifficultyLabel(difficulty?: string): string {
@@ -30,6 +23,7 @@ function getDifficultyLabel(difficulty?: string): string {
 export function RecipeCard({ recipe, matchResult }: RecipeCardProps) {
   const navigate = useNavigate()
   const totalTime = (recipe.prepTimeMinutes || 0) + (recipe.cookTimeMinutes || 0)
+  const counts = matchResult ? countRequiredIngredients(matchResult) : null
 
   return (
     <Card
@@ -37,10 +31,15 @@ export function RecipeCard({ recipe, matchResult }: RecipeCardProps) {
       onClick={() => navigate(`/recipe/${recipe.id}`)}
     >
       <CardContent className="p-4">
-        <div className="flex items-start gap-3">
+        <div className="flex items-center gap-3">
           <div className="flex-1 min-w-0">
-            {/* Name */}
-            <h3 className="font-semibold text-gray-900 truncate">{recipe.name}</h3>
+            {/* Name, with a heart for favorites */}
+            <div className="flex items-center gap-1.5 min-w-0">
+              <h3 className="font-semibold text-gray-900 truncate">{recipe.name}</h3>
+              {recipe.isFavorite && (
+                <Heart className="h-3.5 w-3.5 flex-shrink-0 text-red-500 fill-red-500" aria-label="Favorite" />
+              )}
+            </div>
 
             {/* Description */}
             {recipe.description && (
@@ -73,20 +72,8 @@ export function RecipeCard({ recipe, matchResult }: RecipeCardProps) {
             </div>
           </div>
 
-          {/* Right side: match score + favorite */}
-          <div className="flex flex-col items-end gap-2 flex-shrink-0">
-            {matchResult && (
-              <span className={cn(
-                'px-2 py-0.5 rounded-full text-xs font-medium',
-                getMatchColor(matchResult.matchScore)
-              )}>
-                {matchResult.matchScore}%
-              </span>
-            )}
-            {recipe.isFavorite && (
-              <Heart className="h-4 w-4 text-red-500 fill-red-500" />
-            )}
-          </div>
+          {/* How many ingredients are in the pantry; the recipe page lists which */}
+          {counts && <IngredientRing have={counts.have} total={counts.total} />}
         </div>
       </CardContent>
     </Card>

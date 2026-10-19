@@ -3,9 +3,9 @@ import { useNavigate } from 'react-router-dom'
 import { Clock, Plus, Search, TriangleAlert, UtensilsCrossed } from 'lucide-react'
 import { BottomSheet } from '@/components/common'
 import { useDemoStore } from '@/stores/demoStore'
-import { matchAllRecipes } from '@/utils/recipeMatching'
+import { countRequiredIngredients, matchAllRecipes } from '@/utils/recipeMatching'
+import { IngredientRing } from '@/components/recipes/IngredientRing'
 import { formatRelativeDay, getSlotLabel } from '@/utils/mealPlan'
-import { cn } from '@/utils/cn'
 import type { MealSlot, Recipe } from '@/types'
 
 interface RecipePickerSheetProps {
@@ -13,13 +13,6 @@ interface RecipePickerSheetProps {
   slot: MealSlot
   onClose: () => void
   onPick: (recipe: Recipe) => void
-}
-
-function getMatchColor(score: number): string {
-  if (score === 100) return 'bg-green-100 text-green-700'
-  if (score >= 80) return 'bg-amber-100 text-amber-700'
-  if (score >= 50) return 'bg-orange-100 text-orange-700'
-  return 'bg-gray-100 text-gray-600'
 }
 
 // Pick a recipe for one day and meal. Recipes that use expiring food come first.
@@ -79,7 +72,9 @@ export function RecipePickerSheet({ date, slot, onClose, onPick }: RecipePickerS
             <p className="text-center text-sm text-gray-500 py-10">No matching recipes</p>
           ) : (
             <ul className="pb-4">
-              {results.map(({ recipe, matchScore, expiringIngredientsUsed }) => {
+              {results.map((result) => {
+                const { recipe, expiringIngredientsUsed } = result
+                const { have, total } = countRequiredIngredients(result)
                 const totalTime = (recipe.prepTimeMinutes || 0) + (recipe.cookTimeMinutes || 0)
                 return (
                   <li key={recipe.id}>
@@ -105,9 +100,7 @@ export function RecipePickerSheet({ date, slot, onClose, onPick }: RecipePickerS
                           )}
                         </div>
                       </div>
-                      <span className={cn('px-2 py-0.5 rounded-full text-xs font-medium flex-shrink-0', getMatchColor(matchScore))}>
-                        {matchScore}%
-                      </span>
+                      <IngredientRing have={have} total={total} size={36} />
                       <Plus className="h-5 w-5 text-primary flex-shrink-0" />
                     </button>
                   </li>

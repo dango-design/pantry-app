@@ -122,3 +122,10 @@ export function matchAllRecipes(
     return b.matchScore - a.matchScore
   })
 }
+
+/** Required ingredients in the pantry vs in the recipe (optional ones don't count) */
+export function countRequiredIngredients(result: RecipeMatchResult): { have: number; total: number } {
+  const total = result.recipe.ingredients.filter((ing) => !ing.isOptional).length
+  const missing = result.missingIngredients.filter((m) => !m.ingredient.isOptional).length
+  return { have: total - missing, total }
+}
