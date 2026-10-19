@@ -13,13 +13,14 @@ type AddNote =
   | { kind: 'on_list'; name: string }
 
 interface QuickAddToListProps {
+  placeholder?: string
   autoFocus?: boolean
   /** Say "Added …" after each add, for places where the list itself isn't visible */
   confirmAdds?: boolean
 }
 
 /** Type an item onto the shopping list, with a heads-up for duplicates and things already at home */
-export function QuickAddToList({ autoFocus, confirmAdds }: QuickAddToListProps) {
+export function QuickAddToList({ placeholder = 'Add item...', autoFocus, confirmAdds }: QuickAddToListProps) {
   const { shoppingList, inventory, addShoppingItem } = useDemoStore()
   const [name, setName] = useState('')
   const [note, setNote] = useState<AddNote | null>(null)
@@ -60,7 +61,8 @@ export function QuickAddToList({ autoFocus, confirmAdds }: QuickAddToListProps) 
     <div>
       <div className="flex gap-2">
         <Input
-          placeholder="Add item..."
+          placeholder={placeholder}
+          className="h-10 border-gray-200"
           aria-label="Item to add to your shopping list"
           value={name}
           autoFocus={autoFocus}
@@ -74,7 +76,7 @@ export function QuickAddToList({ autoFocus, confirmAdds }: QuickAddToListProps) 
         <button
           onClick={handleAdd}
           aria-label="Add to list"
-          className="p-2 bg-primary text-white rounded-lg hover:bg-primary-hover transition-colors"
+          className="w-10 h-10 flex-shrink-0 flex items-center justify-center bg-primary text-white rounded-lg hover:bg-primary-hover transition-colors"
         >
           <Plus className="h-5 w-5" />
         </button>

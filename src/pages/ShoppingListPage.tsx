@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react'
 import { Lightbulb, Trash2, Home } from 'lucide-react'
-import { Header } from '@/components/layout'
+import { TabHeader } from '@/components/layout'
 import { Badge, Button } from '@/components/common'
 import { QuickAddToList } from '@/components/shopping'
 import { ItemReviewList, type ReviewItem } from '@/components/smart-input'
@@ -126,16 +126,9 @@ export function ShoppingListPage() {
 
   return (
     <div className="min-h-screen pb-24">
-      <Header
-        title="Shopping list"
-        showSearch={false}
-        showAdd={false}
-      />
+      <TabHeader title="Shopping list" tool={<QuickAddToList placeholder="Add to shopping list" />} />
 
-      <div className="p-4 space-y-4">
-        {/* Add item input */}
-        <QuickAddToList />
-
+      <div className="px-4 pt-2 pb-4 space-y-4">
         {/* Suggestions */}
         {suggestions.length > 0 && (
           <section>

@@ -1,9 +1,9 @@
 import { useState, useMemo, useCallback } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { Search, SlidersHorizontal, ArrowUpDown, Check, Settings } from 'lucide-react'
+import { SlidersHorizontal, ArrowUpDown, Check } from 'lucide-react'
 import { FoodItemCard, useAddToList } from '@/components/inventory'
 import { FilterSheet, type ExpirationFilter } from '@/components/inventory/FilterSheet'
 import { TonightBanner } from '@/components/plan'
+import { TabHeader, TabSearchField } from '@/components/layout'
 import { Snackbar } from '@/components/common'
 import { useDemoStore } from '@/stores/demoStore'
 import { cn } from '@/utils/cn'
@@ -41,7 +41,6 @@ interface SnackbarState {
 }
 
 export function InventoryPage() {
-  const navigate = useNavigate()
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategories, setSelectedCategories] = useState<Set<FoodCategory | 'all'>>(new Set(['all']))
   const [selectedLocations, setSelectedLocations] = useState<Set<StorageLocation | 'all'>>(new Set(['all']))
@@ -177,30 +176,12 @@ export function InventoryPage() {
     <div className="min-h-screen bg-gray-50">
       {/* Responsive container */}
       <div className="max-w-lg mx-auto pb-24">
-        {/* Header with Search Bar */}
-        <header className="sticky top-0 z-40 bg-white px-4 pt-4 pb-3">
-          {/* Search row */}
-          <div className="flex items-center gap-3">
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search pantry"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full h-10 pl-10 pr-4 bg-white border border-gray-200 rounded-lg text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-              />
-            </div>
-            <button
-              onClick={() => navigate('/settings')}
-              className="w-10 h-10 flex items-center justify-center text-gray-500 hover:text-gray-700"
-            >
-              <Settings className="h-5 w-5" />
-            </button>
-          </div>
-
+        <TabHeader
+          title="Pantry"
+          tool={<TabSearchField value={searchQuery} onChange={setSearchQuery} placeholder="Search pantry" />}
+        >
           {/* Filter, Sort, and chips row */}
-          <div className="flex items-center gap-2 mt-3">
+          <div className="flex items-center gap-2">
             {/* Filter icon */}
             <button
               onClick={() => setShowFilterSheet(true)}
@@ -275,7 +256,7 @@ export function InventoryPage() {
               </div>
             </div>
           </div>
-        </header>
+        </TabHeader>
 
         {/* Content */}
         <div className="px-4 pt-2 space-y-2">

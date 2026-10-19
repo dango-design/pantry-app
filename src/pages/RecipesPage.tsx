@@ -1,7 +1,8 @@
 import { useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Search, SlidersHorizontal, UtensilsCrossed } from 'lucide-react'
+import { SlidersHorizontal, UtensilsCrossed } from 'lucide-react'
 import { RecipeCard } from '@/components/recipes'
+import { TabHeader, TabSearchField } from '@/components/layout'
 import { RecipeFilterSheet, type RecipeDifficulty } from '@/components/recipes/RecipeFilterSheet'
 import { useDemoStore } from '@/stores/demoStore'
 import { matchAllRecipes } from '@/utils/recipeMatching'
@@ -111,24 +112,13 @@ export function RecipesPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-lg mx-auto pb-24">
-        {/* Header */}
-        <header className="sticky top-0 z-40 bg-white px-4 pt-4 pb-3">
-          {/* Search. New recipes come from the + in the bottom nav (Add sheet). */}
-          <div className="flex items-center gap-2">
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search recipes"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full h-10 pl-10 pr-4 bg-white border border-gray-200 rounded-lg text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-              />
-            </div>
-          </div>
-
+        {/* New recipes come from the + in the bottom nav (Add sheet) */}
+        <TabHeader
+          title="Recipes"
+          tool={<TabSearchField value={searchQuery} onChange={setSearchQuery} placeholder="Search recipes" />}
+        >
           {/* Filter + Quick filter chips */}
-          <div className="flex items-center gap-2 mt-3">
+          <div className="flex items-center gap-2">
             <button
               onClick={() => setShowFilterSheet(true)}
               className="relative w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-700 flex-shrink-0"
@@ -160,7 +150,7 @@ export function RecipesPage() {
               </div>
             </div>
           </div>
-        </header>
+        </TabHeader>
 
         {/* Content */}
         <div className="px-4 pt-2 space-y-2">

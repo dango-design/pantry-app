@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom'
 import { format, isValid, parseISO } from 'date-fns'
 import { ChevronLeft, ChevronRight, Plus, ShoppingCart } from 'lucide-react'
 import { Snackbar } from '@/components/common'
+import { TabHeader } from '@/components/layout'
 import { MealPlanEntryCard, MoveMealSheet, RecipePickerSheet, ShopForWeekSheet } from '@/components/plan'
 import { useMealDrag } from '@/components/plan/useMealDrag'
 import { useDemoStore } from '@/stores/demoStore'
@@ -120,10 +121,6 @@ export function PlanPage() {
   )
   const toBuyCount = shopLines.filter((l) => l.status === 'buy' && !l.optional).length
   const toCheckCount = shopLines.filter((l) => l.status === 'check').length
-  const plannedCount = weekDates.reduce(
-    (sum, d) => sum + (entriesByDate.get(d)?.filter((e) => e.status !== 'skipped').length ?? 0),
-    0
-  )
 
   const shopSummary = (() => {
     if (shoppableEntries.length === 0) {
@@ -193,32 +190,33 @@ export function PlanPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-lg mx-auto pb-24">
-        {/* Header with week navigation */}
-        <header className="sticky top-0 z-30 bg-white px-4 pt-4 pb-3 border-b border-gray-100">
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => goToWeek(shiftWeek(weekStart, -1))}
-              aria-label="Previous week"
-              className="w-10 h-10 flex items-center justify-center rounded-full text-gray-600 hover:bg-gray-100"
-            >
-              <ChevronLeft className="h-5 w-5" />
-            </button>
-            <div className="flex-1 text-center">
-              <h1 className="text-lg font-semibold text-gray-900 leading-tight">{weekTitle}</h1>
-              <p className="text-xs text-gray-500">
-                {formatWeekRange(weekStart)} · {plannedCount} meal{plannedCount !== 1 ? 's' : ''}
+        <TabHeader
+          title="Meal plan"
+          tool={
+            <div className="h-10 flex items-center rounded-lg border border-gray-200">
+              <button
+                onClick={() => goToWeek(shiftWeek(weekStart, -1))}
+                aria-label="Previous week"
+                className="w-10 h-full flex items-center justify-center rounded-l-lg text-gray-600 hover:bg-gray-50"
+              >
+                <ChevronLeft className="h-5 w-5" />
+              </button>
+              <p className="flex-1 min-w-0 truncate text-center text-sm" aria-live="polite">
+                <span className="font-medium text-gray-900">{weekTitle}</span>
+                <span className="text-gray-500"> · {formatWeekRange(weekStart)}</span>
               </p>
+              <button
+                onClick={() => goToWeek(shiftWeek(weekStart, 1))}
+                aria-label="Next week"
+                className="w-10 h-full flex items-center justify-center rounded-r-lg text-gray-600 hover:bg-gray-50"
+              >
+                <ChevronRight className="h-5 w-5" />
+              </button>
             </div>
-            <button
-              onClick={() => goToWeek(shiftWeek(weekStart, 1))}
-              aria-label="Next week"
-              className="w-10 h-10 flex items-center justify-center rounded-full text-gray-600 hover:bg-gray-100"
-            >
-              <ChevronRight className="h-5 w-5" />
-            </button>
-          </div>
+          }
+        >
           {!isCurrentWeek && (
-            <div className="flex justify-center mt-2">
+            <div className="flex justify-center">
               <button
                 onClick={() => goToWeek(getWeekStart(new Date()))}
                 className="px-3 py-1 rounded-full border border-gray-300 text-xs font-medium text-gray-600 hover:border-gray-400"
@@ -227,9 +225,9 @@ export function PlanPage() {
               </button>
             </div>
           )}
-        </header>
+        </TabHeader>
 
-        <div className="px-4 pt-3 space-y-3">
+        <div className="px-4 pt-2 space-y-3">
           {/* Shop for the week */}
           <button
             onClick={() => setShowShopSheet(true)}
