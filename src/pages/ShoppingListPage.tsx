@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { Plus, Lightbulb, Trash2 } from 'lucide-react'
+import { Plus, Lightbulb, Trash2, Info, Home } from 'lucide-react'
 import { Header } from '@/components/layout'
 import { Input, Badge, Button } from '@/components/common'
 import { ItemReviewList, type ReviewItem } from '@/components/smart-input'
@@ -10,15 +10,19 @@ import { CATEGORIES } from '@/utils/constants'
 import { todayDateString } from '@/utils/dates'
 import { calculateFreshnessScore } from '@/utils/freshness'
 import { estimateExpirationDate, getDefaultStorageLocation, lookupFood } from '@/utils/foodDatabase'
-import { isDiscreteUnit } from '@/utils/units'
+import { describeStock, findInPantry, isLowStock, isSameName } from '@/utils/pantryMatch'
 import type { FoodCategory, FoodItem, ShoppingListItem } from '@/types'
 
-// Low when at or below a quarter of what was bought,
-// or down to the last one of several (e.g. 1 of 6 eggs)
-function isLowStock(item: FoodItem): boolean {
-  if (!(item.originalQuantity > 0)) return false
-  if (item.quantity <= item.originalQuantity * 0.25) return true
-  return isDiscreteUnit(item.quantityUnit) && item.originalQuantity > 1 && item.quantity <= 1
+// Shown under the add field instead of adding right away. Adding the same
+// name again (Enter or "Add anyway") goes through.
+type AddNote =
+  | { kind: 'in_pantry'; name: string; item: FoodItem }
+  | { kind: 'on_list'; name: string }
+
+// A pantry item that's in stock and not running low: worth flagging before buying more
+function stockedInPantry(name: string, inventory: FoodItem[]): FoodItem | undefined {
+  const match = findInPantry(name, inventory)
+  return match && !isLowStock(match) ? match : undefined
 }
 
 function toReviewItem(item: ShoppingListItem): ReviewItem {
@@ -48,6 +52,7 @@ export function ShoppingListPage() {
   } = useDemoStore()
 
   const [newItemName, setNewItemName] = useState('')
+  const [addNote, setAddNote] = useState<AddNote | null>(null)
   const [reviewItems, setReviewItems] = useState<ReviewItem[] | null>(null)
 
   // Suggest restocking items that are running low
@@ -76,6 +81,22 @@ export function ShoppingListPage() {
   const handleAddItem = () => {
     const name = newItemName.trim()
     if (!name) return
+
+    // First try: point out duplicates and items already at home. Once the note
+    // is showing for this name, adding again goes through.
+    if (addNote?.name !== name) {
+      if (shoppingList.some((item) => !item.isChecked && isSameName(item.name, name))) {
+        setAddNote({ kind: 'on_list', name })
+        return
+      }
+      const stocked = stockedInPantry(name, inventory)
+      if (stocked) {
+        setAddNote({ kind: 'in_pantry', name, item: stocked })
+        return
+      }
+    }
+
+    setAddNote(null)
     addShoppingItem({
       shoppingListId: 'demo-list',
       name,
@@ -155,19 +176,44 @@ export function ShoppingListPage() {
 
       <div className="p-4 space-y-4">
         {/* Add item input */}
-        <div className="flex gap-2">
-          <Input
-            placeholder="Add item..."
-            value={newItemName}
-            onChange={(e) => setNewItemName(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleAddItem()}
-          />
-          <button
-            onClick={handleAddItem}
-            className="p-2 bg-primary text-white rounded-lg hover:bg-primary-hover transition-colors"
-          >
-            <Plus className="h-5 w-5" />
-          </button>
+        <div>
+          <div className="flex gap-2">
+            <Input
+              placeholder="Add item..."
+              value={newItemName}
+              onChange={(e) => {
+                setNewItemName(e.target.value)
+                setAddNote(null)
+              }}
+              onKeyDown={(e) => e.key === 'Enter' && handleAddItem()}
+            />
+            <button
+              onClick={handleAddItem}
+              aria-label="Add to list"
+              className="p-2 bg-primary text-white rounded-lg hover:bg-primary-hover transition-colors"
+            >
+              <Plus className="h-5 w-5" />
+            </button>
+          </div>
+
+          {addNote && (
+            <div role="status" className="mt-2 flex items-start gap-2 rounded-lg bg-amber-50 border border-amber-100 px-3 py-2 text-sm text-amber-900">
+              <Info className="h-4 w-4 mt-0.5 flex-shrink-0 text-amber-700" />
+              <div className="flex-1 min-w-0">
+                {addNote.kind === 'on_list' ? (
+                  <p>Already on your list</p>
+                ) : (
+                  <>
+                    <p>You have {addNote.item.name} at home</p>
+                    <p className="text-xs text-amber-800">{describeStock(addNote.item)}</p>
+                  </>
+                )}
+              </div>
+              <button onClick={handleAddItem} className="flex-shrink-0 font-medium underline underline-offset-2 hover:text-amber-950">
+                Add anyway
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Suggestions */}
@@ -212,7 +258,10 @@ export function ShoppingListPage() {
                 </span>
               </div>
               <div className="space-y-1">
-                {categoryItems.map((item) => (
+                {categoryItems.map((item) => {
+                  // Flag list items that are still stocked at home (e.g. added from a recipe)
+                  const atHome = item.isChecked ? undefined : stockedInPantry(item.name, inventory)
+                  return (
                   <div
                     key={item.id}
                     className={cn(
@@ -261,16 +310,25 @@ export function ShoppingListPage() {
                       {item.notes && (
                         <span className="block text-xs text-gray-400">{item.notes}</span>
                       )}
+                      {atHome && (
+                        <span className="mt-0.5 flex items-center gap-1 text-xs text-amber-700">
+                          <Home className="h-3 w-3 flex-shrink-0" />
+                          {formatQuantity(atHome.quantity, atHome.quantityUnit)} at home
+                          {!isSameName(atHome.name, item.name) && ` (${atHome.name})`}
+                        </span>
+                      )}
                     </span>
 
                     <button
                       onClick={() => removeShoppingItem(item.id)}
+                      aria-label={`Remove ${item.name} from list`}
                       className="p-1 text-gray-400 hover:text-red-500 transition-colors"
                     >
                       <Trash2 className="h-4 w-4" />
                     </button>
                   </div>
-                ))}
+                  )
+                })}
               </div>
             </section>
           )

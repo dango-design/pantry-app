@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Search, SlidersHorizontal, ArrowUpDown, Check, Settings } from 'lucide-react'
-import { FoodItemCard } from '@/components/inventory'
+import { FoodItemCard, useAddToList } from '@/components/inventory'
 import { FilterSheet, type ExpirationFilter } from '@/components/inventory/FilterSheet'
 import { TonightBanner } from '@/components/plan'
 import { Snackbar } from '@/components/common'
@@ -51,7 +51,7 @@ export function InventoryPage() {
   const [showFilterSheet, setShowFilterSheet] = useState(false)
   const [snackbar, setSnackbar] = useState<SnackbarState>({ open: false, message: '' })
 
-  const { inventory, consumeItem, updateItem, addShoppingItem } = useDemoStore()
+  const { inventory, consumeItem, updateItem } = useDemoStore()
 
   // Count active filters for badge
   const activeFilterCount =
@@ -79,34 +79,10 @@ export function InventoryPage() {
     })
   }, [consumeItem, updateItem])
 
-  // Handle adding item to cart (mark used + add to shopping list)
-  const handleAddToCart = useCallback((item: FoodItem) => {
-    const previousQuantity = item.quantity
-    consumeItem(item.id, item.quantity) // Sets quantity to 0
-
-    // Add to shopping list
-    const newShoppingItem = addShoppingItem({
-      shoppingListId: 'demo-list',
-      name: item.name,
-      quantity: item.quantity,
-      quantityUnit: item.quantityUnit,
-      category: item.category,
-      isChecked: false,
-      source: 'low_stock',
-      sourceItemId: item.id,
-      priority: 'normal',
-    })
-
-    setSnackbar({
-      open: true,
-      message: `${item.name} removed from pantry and added to grocery list`,
-      undoAction: () => {
-        updateItem(item.id, { quantity: previousQuantity, status: 'active', consumedAt: undefined })
-        // Remove from shopping list - we need the ID from the returned item
-        useDemoStore.getState().removeShoppingItem(newShoppingItem.id)
-      },
-    })
-  }, [consumeItem, updateItem, addShoppingItem])
+  // Cart action on a card: asks first when the item is still in stock
+  const { requestAdd, sheet: addToListSheet } = useAddToList(({ message, undo }) => {
+    setSnackbar({ open: true, message, undoAction: undo })
+  })
 
   // Filter active items
   const activeItems = useMemo(() => {
@@ -318,7 +294,7 @@ export function InventoryPage() {
                 key={item.id}
                 item={item}
                 onMarkUsed={handleMarkUsed}
-                onAddToCart={handleAddToCart}
+                onAddToCart={requestAdd}
               />
             ))
           )}
@@ -337,6 +313,9 @@ export function InventoryPage() {
         onExpirationChange={setExpirationFilter}
         onReset={handleResetFilters}
       />
+
+      {/* "You still have …" confirmation for the cart action */}
+      {addToListSheet}
 
       {/* Snackbar */}
       <Snackbar

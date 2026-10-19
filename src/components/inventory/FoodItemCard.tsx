@@ -21,7 +21,8 @@ const M3 = {
 interface FoodItemCardProps {
   item: FoodItem
   onMarkUsed?: (item: FoodItem) => void
-  onAddToCart?: (item: FoodItem) => void
+  /** Return false when the item wasn't added right away (e.g. the page asks first) */
+  onAddToCart?: (item: FoodItem) => boolean | void
   className?: string
 }
 
@@ -110,15 +111,12 @@ export function FoodItemCard({
   const handleAddToCart = (e?: React.MouseEvent | React.TouchEvent) => {
     e?.stopPropagation()
 
-    // Trigger the fly animation
-    if (iconRef.current) {
+    // Fly to the cart only when the item went straight onto the list,
+    // not when the page asks first or it was already there
+    const added = onAddToCart?.(item)
+    if (added !== false && iconRef.current) {
       triggerAnimation(iconRef.current, <FoodIcon size={32} strokeWidth={1.75} color={tone.ink} />)
     }
-
-    // Call the callback after a short delay for the animation to be visible
-    setTimeout(() => {
-      onAddToCart?.(item)
-    }, 100)
   }
 
   const handleMarkUsed = (e?: React.MouseEvent | React.TouchEvent) => {
@@ -284,7 +282,7 @@ export function FoodItemCard({
           <button
             onClick={handleAddToCart}
             className="w-14 flex items-center justify-center bg-primary text-white hover:bg-primary-hover transition-colors"
-            title="Add to grocery list & remove from pantry"
+            title="Add to shopping list"
           >
             <ShoppingCart className="h-5 w-5" />
           </button>

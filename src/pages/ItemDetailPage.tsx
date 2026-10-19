@@ -7,6 +7,7 @@ import { CATEGORIES, CATEGORY_TONES, STORAGE_LOCATIONS, QUANTITY_UNITS } from '@
 import { calculateFreshnessScore, formatExpirationText, getFreshnessLevel, FRESHNESS_COLORS } from '@/utils/freshness'
 import { formatDateString } from '@/utils/dates'
 import { FoodThumbnail } from '@/components/icons'
+import { useAddToList } from '@/components/inventory'
 
 // Snackbar state type
 interface SnackbarState {
@@ -18,7 +19,7 @@ interface SnackbarState {
 export function ItemDetailPage() {
   const navigate = useNavigate()
   const { id } = useParams<{ id: string }>()
-  const { inventory, deleteItem, consumeItem, updateItem, addShoppingItem } = useDemoStore()
+  const { inventory, deleteItem, consumeItem, updateItem } = useDemoStore()
 
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const [showUseDialog, setShowUseDialog] = useState(false)
@@ -28,6 +29,13 @@ export function ItemDetailPage() {
   const item = useMemo(() => {
     return inventory.find((i) => i.id === id)
   }, [inventory, id])
+
+  // "Add to list" asks first when the item is still in stock. Only the
+  // "Used it up" choice empties the item, so only then go back.
+  const { requestAdd, sheet: addToListSheet } = useAddToList(({ message, undo, usedUp }) => {
+    setSnackbar({ open: true, message, undoAction: undo })
+    if (usedUp) setTimeout(() => navigate('/'), 300)
+  })
 
   if (!item) {
     return (
@@ -67,36 +75,6 @@ export function ItemDetailPage() {
       message: `${item.name} removed from pantry`,
       undoAction: () => {
         updateItem(item.id, { quantity: previousQuantity, status: 'active', consumedAt: undefined })
-      },
-    })
-
-    // Navigate back after a short delay
-    setTimeout(() => navigate('/'), 300)
-  }
-
-  const handleAddToGroceryList = () => {
-    const previousQuantity = item.quantity
-    consumeItem(item.id, item.quantity) // Sets quantity to 0
-
-    // Add to shopping list
-    const newShoppingItem = addShoppingItem({
-      shoppingListId: 'demo-list',
-      name: item.name,
-      quantity: item.quantity,
-      quantityUnit: item.quantityUnit,
-      category: item.category,
-      isChecked: false,
-      source: 'low_stock',
-      sourceItemId: item.id,
-      priority: 'normal',
-    })
-
-    setSnackbar({
-      open: true,
-      message: `${item.name} added to grocery list`,
-      undoAction: () => {
-        updateItem(item.id, { quantity: previousQuantity, status: 'active', consumedAt: undefined })
-        useDemoStore.getState().removeShoppingItem(newShoppingItem.id)
       },
     })
 
@@ -260,7 +238,7 @@ export function ItemDetailPage() {
               Used some
             </Button>
             <Button
-              onClick={handleAddToGroceryList}
+              onClick={() => requestAdd(item)}
               variant="secondary"
               className="flex-1"
               size="lg"
@@ -338,6 +316,9 @@ export function ItemDetailPage() {
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* "You still have …" confirmation for Add to list */}
+      {addToListSheet}
 
       {/* Snackbar */}
       <Snackbar
