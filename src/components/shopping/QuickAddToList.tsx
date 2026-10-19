@@ -75,8 +75,8 @@ export function QuickAddToList({ placeholder = 'Add item...', autoFocus, confirm
         />
         <button
           onClick={handleAdd}
-          aria-label="Add to list"
-          className="w-10 h-10 flex-shrink-0 flex items-center justify-center bg-primary text-white rounded-lg hover:bg-primary-hover transition-colors"
+          aria-label="Add to shopping list"
+          className="w-10 h-10 flex-shrink-0 flex items-center justify-center rounded-lg border border-primary-muted bg-primary-soft text-primary hover:bg-primary-muted transition-colors"
         >
           <Plus className="h-5 w-5" />
         </button>
@@ -104,7 +104,7 @@ export function QuickAddToList({ placeholder = 'Add item...', autoFocus, confirm
       {confirmAdds && lastAdded && !note && (
         <p role="status" className="mt-2 flex items-center gap-1 text-sm text-green-700">
           <Check className="h-4 w-4" />
-          Added {lastAdded} to your list
+          Added {lastAdded} to your shopping list
         </p>
       )}
     </div>

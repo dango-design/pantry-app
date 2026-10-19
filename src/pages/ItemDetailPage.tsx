@@ -30,7 +30,7 @@ export function ItemDetailPage() {
     return inventory.find((i) => i.id === id)
   }, [inventory, id])
 
-  // "Add to list" asks first when the item is still in stock. Only the
+  // "Buy more" asks first when the item is still in stock. Only the
   // "Used it up" choice empties the item, so only then go back.
   const { requestAdd, sheet: addToListSheet } = useAddToList(({ message, undo, usedUp }) => {
     setSnackbar({ open: true, message, undoAction: undo })
@@ -244,7 +244,7 @@ export function ItemDetailPage() {
               size="lg"
             >
               <ShoppingCart className="h-5 w-5 mr-2" />
-              Add to list
+              Buy more
             </Button>
           </div>
 
@@ -317,7 +317,7 @@ export function ItemDetailPage() {
         </DialogActions>
       </Dialog>
 
-      {/* "You still have …" confirmation for Add to list */}
+      {/* "You still have …" confirmation for Buy more */}
       {addToListSheet}
 
       {/* Snackbar */}

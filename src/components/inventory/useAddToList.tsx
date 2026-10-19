@@ -7,7 +7,7 @@ import { AlreadyInPantrySheet } from './AlreadyInPantrySheet'
 export interface AddToListResult {
   message: string
   undo?: () => void
-  /** The pantry item was cleared (the "Used it up" choice) */
+  /** The pantry item was cleared (the "I'm out of it" choice) */
   usedUp: boolean
 }
 
@@ -39,7 +39,9 @@ export function useAddToList(onDone: (result: AddToListResult) => void) {
     })
 
     onDone({
-      message: usedUp ? `${item.name} used up and added to your list` : `${item.name} added to your list`,
+      message: usedUp
+        ? `${item.name} removed from your pantry and added to your shopping list`
+        : `${item.name} added to your shopping list`,
       usedUp,
       undo: () => {
         removeShoppingItem(listItem.id)
@@ -51,7 +53,7 @@ export function useAddToList(onDone: (result: AddToListResult) => void) {
   /** Returns true when the item was added straight away (no sheet, not a duplicate) */
   const requestAdd = (item: FoodItem): boolean => {
     if (shoppingList.some((listItem) => !listItem.isChecked && isSameName(listItem.name, item.name))) {
-      onDone({ message: `${item.name} is already on your list`, usedUp: false })
+      onDone({ message: `${item.name} is already on your shopping list`, usedUp: false })
       return false
     }
     if (item.quantity <= 0 || isLowStock(item)) {

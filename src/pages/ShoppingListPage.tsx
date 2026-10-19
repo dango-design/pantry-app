@@ -280,8 +280,10 @@ export function ShoppingListPage() {
             <span className="text-sm text-gray-500">
               {checkedCount} item{checkedCount > 1 ? 's' : ''} checked
             </span>
+            {/* Secondary so the + in the nav stays the only filled button on screen */}
             <Button
               size="sm"
+              variant="secondary"
               onClick={handleReviewChecked}
             >
               Add to pantry
