@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { ArrowLeft, Minus, Plus, Clock, MapPin, Tag, ShoppingCart, CheckCircle2, Edit2 } from 'lucide-react'
+import { ArrowLeft, Minus, Plus, Clock, MapPin, Tag, ShoppingCart, CheckCircle2, Edit2, SlidersHorizontal, Trash2 } from 'lucide-react'
 import { Button, Card, CardContent, Dialog, DialogActions, Snackbar } from '@/components/common'
 import { useDemoStore } from '@/stores/demoStore'
 import { CATEGORIES, CATEGORY_TONES, STORAGE_LOCATIONS, QUANTITY_UNITS } from '@/utils/constants'
@@ -242,29 +242,13 @@ export function ItemDetailPage() {
           </CardContent>
         </Card>
 
-        {/* Actions */}
+        {/* Actions: one filled primary, soft secondaries, and Remove as a quiet text link */}
         <div className="space-y-3">
-          {/* Primary action: Add to grocery list */}
-          <Button
-            onClick={handleAddToGroceryList}
-            className="w-full bg-teal-500 hover:bg-teal-600"
-            size="lg"
-          >
-            <ShoppingCart className="h-5 w-5 mr-2" />
-            Add to grocery list
-          </Button>
-
-          {/* Secondary action: Mark as used */}
-          <Button
-            onClick={handleMarkUsed}
-            className="w-full bg-primary hover:bg-primary-hover"
-            size="lg"
-          >
+          <Button onClick={handleMarkUsed} className="w-full" size="lg">
             <CheckCircle2 className="h-5 w-5 mr-2" />
-            Mark as used
+            Used it all
           </Button>
 
-          {/* Tertiary actions: Used some / Remove */}
           <div className="flex gap-3">
             <Button
               onClick={() => setShowUseDialog(true)}
@@ -272,17 +256,27 @@ export function ItemDetailPage() {
               className="flex-1"
               size="lg"
             >
+              <SlidersHorizontal className="h-5 w-5 mr-2" />
               Used some
             </Button>
             <Button
-              onClick={() => setShowDeleteDialog(true)}
+              onClick={handleAddToGroceryList}
               variant="secondary"
-              className="flex-1 text-red-600 hover:text-red-700 hover:bg-red-50"
+              className="flex-1"
               size="lg"
             >
-              Remove
+              <ShoppingCart className="h-5 w-5 mr-2" />
+              Add to list
             </Button>
           </div>
+
+          <button
+            onClick={() => setShowDeleteDialog(true)}
+            className="w-full flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 transition-colors"
+          >
+            <Trash2 className="h-4 w-4" />
+            Remove from pantry
+          </button>
         </div>
       </div>
 

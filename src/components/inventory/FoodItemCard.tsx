@@ -177,7 +177,7 @@ export function FoodItemCard({
       {isTouch && (
         <div
           className={cn(
-            'absolute left-0 top-0 bottom-0 flex items-center justify-center bg-teal-500 transition-opacity',
+            'absolute left-0 top-0 bottom-0 flex items-center justify-center bg-primary transition-opacity',
             swipeDirection === 'right' && isDragging ? 'opacity-100' : 'opacity-0'
           )}
           style={{ width: ACTION_WIDTH }}
@@ -283,7 +283,7 @@ export function FoodItemCard({
         >
           <button
             onClick={handleAddToCart}
-            className="w-14 flex items-center justify-center bg-teal-500 text-white hover:bg-teal-600 transition-colors"
+            className="w-14 flex items-center justify-center bg-primary text-white hover:bg-primary-hover transition-colors"
             title="Add to grocery list & remove from pantry"
           >
             <ShoppingCart className="h-5 w-5" />
