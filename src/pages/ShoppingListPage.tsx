@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react'
 import { Lightbulb, Trash2, Home } from 'lucide-react'
-import { TabHeader } from '@/components/layout'
+import { TabHeader, TabSearchField } from '@/components/layout'
 import { Badge, Button } from '@/components/common'
 import { QuickAddToList } from '@/components/shopping'
 import { ItemReviewList, type ReviewItem } from '@/components/smart-input'
@@ -42,6 +42,8 @@ export function ShoppingListPage() {
   } = useDemoStore()
 
   const [reviewItems, setReviewItems] = useState<ReviewItem[] | null>(null)
+  const [searchQuery, setSearchQuery] = useState('')
+  const query = searchQuery.trim().toLowerCase()
 
   // Suggest restocking items that are running low
   const suggestions = useMemo(() => {
@@ -112,34 +114,43 @@ export function ShoppingListPage() {
     setReviewItems(null)
   }
 
+  // Search narrows both the list and the suggestions
+  const visibleSuggestions = suggestions.filter((s) => !query || s.name.toLowerCase().includes(query))
+
   // Group items by category
   const groupedItems = useMemo(() => {
-    return shoppingList.reduce((acc, item) => {
+    const visible = query ? shoppingList.filter((item) => item.name.toLowerCase().includes(query)) : shoppingList
+    return visible.reduce((acc, item) => {
       const category = item.category || 'other'
       if (!acc[category]) acc[category] = []
       acc[category].push(item)
       return acc
     }, {} as Record<FoodCategory | 'other', typeof shoppingList>)
-  }, [shoppingList])
+  }, [shoppingList, query])
 
   const checkedCount = shoppingList.filter((i) => i.isChecked).length
 
   return (
     <div className="min-h-screen pb-24">
-      <TabHeader title="Shopping list" tool={<QuickAddToList placeholder="Add to shopping list" />} />
+      <TabHeader
+        title="Shopping list"
+        tool={<TabSearchField value={searchQuery} onChange={setSearchQuery} placeholder="Search shopping list" />}
+      >
+        <QuickAddToList placeholder="Add to shopping list" />
+      </TabHeader>
 
       <div className="px-4 pt-2 pb-4 space-y-4">
         {/* Suggestions */}
-        {suggestions.length > 0 && (
+        {visibleSuggestions.length > 0 && (
           <section>
             <div className="flex items-center gap-2 mb-2">
               <Lightbulb className="h-4 w-4 text-yellow-500" />
               <span className="text-sm font-medium text-gray-700">
-                Suggested ({suggestions.length})
+                Suggested ({visibleSuggestions.length})
               </span>
             </div>
             <div className="space-y-1">
-              {suggestions.slice(0, 5).map((suggestion, index) => (
+              {visibleSuggestions.slice(0, 5).map((suggestion, index) => (
                 <button
                   key={`${suggestion.name}-${index}`}
                   onClick={() => handleAcceptSuggestion(suggestion)}
@@ -247,11 +258,17 @@ export function ShoppingListPage() {
           )
         })}
 
-        {/* Empty state */}
-        {shoppingList.length === 0 && suggestions.length === 0 && (
+        {/* Empty states */}
+        {!query && shoppingList.length === 0 && suggestions.length === 0 && (
           <div className="text-center py-12 text-gray-500">
             <p className="mb-2">Your shopping list is empty</p>
             <p className="text-sm">Add items above or accept suggestions</p>
+          </div>
+        )}
+        {query && Object.keys(groupedItems).length === 0 && visibleSuggestions.length === 0 && (
+          <div className="text-center py-12 text-gray-500">
+            <p className="mb-2">Nothing on your list matches "{searchQuery.trim()}"</p>
+            <p className="text-sm">Add it with the field above</p>
           </div>
         )}
       </div>
