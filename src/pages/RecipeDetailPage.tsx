@@ -172,14 +172,18 @@ export function RecipeDetailPage() {
         <div className="flex items-center justify-between h-14 px-4 max-w-lg mx-auto">
           <button
             onClick={() => navigate(-1)}
+            aria-label="Back"
             className="p-2 -ml-2 text-gray-600 hover:text-gray-900"
           >
             <ArrowLeft className="h-5 w-5" />
           </button>
           <h1 className="text-lg font-semibold text-gray-900 truncate mx-4">Recipe</h1>
-          <div className="flex items-center gap-1">
+          {/* Favorite, edit, and delete. Delete lives up here, away from "I made this". */}
+          <div className="flex items-center -mr-2">
             <button
               onClick={() => toggleRecipeFavorite(recipe.id)}
+              aria-label={recipe.isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+              aria-pressed={recipe.isFavorite}
               className="p-2 text-gray-500 hover:text-red-500"
             >
               <Heart
@@ -188,9 +192,17 @@ export function RecipeDetailPage() {
             </button>
             <button
               onClick={() => navigate(`/recipe/${recipe.id}/edit`)}
+              aria-label="Edit recipe"
               className="p-2 text-gray-500 hover:text-gray-700"
             >
               <Edit2 className="h-5 w-5" />
+            </button>
+            <button
+              onClick={() => setShowDeleteDialog(true)}
+              aria-label="Delete recipe"
+              className="p-2 text-gray-500 hover:text-red-600"
+            >
+              <Trash2 className="h-5 w-5" />
             </button>
           </div>
         </div>
@@ -336,33 +348,25 @@ export function RecipeDetailPage() {
         className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4"
         style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}
       >
+        {/* One row on small phones: labels never wrap, and the bar stays one 48px button tall.
+            "I made this" takes the full width when nothing is missing. */}
         <div className="flex gap-3 max-w-lg mx-auto">
-          <Button
-            onClick={handleOpenCookDialog}
-            className="flex-1 bg-primary hover:bg-primary-hover"
-            size="lg"
-          >
-            <CookingPot className="h-5 w-5 mr-2" />
-            I made this
-          </Button>
           {requiredMissingCount > 0 && (
             <Button
               onClick={handleAddMissingToList}
               variant="secondary"
-              size="lg"
-              className="flex-1"
+              className="flex-1 min-w-0 h-12 px-3 whitespace-nowrap"
             >
-              <ShoppingCart className="h-5 w-5 mr-2" />
+              <ShoppingCart className="h-4 w-4 mr-1.5 flex-shrink-0" />
               Add missing ({requiredMissingCount})
             </Button>
           )}
           <Button
-            onClick={() => setShowDeleteDialog(true)}
-            variant="secondary"
-            size="lg"
-            className="text-red-600 hover:text-red-700 hover:bg-red-50 px-3"
+            onClick={handleOpenCookDialog}
+            className="flex-1 min-w-0 h-12 px-3 whitespace-nowrap"
           >
-            <Trash2 className="h-5 w-5" />
+            <CookingPot className="h-4 w-4 mr-1.5 flex-shrink-0" />
+            I made this
           </Button>
         </div>
       </div>
