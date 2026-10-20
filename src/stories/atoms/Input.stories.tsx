@@ -60,7 +60,7 @@ export const Default: Story = {
 
 export const WithLabel: Story = {
   args: {
-    label: 'Email Address',
+    label: 'Email address',
     placeholder: 'you@example.com',
     type: 'email',
   },
@@ -77,7 +77,7 @@ export const WithHint: Story = {
 
 export const WithError: Story = {
   args: {
-    label: 'Email Address',
+    label: 'Email address',
     type: 'email',
     value: 'invalid-email',
     error: 'Please enter a valid email address',
@@ -86,7 +86,7 @@ export const WithError: Story = {
 
 export const Disabled: Story = {
   args: {
-    label: 'Disabled Input',
+    label: 'Disabled input',
     value: 'Cannot edit this',
     disabled: true,
   },
@@ -104,7 +104,7 @@ export const NumberInput: Story = {
 
 export const DateInput: Story = {
   args: {
-    label: 'Expiration Date',
+    label: 'Expiration date',
     type: 'date',
   },
 }
@@ -113,9 +113,9 @@ export const AllStates: Story = {
   render: () => (
     <div className="flex flex-col gap-6 w-80">
       <Input placeholder="Default state" />
-      <Input label="With Label" placeholder="Enter value..." />
-      <Input label="With Hint" placeholder="Enter value..." hint="This is a helpful hint" />
-      <Input label="With Error" value="Bad value" error="This field has an error" />
+      <Input label="With label" placeholder="Enter value..." />
+      <Input label="With hint" placeholder="Enter value..." hint="This is a helpful hint" />
+      <Input label="With error" value="Bad value" error="This field has an error" />
       <Input label="Disabled" value="Cannot edit" disabled />
     </div>
   ),

@@ -14,6 +14,7 @@ import {
   RecipesPage,
   RecipeDetailPage,
   RecipeFormPage,
+  PlanPage,
   SettingsPage,
   HouseholdPage,
 } from '@/pages'
@@ -64,6 +65,7 @@ function AppRoutes() {
       >
         <Route path="/" element={<InventoryPage />} />
         <Route path="/recipes" element={<RecipesPage />} />
+        <Route path="/plan" element={<PlanPage />} />
         <Route path="/shopping" element={<ShoppingListPage />} />
       </Route>
 
@@ -77,6 +79,7 @@ function AppRoutes() {
       >
         <Route path="/add" element={<AddItemPage />} />
         <Route path="/item/:id" element={<ItemDetailPage />} />
+        <Route path="/item/:id/edit" element={<AddItemPage />} />
         <Route path="/recipe/new" element={<RecipeFormPage />} />
         <Route path="/recipe/:id" element={<RecipeDetailPage />} />
         <Route path="/recipe/:id/edit" element={<RecipeFormPage />} />

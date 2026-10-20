@@ -1,4 +1,5 @@
 import type { Recipe, RecipeIngredient, FoodItem } from '@/types'
+import { getDaysUntilExpiration } from './freshness'
 
 export interface IngredientMatch {
   ingredient: RecipeIngredient
@@ -19,7 +20,7 @@ export interface RecipeMatchResult {
  * Check if a food item name matches a recipe ingredient name.
  * Tries exact match, then substring match, then substitutes.
  */
-function ingredientMatchesItem(ingredient: RecipeIngredient, item: FoodItem): boolean {
+export function ingredientMatchesItem(ingredient: RecipeIngredient, item: FoodItem): boolean {
   const ingredientName = ingredient.name.toLowerCase()
   const itemName = item.name.toLowerCase()
 
@@ -46,10 +47,7 @@ function ingredientMatchesItem(ingredient: RecipeIngredient, item: FoodItem): bo
  * Check if a food item is expiring soon (within 3 days)
  */
 function isExpiringSoon(item: FoodItem): boolean {
-  const now = new Date()
-  const expDate = new Date(item.expirationDate)
-  const daysUntil = Math.ceil((expDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
-  return daysUntil <= 3
+  return getDaysUntilExpiration(item.expirationDate) <= 3
 }
 
 /**
@@ -123,4 +121,11 @@ export function matchAllRecipes(
     // Then by match score
     return b.matchScore - a.matchScore
   })
+}
+
+/** Required ingredients in the pantry vs in the recipe (optional ones don't count) */
+export function countRequiredIngredients(result: RecipeMatchResult): { have: number; total: number } {
+  const total = result.recipe.ingredients.filter((ing) => !ing.isOptional).length
+  const missing = result.missingIngredients.filter((m) => !m.ingredient.isOptional).length
+  return { have: total - missing, total }
 }

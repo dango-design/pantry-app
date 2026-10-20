@@ -1,17 +1,36 @@
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { ArrowLeft, Heart, Clock, Users, ChefHat, Edit2, Trash2, CookingPot, ShoppingCart } from 'lucide-react'
+import { ArrowLeft, Heart, Clock, Users, ChefHat, Edit2, Trash2, CookingPot, ShoppingCart, CalendarDays, Plus } from 'lucide-react'
 import { Button, Card, CardContent, Dialog, DialogActions, Snackbar } from '@/components/common'
-import { IngredientMatchList } from '@/components/recipes'
+import { IngredientMatchList, IngredientRing } from '@/components/recipes'
+import { AddToPlanSheet } from '@/components/plan'
 import { useDemoStore } from '@/stores/demoStore'
-import { matchRecipeToInventory } from '@/utils/recipeMatching'
+import { countRequiredIngredients, matchRecipeToInventory, type IngredientMatch } from '@/utils/recipeMatching'
+import { convertQuantity, formatUnit, roundQuantity } from '@/utils/units'
 import { cn } from '@/utils/cn'
 import type { QuantityUnit } from '@/types'
+import { todayDateString } from '@/utils/dates'
+import { formatMealTime } from '@/utils/mealPlan'
+import { CATEGORY_TONES } from '@/utils/constants'
+
+// "dinner today" -> "Dinner today"
+function capitalize(text: string): string {
+  return text.charAt(0).toUpperCase() + text.slice(1)
+}
 
 interface SnackbarState {
   open: boolean
   message: string
   undoAction?: () => void
+}
+
+// How much of the matched pantry item an ingredient uses, in the pantry item's unit.
+// null when the units can't be converted (e.g. 1 cup of spinach from a 1 pack item).
+function getPantryAmount(match: IngredientMatch): number | null {
+  if (!match.matchedItem) return null
+  const converted = convertQuantity(match.ingredient.quantity, match.ingredient.unit, match.matchedItem.quantityUnit)
+  if (converted === null) return null
+  return roundQuantity(Math.min(converted, match.matchedItem.quantity))
 }
 
 export function RecipeDetailPage() {
@@ -24,8 +43,11 @@ export function RecipeDetailPage() {
 
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const [showCookDialog, setShowCookDialog] = useState(false)
-  const [checkedIngredients, setCheckedIngredients] = useState<Set<number>>(new Set())
+  // Amount used per ingredient index, in the matched pantry item's unit
+  const [usedAmounts, setUsedAmounts] = useState<Record<number, string>>({})
   const [snackbar, setSnackbar] = useState<SnackbarState>({ open: false, message: '' })
+  const [showPlanSheet, setShowPlanSheet] = useState(false)
+  const mealPlan = useDemoStore((state) => state.mealPlan)
 
   const recipe = useMemo(() => recipes.find((r) => r.id === id), [recipes, id])
 
@@ -34,26 +56,60 @@ export function RecipeDetailPage() {
     return matchRecipeToInventory(recipe, inventory)
   }, [recipe, inventory])
 
-  // Hooks must run before the not-found early return
-  const handleCook = useCallback(() => {
-    if (!recipe || !matchResult) return
+  // Upcoming planned meals for this recipe
+  const upcomingPlans = useMemo(() => {
+    const today = todayDateString()
+    return mealPlan
+      .filter((e) => e.recipeId === id && e.status === 'planned' && e.date >= today)
+      .sort((a, b) => a.date.localeCompare(b.date))
+  }, [mealPlan, id])
 
-    // Track what was consumed for undo
-    const consumedItems: Array<{ id: string; previousQuantity: number }> = []
+  if (!recipe) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-gray-500 mb-4">Recipe not found</p>
+          <Button onClick={() => navigate('/recipes')}>Go to recipes</Button>
+        </div>
+      </div>
+    )
+  }
 
-    // Deduct checked ingredients from inventory
-    for (const index of checkedIngredients) {
-      const ingredient = recipe.ingredients[index]
-      const match = matchResult.availableIngredients.find(
-        (a) => a.ingredient === ingredient
-      )
-      if (match?.matchedItem) {
-        consumedItems.push({
-          id: match.matchedItem.id,
-          previousQuantity: match.matchedItem.quantity,
-        })
-        consumeItem(match.matchedItem.id, ingredient.quantity)
+  const totalTime = (recipe.prepTimeMinutes || 0) + (recipe.cookTimeMinutes || 0)
+
+  const handleDelete = () => {
+    deleteRecipe(recipe.id)
+    navigate('/recipes')
+  }
+
+  // Initialize cook dialog: prefill amounts only where the recipe unit converts
+  // to the pantry unit. Otherwise leave it empty so nothing is deducted by guesswork.
+  const handleOpenCookDialog = () => {
+    if (!matchResult) return
+    const amounts: Record<number, string> = {}
+    for (const match of matchResult.availableIngredients) {
+      const amount = getPantryAmount(match)
+      amounts[recipe.ingredients.indexOf(match.ingredient)] = amount === null ? '' : String(amount)
+    }
+    setUsedAmounts(amounts)
+    setShowCookDialog(true)
+  }
+
+  const handleCook = () => {
+    if (!matchResult) return
+
+    // Quantities before cooking, for undo
+    const previousQuantities = new Map<string, number>()
+
+    // Deduct the amounts used from inventory
+    for (const match of matchResult.availableIngredients) {
+      if (!match.matchedItem) continue
+      const amount = Number(usedAmounts[recipe.ingredients.indexOf(match.ingredient)])
+      if (!(amount > 0)) continue
+      if (!previousQuantities.has(match.matchedItem.id)) {
+        previousQuantities.set(match.matchedItem.id, match.matchedItem.quantity)
       }
+      consumeItem(match.matchedItem.id, amount)
     }
 
     markRecipeCooked(recipe.id)
@@ -64,8 +120,8 @@ export function RecipeDetailPage() {
       message: `Marked "${recipe.name}" as cooked!`,
       undoAction: () => {
         // Restore consumed inventory items
-        for (const item of consumedItems) {
-          updateItem(item.id, { quantity: item.previousQuantity, status: 'active', consumedAt: undefined })
+        for (const [itemId, previousQuantity] of previousQuantities) {
+          updateItem(itemId, { quantity: previousQuantity, status: 'active', consumedAt: undefined })
         }
         // Undo the cooked count
         useDemoStore.getState().updateRecipe(recipe.id, {
@@ -74,9 +130,9 @@ export function RecipeDetailPage() {
         })
       },
     })
-  }, [recipe, matchResult, checkedIngredients, consumeItem, markRecipeCooked, updateItem])
+  }
 
-  const handleAddMissingToList = useCallback(() => {
+  const handleAddMissingToList = () => {
     if (!matchResult) return
     let count = 0
     for (const missing of matchResult.missingIngredients) {
@@ -96,9 +152,9 @@ export function RecipeDetailPage() {
       open: true,
       message: `Added ${count} item${count !== 1 ? 's' : ''} to shopping list`,
     })
-  }, [matchResult, addShoppingItem])
+  }
 
-  const handleAddSingleToList = useCallback((name: string, quantity: number, unit: string) => {
+  const handleAddSingleToList = (name: string, quantity: number, unit: string) => {
     addShoppingItem({
       shoppingListId: 'demo-list',
       name,
@@ -109,38 +165,6 @@ export function RecipeDetailPage() {
       priority: 'normal',
     })
     setSnackbar({ open: true, message: `${name} added to shopping list` })
-  }, [addShoppingItem])
-
-  if (!recipe) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-gray-500 mb-4">Recipe not found</p>
-          <Button onClick={() => navigate('/recipes')}>Go to Recipes</Button>
-        </div>
-      </div>
-    )
-  }
-
-  const totalTime = (recipe.prepTimeMinutes || 0) + (recipe.cookTimeMinutes || 0)
-
-  const handleDelete = () => {
-    deleteRecipe(recipe.id)
-    navigate('/recipes')
-  }
-
-  // Initialize cook dialog: pre-check all available ingredients
-  const handleOpenCookDialog = () => {
-    if (!matchResult) return
-    const checked = new Set<number>()
-    recipe.ingredients.forEach((_, index) => {
-      const isAvailable = matchResult.availableIngredients.some(
-        (a) => a.ingredient === recipe.ingredients[index]
-      )
-      if (isAvailable) checked.add(index)
-    })
-    setCheckedIngredients(checked)
-    setShowCookDialog(true)
   }
 
   const requiredMissingCount = matchResult
@@ -154,14 +178,18 @@ export function RecipeDetailPage() {
         <div className="flex items-center justify-between h-14 px-4 max-w-lg mx-auto">
           <button
             onClick={() => navigate(-1)}
+            aria-label="Back"
             className="p-2 -ml-2 text-gray-600 hover:text-gray-900"
           >
             <ArrowLeft className="h-5 w-5" />
           </button>
           <h1 className="text-lg font-semibold text-gray-900 truncate mx-4">Recipe</h1>
-          <div className="flex items-center gap-1">
+          {/* Favorite, edit, and delete. Delete lives up here, away from "I made this". */}
+          <div className="flex items-center -mr-2">
             <button
               onClick={() => toggleRecipeFavorite(recipe.id)}
+              aria-label={recipe.isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+              aria-pressed={recipe.isFavorite}
               className="p-2 text-gray-500 hover:text-red-500"
             >
               <Heart
@@ -170,9 +198,17 @@ export function RecipeDetailPage() {
             </button>
             <button
               onClick={() => navigate(`/recipe/${recipe.id}/edit`)}
+              aria-label="Edit recipe"
               className="p-2 text-gray-500 hover:text-gray-700"
             >
               <Edit2 className="h-5 w-5" />
+            </button>
+            <button
+              onClick={() => setShowDeleteDialog(true)}
+              aria-label="Delete recipe"
+              className="p-2 text-gray-500 hover:text-red-600"
+            >
+              <Trash2 className="h-5 w-5" />
             </button>
           </div>
         </div>
@@ -215,7 +251,7 @@ export function RecipeDetailPage() {
             {(recipe.cuisine || recipe.tags.length > 0) && (
               <div className="flex flex-wrap gap-1.5 mt-3">
                 {recipe.cuisine && (
-                  <span className="px-2 py-0.5 bg-purple-50 text-purple-700 rounded-full text-xs font-medium">
+                  <span className="px-2 py-0.5 bg-primary-soft text-primary rounded-full text-xs font-medium">
                     {recipe.cuisine}
                   </span>
                 )}
@@ -227,29 +263,18 @@ export function RecipeDetailPage() {
               </div>
             )}
 
-            {/* Match score */}
-            {matchResult && (
-              <div className="mt-3 flex items-center gap-2">
-                <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
-                  <div
-                    className="h-full rounded-full transition-all"
-                    style={{
-                      width: `${matchResult.matchScore}%`,
-                      backgroundColor: matchResult.matchScore === 100
-                        ? '#22C55E'
-                        : matchResult.matchScore >= 80
-                          ? '#F59E0B'
-                          : matchResult.matchScore >= 50
-                            ? '#F97316'
-                            : '#9CA3AF',
-                    }}
-                  />
+            {/* How many required ingredients are in the pantry (the list below shows which) */}
+            {matchResult && (() => {
+              const { have, total } = countRequiredIngredients(matchResult)
+              return (
+                <div className="mt-3 flex items-center gap-3">
+                  <IngredientRing have={have} total={total} size={44} />
+                  <p className="text-sm text-gray-600">
+                    {have >= total ? 'All ingredients in your pantry' : `${have} of ${total} ingredients in your pantry`}
+                  </p>
                 </div>
-                <span className="text-sm font-medium text-gray-600">
-                  {matchResult.matchScore}% match
-                </span>
-              </div>
-            )}
+              )
+            })()}
 
             {recipe.timesCooked > 0 && (
               <p className="text-xs text-gray-400 mt-2">
@@ -257,6 +282,48 @@ export function RecipeDetailPage() {
                 {recipe.lastCookedAt && ` · Last: ${new Date(recipe.lastCookedAt).toLocaleDateString()}`}
               </p>
             )}
+          </CardContent>
+        </Card>
+
+        {/* Meal plan: when this recipe is next planned (links to that week), and a way to plan it */}
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <span
+                className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+                style={{ backgroundColor: CATEGORY_TONES.dairy.tint, color: CATEGORY_TONES.dairy.ink }}
+              >
+                <CalendarDays className="h-5 w-5" />
+              </span>
+              {upcomingPlans.length > 0 ? (
+                <button
+                  onClick={() => navigate(`/plan?week=${upcomingPlans[0].date}`)}
+                  className="flex-1 min-w-0 text-left"
+                >
+                  {/* Short enough to sit beside the button on a 360px phone; wraps rather than truncates */}
+                  <span className="block font-medium text-gray-900">
+                    {capitalize(formatMealTime(upcomingPlans[0].date, upcomingPlans[0].slot))}
+                  </span>
+                  <span className="block text-sm text-gray-500">
+                    {upcomingPlans.length > 1 && `+${upcomingPlans.length - 1} more · `}View in plan ›
+                  </span>
+                </button>
+              ) : (
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium text-gray-900">Not planned</p>
+                  <p className="text-sm text-gray-500">Pick a day</p>
+                </div>
+              )}
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => setShowPlanSheet(true)}
+                className="flex-shrink-0 whitespace-nowrap"
+              >
+                <Plus className="h-4 w-4 mr-1" />
+                {upcomingPlans.length > 0 ? 'Plan again' : 'Add to plan'}
+              </Button>
+            </div>
           </CardContent>
         </Card>
 
@@ -283,7 +350,7 @@ export function RecipeDetailPage() {
             <ol className="space-y-3">
               {recipe.instructions.map((step, index) => (
                 <li key={index} className="flex gap-3">
-                  <span className="flex-shrink-0 w-6 h-6 bg-purple-100 text-purple-700 rounded-full flex items-center justify-center text-xs font-medium">
+                  <span className="flex-shrink-0 w-6 h-6 bg-primary-muted text-primary rounded-full flex items-center justify-center text-xs font-medium">
                     {index + 1}
                   </span>
                   <p className="text-sm text-gray-700 leading-relaxed pt-0.5">{step}</p>
@@ -309,33 +376,25 @@ export function RecipeDetailPage() {
         className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4"
         style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}
       >
+        {/* One row on small phones: labels never wrap, and the bar stays one 48px button tall.
+            "I made this" takes the full width when nothing is missing. */}
         <div className="flex gap-3 max-w-lg mx-auto">
-          <Button
-            onClick={handleOpenCookDialog}
-            className="flex-1 bg-purple-600 hover:bg-purple-700"
-            size="lg"
-          >
-            <CookingPot className="h-5 w-5 mr-2" />
-            I Made This
-          </Button>
           {requiredMissingCount > 0 && (
             <Button
               onClick={handleAddMissingToList}
               variant="secondary"
-              size="lg"
-              className="flex-1"
+              className="flex-1 min-w-0 h-12 px-3 whitespace-nowrap"
             >
-              <ShoppingCart className="h-5 w-5 mr-2" />
-              Add Missing ({requiredMissingCount})
+              <ShoppingCart className="h-4 w-4 mr-1.5 flex-shrink-0" />
+              Add missing ({requiredMissingCount})
             </Button>
           )}
           <Button
-            onClick={() => setShowDeleteDialog(true)}
-            variant="secondary"
-            size="lg"
-            className="text-red-600 hover:text-red-700 hover:bg-red-50 px-3"
+            onClick={handleOpenCookDialog}
+            className="flex-1 min-w-0 h-12 px-3 whitespace-nowrap"
           >
-            <Trash2 className="h-5 w-5" />
+            <CookingPot className="h-4 w-4 mr-1.5 flex-shrink-0" />
+            I made this
           </Button>
         </div>
       </div>
@@ -344,7 +403,7 @@ export function RecipeDetailPage() {
       <Dialog
         open={showDeleteDialog}
         onClose={() => setShowDeleteDialog(false)}
-        title="Delete Recipe"
+        title="Delete recipe"
         description={`Are you sure you want to delete "${recipe.name}"? This cannot be undone.`}
       >
         <DialogActions>
@@ -357,50 +416,79 @@ export function RecipeDetailPage() {
       <Dialog
         open={showCookDialog}
         onClose={() => setShowCookDialog(false)}
-        title="I Made This!"
-        description="Which ingredients did you use? We'll deduct them from your pantry."
+        title="I made this!"
+        description="How much did you use? We'll deduct it from your pantry."
       >
-        <div className="space-y-2 max-h-60 overflow-y-auto">
+        <div className="space-y-1 max-h-80 overflow-y-auto">
           {recipe.ingredients.map((ingredient, index) => {
-            const isAvailable = matchResult?.availableIngredients.some(
+            const match = matchResult?.availableIngredients.find(
               (a) => a.ingredient === ingredient
             )
+            const pantryItem = match?.matchedItem
+            const ingredientLabel = `${ingredient.quantity} ${ingredient.unit} ${ingredient.name}`
+
+            if (!match || !pantryItem) {
+              return (
+                <div key={index} className="py-2 text-sm text-gray-400">
+                  {ingredientLabel} (not in pantry)
+                </div>
+              )
+            }
+
+            const pantryUnit = formatUnit(pantryItem.quantityUnit)
+            const isConvertible = getPantryAmount(match) !== null
             return (
-              <label
-                key={index}
-                className={cn(
-                  'flex items-center gap-3 py-2 px-2 rounded-lg cursor-pointer',
-                  !isAvailable && 'opacity-50'
+              <div key={index} className="py-2">
+                <div className="flex items-center gap-3">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm text-gray-900">{ingredientLabel}</p>
+                    <p className="text-xs text-gray-500 truncate">
+                      Pantry: {pantryItem.name} · {pantryItem.quantity} {pantryUnit}
+                    </p>
+                  </div>
+                  <input
+                    type="number"
+                    inputMode="decimal"
+                    min={0}
+                    max={pantryItem.quantity}
+                    step="any"
+                    placeholder="0"
+                    value={usedAmounts[index] ?? ''}
+                    onChange={(e) => setUsedAmounts({ ...usedAmounts, [index]: e.target.value })}
+                    aria-label={`Amount of ${pantryItem.name} used, in ${pantryUnit}`}
+                    className="w-20 px-2 py-1.5 border border-gray-300 rounded-lg text-sm text-right focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                  />
+                  <span className="w-10 text-sm text-gray-500">{pantryUnit}</span>
+                </div>
+                {!isConvertible && (
+                  <p className="text-xs text-amber-700 mt-1">
+                    Recipe is in {ingredient.unit}, pantry is in {pantryUnit}. Enter how much you used.
+                  </p>
                 )}
-              >
-                <input
-                  type="checkbox"
-                  checked={checkedIngredients.has(index)}
-                  disabled={!isAvailable}
-                  onChange={(e) => {
-                    const newSet = new Set(checkedIngredients)
-                    if (e.target.checked) {
-                      newSet.add(index)
-                    } else {
-                      newSet.delete(index)
-                    }
-                    setCheckedIngredients(newSet)
-                  }}
-                  className="w-4 h-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
-                />
-                <span className="text-sm">
-                  {ingredient.quantity} {ingredient.unit} {ingredient.name}
-                  {!isAvailable && ' (not in pantry)'}
-                </span>
-              </label>
+              </div>
             )
           })}
         </div>
         <DialogActions>
           <Button variant="secondary" onClick={() => setShowCookDialog(false)}>Cancel</Button>
-          <Button onClick={handleCook}>Done Cooking</Button>
+          <Button onClick={handleCook}>Done cooking</Button>
         </DialogActions>
       </Dialog>
+
+      {showPlanSheet && (
+        <AddToPlanSheet
+          recipe={recipe}
+          onClose={() => setShowPlanSheet(false)}
+          onAdded={(entry) => {
+            setShowPlanSheet(false)
+            setSnackbar({
+              open: true,
+              message: `Planned for ${formatMealTime(entry.date, entry.slot)}`,
+              undoAction: () => useDemoStore.getState().removeMealPlanEntry(entry.id),
+            })
+          }}
+        />
+      )}
 
       <Snackbar
         open={snackbar.open}

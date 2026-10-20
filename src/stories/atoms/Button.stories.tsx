@@ -41,42 +41,42 @@ type Story = StoryObj<typeof meta>
 
 export const Primary: Story = {
   args: {
-    children: 'Primary Button',
+    children: 'Primary button',
     variant: 'primary',
   },
 }
 
 export const Secondary: Story = {
   args: {
-    children: 'Secondary Button',
+    children: 'Secondary button',
     variant: 'secondary',
   },
 }
 
 export const Ghost: Story = {
   args: {
-    children: 'Ghost Button',
+    children: 'Ghost button',
     variant: 'ghost',
   },
 }
 
 export const Danger: Story = {
   args: {
-    children: 'Delete Item',
+    children: 'Delete item',
     variant: 'danger',
   },
 }
 
 export const Small: Story = {
   args: {
-    children: 'Small Button',
+    children: 'Small button',
     size: 'sm',
   },
 }
 
 export const Large: Story = {
   args: {
-    children: 'Large Button',
+    children: 'Large button',
     size: 'lg',
   },
 }
@@ -100,7 +100,7 @@ export const WithIcon: Story = {
     children: (
       <>
         <Plus className="h-4 w-4 mr-2" />
-        Add Item
+        Add item
       </>
     ),
   },
@@ -116,7 +116,7 @@ export const IconOnly: Story = {
 
 export const FullWidth: Story = {
   args: {
-    children: 'Full Width Button',
+    children: 'Full width button',
     className: 'w-full',
   },
   decorators: [

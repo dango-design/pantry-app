@@ -7,6 +7,13 @@ export default {
   theme: {
     extend: {
       colors: {
+        // Brand primary (charcoal). Change these to re-theme buttons, chips, focus rings and the add button.
+        primary: {
+          DEFAULT: '#2F2F33', // charcoal, softer than zinc-900 (13:1 on white): filled buttons, selected chips, active tab
+          hover: '#45454B', // one step lighter: hover on filled primary, hover on primary text
+          soft: '#F4F4F5', // zinc-100: tinted backgrounds (tags, quick-add tiles)
+          muted: '#E4E4E7', // zinc-200: hover on soft backgrounds, step badges
+        },
         // Category colors (from Figma/spec)
         category: {
           produce: '#22C55E',
@@ -39,6 +46,10 @@ export default {
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],
+      },
+      screens: {
+        // Devices with a mouse or trackpad (not touch-first), for hover-only affordances like drag grips
+        'can-hover': { raw: '(hover: hover) and (pointer: fine)' },
       },
     },
   },

@@ -41,7 +41,7 @@ export const WithHeader: Story = {
     children: (
       <>
         <CardHeader>
-          <h3 className="font-semibold text-gray-900">Card Title</h3>
+          <h3 className="font-semibold text-gray-900">Card title</h3>
         </CardHeader>
         <CardContent>
           <p className="text-gray-600">Card content goes here.</p>
@@ -113,7 +113,7 @@ export const AllVariations: Story = {
 
       <Card>
         <CardHeader>
-          <h3 className="font-semibold">With Header</h3>
+          <h3 className="font-semibold">With header</h3>
         </CardHeader>
         <CardContent>
           <p className="text-gray-600">Card with header section</p>
@@ -122,7 +122,7 @@ export const AllVariations: Story = {
 
       <Card>
         <CardHeader>
-          <h3 className="font-semibold">Full Card</h3>
+          <h3 className="font-semibold">Full card</h3>
         </CardHeader>
         <CardContent>
           <p className="text-gray-600">Card with all sections</p>

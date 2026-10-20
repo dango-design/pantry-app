@@ -44,7 +44,7 @@ export const Success: Story = {
 
 export const Warning: Story = {
   args: {
-    children: 'Expiring Soon',
+    children: 'Expiring soon',
     variant: 'warning',
   },
 }
@@ -96,15 +96,15 @@ export const UseCases: StoryObj = {
   render: () => (
     <div className="space-y-4">
       <div className="flex items-center gap-2">
-        <span className="text-gray-700">Freshness Status:</span>
+        <span className="text-gray-700">Freshness status:</span>
         <Badge variant="success">Fresh</Badge>
       </div>
       <div className="flex items-center gap-2">
-        <span className="text-gray-700">Expiration Warning:</span>
+        <span className="text-gray-700">Expiration warning:</span>
         <Badge variant="warning">2 days left</Badge>
       </div>
       <div className="flex items-center gap-2">
-        <span className="text-gray-700">Item Count:</span>
+        <span className="text-gray-700">Item count:</span>
         <Badge variant="info">12 items</Badge>
       </div>
       <div className="flex items-center gap-2">

@@ -1,11 +1,13 @@
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { ArrowLeft, Minus, Plus, Clock, MapPin, Tag, ShoppingCart, CheckCircle2 } from 'lucide-react'
+import { ArrowLeft, Minus, Plus, Clock, MapPin, Tag, ShoppingCart, CheckCircle2, Edit2, SlidersHorizontal, Trash2 } from 'lucide-react'
 import { Button, Card, CardContent, Dialog, DialogActions, Snackbar } from '@/components/common'
 import { useDemoStore } from '@/stores/demoStore'
-import { CATEGORIES, STORAGE_LOCATIONS, QUANTITY_UNITS } from '@/utils/constants'
-import { formatExpirationText, getFreshnessLevel, FRESHNESS_COLORS } from '@/utils/freshness'
-import { getFoodIcon } from '@/components/icons'
+import { CATEGORIES, CATEGORY_TONES, STORAGE_LOCATIONS, QUANTITY_UNITS } from '@/utils/constants'
+import { calculateFreshnessScore, formatExpirationText, getFreshnessLevel, FRESHNESS_COLORS } from '@/utils/freshness'
+import { formatDateString } from '@/utils/dates'
+import { FoodThumbnail } from '@/components/icons'
+import { useAddToList } from '@/components/inventory'
 
 // Snackbar state type
 interface SnackbarState {
@@ -17,7 +19,7 @@ interface SnackbarState {
 export function ItemDetailPage() {
   const navigate = useNavigate()
   const { id } = useParams<{ id: string }>()
-  const { inventory, deleteItem, consumeItem, updateItem, addShoppingItem } = useDemoStore()
+  const { inventory, deleteItem, consumeItem, updateItem } = useDemoStore()
 
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const [showUseDialog, setShowUseDialog] = useState(false)
@@ -28,9 +30,43 @@ export function ItemDetailPage() {
     return inventory.find((i) => i.id === id)
   }, [inventory, id])
 
-  // Hooks must run before the not-found early return
-  const handleMarkUsed = useCallback(() => {
-    if (!item) return
+  // "Buy more" asks first when the item is still in stock. Only the
+  // "Used it up" choice empties the item, so only then go back.
+  const { requestAdd, sheet: addToListSheet } = useAddToList(({ message, undo, usedUp }) => {
+    setSnackbar({ open: true, message, undoAction: undo })
+    if (usedUp) setTimeout(() => navigate('/'), 300)
+  })
+
+  if (!item) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-gray-500 mb-4">Item not found</p>
+          <Button onClick={() => navigate('/')}>Go home</Button>
+        </div>
+      </div>
+    )
+  }
+
+  const category = CATEGORIES[item.category] || CATEGORIES.other
+  const location = STORAGE_LOCATIONS[item.storageLocation] || { label: item.storageLocation, color: '#6B7280' }
+  const freshnessLevel = getFreshnessLevel(item.expirationDate)
+  const freshnessScore = calculateFreshnessScore(item.purchaseDate, item.expirationDate)
+  const unitLabel = QUANTITY_UNITS[item.quantityUnit]?.shortLabel || ''
+  const tone = CATEGORY_TONES[item.category] || CATEGORY_TONES.other
+
+
+  const handleUse = () => {
+    consumeItem(item.id, useQuantity)
+    setShowUseDialog(false)
+
+    // If fully consumed, go back
+    if (item.quantity - useQuantity <= 0) {
+      navigate('/')
+    }
+  }
+
+  const handleMarkUsed = () => {
     const previousQuantity = item.quantity
     consumeItem(item.id, item.quantity) // Sets quantity to 0
 
@@ -44,69 +80,9 @@ export function ItemDetailPage() {
 
     // Navigate back after a short delay
     setTimeout(() => navigate('/'), 300)
-  }, [item, consumeItem, updateItem, navigate])
-
-  const handleAddToGroceryList = useCallback(() => {
-    if (!item) return
-    const previousQuantity = item.quantity
-    consumeItem(item.id, item.quantity) // Sets quantity to 0
-
-    // Add to shopping list
-    const newShoppingItem = addShoppingItem({
-      shoppingListId: 'demo-list',
-      name: item.name,
-      quantity: item.quantity,
-      quantityUnit: item.quantityUnit,
-      category: item.category,
-      isChecked: false,
-      source: 'low_stock',
-      sourceItemId: item.id,
-      priority: 'normal',
-    })
-
-    setSnackbar({
-      open: true,
-      message: `${item.name} added to grocery list`,
-      undoAction: () => {
-        updateItem(item.id, { quantity: previousQuantity, status: 'active', consumedAt: undefined })
-        useDemoStore.getState().removeShoppingItem(newShoppingItem.id)
-      },
-    })
-
-    // Navigate back after a short delay
-    setTimeout(() => navigate('/'), 300)
-  }, [item, consumeItem, updateItem, addShoppingItem, navigate])
-
-  if (!item) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-gray-500 mb-4">Item not found</p>
-          <Button onClick={() => navigate('/')}>Go Home</Button>
-        </div>
-      </div>
-    )
-  }
-
-  const category = CATEGORIES[item.category] || CATEGORIES.other
-  const location = STORAGE_LOCATIONS[item.storageLocation] || { label: item.storageLocation, color: '#6B7280' }
-  const freshnessLevel = getFreshnessLevel(item.expirationDate, item.freshnessScore)
-  const unitLabel = QUANTITY_UNITS[item.quantityUnit]?.shortLabel || ''
-  const FoodIcon = getFoodIcon(item.name)
-
-
-  const handleUse = () => {
-    consumeItem(item.id, useQuantity)
-    setShowUseDialog(false)
-
-    // If fully consumed, go back
-    if (item.quantity - useQuantity <= 0) {
-      navigate('/')
-    }
   }
 
   const handleRemove = () => {
-    if (!item) return
     deleteItem(item.id)
     navigate('/')
   }
@@ -122,8 +98,14 @@ export function ItemDetailPage() {
           >
             <ArrowLeft className="h-5 w-5" />
           </button>
-          <h1 className="text-lg font-semibold text-gray-900">Item Details</h1>
-          <div className="w-9" /> {/* Spacer for balance */}
+          <h1 className="text-lg font-semibold text-gray-900">Item details</h1>
+          <button
+            onClick={() => navigate(`/item/${item.id}/edit`)}
+            className="p-2 -mr-2 text-gray-500 hover:text-gray-700"
+            aria-label="Edit item"
+          >
+            <Edit2 className="h-5 w-5" />
+          </button>
         </div>
       </header>
 
@@ -135,7 +117,7 @@ export function ItemDetailPage() {
               {/* Category indicator */}
               <div
                 className="w-2 h-20 rounded-full flex-shrink-0"
-                style={{ backgroundColor: category.color }}
+                style={{ backgroundColor: tone.strip }}
               />
 
               <div className="flex-1">
@@ -160,20 +142,26 @@ export function ItemDetailPage() {
                     <div
                       className="h-full rounded-full transition-all"
                       style={{
-                        width: `${item.freshnessScore}%`,
+                        width: `${freshnessScore}%`,
                         backgroundColor: FRESHNESS_COLORS[freshnessLevel],
                       }}
                     />
                   </div>
                   <p className="text-xs text-gray-500 mt-1">
-                    {item.freshnessScore}% freshness remaining
+                    {freshnessScore}% freshness remaining
                   </p>
                 </div>
               </div>
 
               {/* Food Icon */}
               <div className="flex-shrink-0">
-                <FoodIcon size={64} />
+                <FoodThumbnail
+                  name={item.name}
+                  category={item.category}
+                  imageUrl={item.imageUrl}
+                  iconSize={32}
+                  className="w-16 h-16 rounded-xl"
+                />
               </div>
             </div>
           </CardContent>
@@ -211,11 +199,11 @@ export function ItemDetailPage() {
             <div className="pt-2 border-t border-gray-100">
               <div className="flex justify-between text-sm">
                 <span className="text-gray-500">Purchased</span>
-                <span>{new Date(item.purchaseDate).toLocaleDateString()}</span>
+                <span>{formatDateString(item.purchaseDate)}</span>
               </div>
               <div className="flex justify-between text-sm mt-2">
                 <span className="text-gray-500">Expires</span>
-                <span>{new Date(item.expirationDate).toLocaleDateString()}</span>
+                <span>{formatDateString(item.expirationDate)}</span>
               </div>
               <div className="flex justify-between text-sm mt-2">
                 <span className="text-gray-500">Added via</span>
@@ -232,29 +220,13 @@ export function ItemDetailPage() {
           </CardContent>
         </Card>
 
-        {/* Actions */}
+        {/* Actions: one filled primary, soft secondaries, and Remove as a quiet text link */}
         <div className="space-y-3">
-          {/* Primary action: Add to Grocery List */}
-          <Button
-            onClick={handleAddToGroceryList}
-            className="w-full bg-teal-500 hover:bg-teal-600"
-            size="lg"
-          >
-            <ShoppingCart className="h-5 w-5 mr-2" />
-            Add to Grocery List
-          </Button>
-
-          {/* Secondary action: Mark as Used */}
-          <Button
-            onClick={handleMarkUsed}
-            className="w-full bg-purple-600 hover:bg-purple-700"
-            size="lg"
-          >
+          <Button onClick={handleMarkUsed} className="w-full" size="lg">
             <CheckCircle2 className="h-5 w-5 mr-2" />
-            Mark as Used
+            Used it all
           </Button>
 
-          {/* Tertiary actions: Used Some / Remove */}
           <div className="flex gap-3">
             <Button
               onClick={() => setShowUseDialog(true)}
@@ -262,17 +234,27 @@ export function ItemDetailPage() {
               className="flex-1"
               size="lg"
             >
-              Used Some
+              <SlidersHorizontal className="h-5 w-5 mr-2" />
+              Used some
             </Button>
             <Button
-              onClick={() => setShowDeleteDialog(true)}
+              onClick={() => requestAdd(item)}
               variant="secondary"
-              className="flex-1 text-red-600 hover:text-red-700 hover:bg-red-50"
+              className="flex-1"
               size="lg"
             >
-              Remove
+              <ShoppingCart className="h-5 w-5 mr-2" />
+              Buy more
             </Button>
           </div>
+
+          <button
+            onClick={() => setShowDeleteDialog(true)}
+            className="w-full flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 transition-colors"
+          >
+            <Trash2 className="h-4 w-4" />
+            Remove from pantry
+          </button>
         </div>
       </div>
 
@@ -280,7 +262,7 @@ export function ItemDetailPage() {
       <Dialog
         open={showDeleteDialog}
         onClose={() => setShowDeleteDialog(false)}
-        title="Remove Item"
+        title="Remove item"
         description="Are you sure you want to remove this item from your pantry? This action cannot be undone."
       >
         <DialogActions>
@@ -293,11 +275,11 @@ export function ItemDetailPage() {
         </DialogActions>
       </Dialog>
 
-      {/* Use Item Dialog */}
+      {/* Use item Dialog */}
       <Dialog
         open={showUseDialog}
         onClose={() => setShowUseDialog(false)}
-        title="Use Item"
+        title="Use item"
         description={`How much ${item.name} did you use?`}
       >
         <div className="flex items-center justify-center gap-4 py-4">
@@ -334,6 +316,9 @@ export function ItemDetailPage() {
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* "You still have …" confirmation for Buy more */}
+      {addToListSheet}
 
       {/* Snackbar */}
       <Snackbar

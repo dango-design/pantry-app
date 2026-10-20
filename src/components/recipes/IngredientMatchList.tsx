@@ -59,7 +59,7 @@ export function IngredientMatchList({ available, missing, onAddToList, compact =
             {!matched && !ingredient.isOptional && onAddToList && (
               <button
                 onClick={() => onAddToList(ingredient.name, ingredient.quantity, ingredient.unit)}
-                className="p-1.5 text-purple-600 hover:bg-purple-50 rounded-lg flex-shrink-0"
+                className="p-1.5 text-primary hover:bg-primary-soft rounded-lg flex-shrink-0"
                 title="Add to shopping list"
               >
                 <ShoppingCart className="h-4 w-4" />

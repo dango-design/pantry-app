@@ -85,7 +85,7 @@ export const OnShoppingPage: Story = {
   },
   render: () => (
     <AppLayoutPreview>
-      <SampleContent title="Shopping List" />
+      <SampleContent title="Shopping list" />
     </AppLayoutPreview>
   ),
 }
@@ -116,7 +116,7 @@ export const OnSettingsPage: Story = {
 function LongContent() {
   return (
     <div className="p-4 space-y-4">
-      <h1 className="text-xl font-bold">Scrolling Content</h1>
+      <h1 className="text-xl font-bold">Scrolling content</h1>
       {Array.from({ length: 15 }).map((_, i) => (
         <div key={i} className="bg-white p-4 rounded-lg shadow-sm">
           <p className="text-gray-600">Item {i + 1} - Scroll to see more content</p>

@@ -16,13 +16,30 @@ export const CATEGORIES: Record<FoodCategory, { label: string; color: string; ic
   other: { label: 'Other', color: '#6B7280', icon: 'box' },
 }
 
+// Softer per-category tones for item cards and image placeholders (the vibrant CATEGORIES colors stay on chips/badges).
+// strip: card color strip, tint: placeholder tile background, ink: placeholder icon (at least 4.5:1 on tint)
+export const CATEGORY_TONES: Record<FoodCategory, { strip: string; tint: string; ink: string }> = {
+  produce: { strip: '#48dc8d', tint: '#E6F7EC', ink: '#1E7A4A' },
+  dairy: { strip: '#a2b8f1', tint: '#EDF1FD', ink: '#3557B7' },
+  meat: { strip: '#f4a4a4', tint: '#FDEEEE', ink: '#A8433B' },
+  seafood: { strip: '#88d4e8', tint: '#E7F6FA', ink: '#1C6F86' },
+  bakery: { strip: '#f0cc88', tint: '#FCF4E4', ink: '#8A5A12' },
+  frozen: { strip: '#b0b4f8', tint: '#EEEFFE', ink: '#4549B5' },
+  pantry: { strip: '#c4b0f8', tint: '#F2EEFE', ink: '#6345B8' },
+  beverages: { strip: '#f0a8c8', tint: '#FCEEF4', ink: '#A33A6A' },
+  condiments: { strip: '#f4b888', tint: '#FDF1E7', ink: '#9A4F17' },
+  snacks: { strip: '#b8dc78', tint: '#F1F8E4', ink: '#4F7215' },
+  prepared: { strip: '#88d8c8', tint: '#E6F7F3', ink: '#1D7465' },
+  other: { strip: '#b8bcc4', tint: '#F1F2F4', ink: '#4B5160' },
+}
+
 // Storage location configuration
 export const STORAGE_LOCATIONS: Record<StorageLocation, { label: string; color: string; icon: string }> = {
   refrigerator: { label: 'Refrigerator', color: '#3B82F6', icon: 'refrigerator' },
   freezer: { label: 'Freezer', color: '#6366F1', icon: 'snowflake' },
   pantry: { label: 'Pantry', color: '#8B5CF6', icon: 'archive' },
   counter: { label: 'Counter', color: '#F59E0B', icon: 'layout-grid' },
-  spice_rack: { label: 'Spice Rack', color: '#EC4899', icon: 'flame' },
+  spice_rack: { label: 'Spice rack', color: '#EC4899', icon: 'flame' },
 }
 
 // Quantity units with labels
@@ -42,6 +59,22 @@ export const QUANTITY_UNITS: Record<QuantityUnit, { label: string; shortLabel: s
   pack: { label: 'Pack', shortLabel: 'pk' },
   bunch: { label: 'Bunch', shortLabel: 'bunch' },
   dozen: { label: 'Dozen', shortLabel: 'dz' },
+}
+
+// Default storage location by category
+export const DEFAULT_STORAGE_LOCATIONS: Record<FoodCategory, StorageLocation> = {
+  produce: 'refrigerator',
+  dairy: 'refrigerator',
+  meat: 'refrigerator',
+  seafood: 'refrigerator',
+  bakery: 'counter',
+  frozen: 'freezer',
+  pantry: 'pantry',
+  beverages: 'refrigerator',
+  condiments: 'refrigerator',
+  snacks: 'pantry',
+  prepared: 'refrigerator',
+  other: 'refrigerator',
 }
 
 // Default expiration days by category and storage location

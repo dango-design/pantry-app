@@ -4,41 +4,25 @@ import { ShoppingCart, Trash2 } from 'lucide-react'
 import Inventory2Outlined from '@mui/icons-material/Inventory2Outlined'
 import AutoDeleteOutlined from '@mui/icons-material/AutoDeleteOutlined'
 import { cn } from '@/utils/cn'
-import { STORAGE_LOCATIONS } from '@/utils/constants'
+import { STORAGE_LOCATIONS, CATEGORY_TONES } from '@/utils/constants'
 import { formatExpirationText, getFreshnessLevel, FRESHNESS_COLORS } from '@/utils/freshness'
 import { QUANTITY_UNITS } from '@/utils/constants'
-import { getFoodIcon, getLocationIcon } from '@/components/icons'
+import { getFoodIcon, getLocationIcon, FoodThumbnail } from '@/components/icons'
 import { useFlyToCart } from '@/components/common'
-import type { FoodItem, FoodCategory } from '@/types'
+import type { FoodItem } from '@/types'
 
-// M3 pastel tones for the card color strip (softer than base category colors)
-const CATEGORY_STRIP_COLORS: Record<FoodCategory, string> = {
-  produce: '#48dc8d',
-  dairy: '#a2b8f1',
-  meat: '#f4a4a4',
-  seafood: '#88d4e8',
-  bakery: '#f0cc88',
-  frozen: '#b0b4f8',
-  pantry: '#c4b0f8',
-  beverages: '#f0a8c8',
-  condiments: '#f4b888',
-  snacks: '#b8dc78',
-  prepared: '#88d8c8',
-  other: '#b8bcc4',
-}
-
-// M3 design tokens
+// Card color tokens (M3 roles, neutral values: white card, zinc-gray outline)
 const M3 = {
   onSurface: '#1D1B20',
-  surface: '#FEF7FF',
-  outlineVariant: '#CAC4D0',
-  surfaceContainerHigh: '#ECE6F0',
+  surface: '#FFFFFF',
+  outlineVariant: '#E4E4E7',
 }
 
 interface FoodItemCardProps {
   item: FoodItem
   onMarkUsed?: (item: FoodItem) => void
-  onAddToCart?: (item: FoodItem) => void
+  /** Return false when the item wasn't added right away (e.g. the page asks first) */
+  onAddToCart?: (item: FoodItem) => boolean | void
   className?: string
 }
 
@@ -107,10 +91,10 @@ export function FoodItemCard({
   const expirationText = formatExpirationText(item.expirationDate)
   const quantityDisplay = formatQuantity(item.quantity, item.quantityUnit)
   const locationLabel = getLocationLabel(item.storageLocation)
-  const stripColor = CATEGORY_STRIP_COLORS[item.category] || CATEGORY_STRIP_COLORS.other
+  const tone = CATEGORY_TONES[item.category] || CATEGORY_TONES.other
 
   // Get the appropriate icons
-  const FoodIcon = getFoodIcon(item.name)
+  const FoodIcon = getFoodIcon(item.name, item.category)
   const LocationIcon = getLocationIcon(item.storageLocation)
 
   // Calculate swipe offset
@@ -127,15 +111,12 @@ export function FoodItemCard({
   const handleAddToCart = (e?: React.MouseEvent | React.TouchEvent) => {
     e?.stopPropagation()
 
-    // Trigger the fly animation
-    if (iconRef.current) {
-      triggerAnimation(iconRef.current, <FoodIcon size={32} />)
+    // Fly to the cart only when the item went straight onto the list,
+    // not when the page asks first or it was already there
+    const added = onAddToCart?.(item)
+    if (added !== false && iconRef.current) {
+      triggerAnimation(iconRef.current, <FoodIcon size={32} strokeWidth={1.75} color={tone.ink} />)
     }
-
-    // Call the callback after a short delay for the animation to be visible
-    setTimeout(() => {
-      onAddToCart?.(item)
-    }, 100)
   }
 
   const handleMarkUsed = (e?: React.MouseEvent | React.TouchEvent) => {
@@ -194,7 +175,7 @@ export function FoodItemCard({
       {isTouch && (
         <div
           className={cn(
-            'absolute left-0 top-0 bottom-0 flex items-center justify-center bg-teal-500 transition-opacity',
+            'absolute left-0 top-0 bottom-0 flex items-center justify-center bg-primary transition-opacity',
             swipeDirection === 'right' && isDragging ? 'opacity-100' : 'opacity-0'
           )}
           style={{ width: ACTION_WIDTH }}
@@ -236,7 +217,7 @@ export function FoodItemCard({
           {/* Color strip - 8px wide, full height, straight right edge */}
           <div
             className="w-2 self-stretch shrink-0"
-            style={{ backgroundColor: stripColor }}
+            style={{ backgroundColor: tone.strip }}
           />
 
           {/* Text content */}
@@ -278,17 +259,16 @@ export function FoodItemCard({
           </div>
         </div>
 
-        {/* Media section - 80px, bordered, with food icon */}
-        <div
+        {/* Media section - 80px, bordered: item photo, or food icon on the category tint */}
+        <FoodThumbnail
           ref={iconRef}
-          className="w-20 self-stretch shrink-0 flex items-center justify-center"
-          style={{
-            backgroundColor: M3.surfaceContainerHigh,
-            borderLeft: `1px solid ${M3.outlineVariant}`,
-          }}
-        >
-          <FoodIcon size={48} />
-        </div>
+          name={item.name}
+          category={item.category}
+          imageUrl={item.imageUrl}
+          iconSize={32}
+          className="w-20 self-stretch shrink-0"
+          style={{ borderLeft: `1px solid ${M3.outlineVariant}` }}
+        />
       </div>
 
       {/* Desktop: Action buttons - slide ON TOP from right on hover */}
@@ -301,15 +281,15 @@ export function FoodItemCard({
         >
           <button
             onClick={handleAddToCart}
-            className="w-14 flex items-center justify-center bg-teal-500 text-white hover:bg-teal-600 transition-colors"
-            title="Add to Grocery List & Remove from Pantry"
+            className="w-14 flex items-center justify-center bg-primary text-white hover:bg-primary-hover transition-colors"
+            title="Add to shopping list"
           >
             <ShoppingCart className="h-5 w-5" />
           </button>
           <button
             onClick={handleMarkUsed}
             className="w-14 flex items-center justify-center bg-red-500 text-white hover:bg-red-600 transition-colors"
-            title="Remove from Pantry"
+            title="Remove from pantry"
           >
             <Trash2 className="h-5 w-5" />
           </button>
@@ -335,9 +315,8 @@ export function FoodItemCheckboxCard({
   const expirationText = formatExpirationText(item.expirationDate)
   const quantityDisplay = formatQuantity(item.quantity, item.quantityUnit)
   const locationLabel = getLocationLabel(item.storageLocation)
-  const FoodIcon = getFoodIcon(item.name)
   const LocationIcon = getLocationIcon(item.storageLocation)
-  const stripColor = CATEGORY_STRIP_COLORS[item.category] || CATEGORY_STRIP_COLORS.other
+  const tone = CATEGORY_TONES[item.category] || CATEGORY_TONES.other
 
   const textColor = checked ? '#9CA3AF' : M3.onSurface
 
@@ -357,7 +336,7 @@ export function FoodItemCheckboxCard({
       {/* Color strip */}
       <div
         className="w-2 self-stretch shrink-0"
-        style={{ backgroundColor: stripColor }}
+        style={{ backgroundColor: tone.strip }}
       />
 
       {/* Checkbox */}
@@ -416,19 +395,15 @@ export function FoodItemCheckboxCard({
         </div>
       </div>
 
-      {/* Food icon */}
-      <div
-        className={cn(
-          'w-20 self-stretch shrink-0 flex items-center justify-center',
-          checked && 'opacity-50'
-        )}
-        style={{
-          backgroundColor: M3.surfaceContainerHigh,
-          borderLeft: `1px solid ${M3.outlineVariant}`,
-        }}
-      >
-        <FoodIcon size={48} />
-      </div>
+      {/* Item photo, or food icon on the category tint */}
+      <FoodThumbnail
+        name={item.name}
+        category={item.category}
+        imageUrl={item.imageUrl}
+        iconSize={32}
+        className={cn('w-20 self-stretch shrink-0', checked && 'opacity-50')}
+        style={{ borderLeft: `1px solid ${M3.outlineVariant}` }}
+      />
     </div>
   )
 }

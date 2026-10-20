@@ -2,8 +2,10 @@ import { useState } from 'react'
 import { Check, X, Edit2, Trash2, ChevronDown } from 'lucide-react'
 import { Button, Input } from '@/components/common'
 import { CATEGORIES, QUANTITY_UNITS, STORAGE_LOCATIONS } from '@/utils/constants'
-import { getFoodIcon } from '@/components/icons'
+import { FoodThumbnail } from '@/components/icons'
 import { cn } from '@/utils/cn'
+import { formatDateString } from '@/utils/dates'
+import { estimateExpirationDate } from '@/utils/foodDatabase'
 import type { FoodCategory, StorageLocation, QuantityUnit } from '@/types'
 
 interface ReviewItem {
@@ -14,6 +16,8 @@ interface ReviewItem {
   quantityUnit: QuantityUnit
   storageLocation: StorageLocation
   brand?: string
+  expirationDate?: string
+  expirationEdited?: boolean
   selected: boolean
 }
 
@@ -23,6 +27,7 @@ interface ItemReviewListProps {
   onConfirm: (items: ReviewItem[]) => void
   onCancel: () => void
   title?: string
+  description?: string
   loading?: boolean
 }
 
@@ -31,7 +36,8 @@ export function ItemReviewList({
   onItemsChange,
   onConfirm,
   onCancel,
-  title = 'Review Items',
+  title = 'Review items',
+  description = 'Review the detected items. Tap to select/deselect, or edit details as needed.',
   loading = false,
 }: ItemReviewListProps) {
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -56,6 +62,16 @@ export function ItemReviewList({
     )
   }
 
+  // Keep an estimated expiration in step with the item's name, category and storage,
+  // unless the user picked the date themselves
+  const updateDetails = (item: ReviewItem, updates: Partial<ReviewItem>) => {
+    const next = { ...item, ...updates }
+    if (next.expirationDate && !next.expirationEdited) {
+      next.expirationDate = estimateExpirationDate(next.name, next.category, next.storageLocation)
+    }
+    updateItem(item.id, next)
+  }
+
   const selectedCount = items.filter(item => item.selected).length
 
   const handleConfirm = () => {
@@ -77,9 +93,7 @@ export function ItemReviewList({
 
       {/* Instructions */}
       <div className="flex-shrink-0 px-4 py-3 bg-blue-50 border-b border-blue-100">
-        <p className="text-sm text-blue-800">
-          Review the detected items. Tap to select/deselect, or edit details as needed.
-        </p>
+        <p className="text-sm text-blue-800">{description}</p>
       </div>
 
       {/* Items list */}
@@ -91,7 +105,6 @@ export function ItemReviewList({
         ) : (
           <div className="p-4 space-y-3">
             {items.map(item => {
-              const FoodIcon = getFoodIcon(item.name)
               const isEditing = editingId === item.id
 
               return (
@@ -99,7 +112,7 @@ export function ItemReviewList({
                   key={item.id}
                   className={cn(
                     'bg-white rounded-xl border-2 transition-colors',
-                    item.selected ? 'border-purple-500' : 'border-transparent'
+                    item.selected ? 'border-primary' : 'border-transparent'
                   )}
                 >
                   {/* Main row */}
@@ -109,16 +122,19 @@ export function ItemReviewList({
                       className={cn(
                         'w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0',
                         item.selected
-                          ? 'bg-purple-600 border-purple-600'
+                          ? 'bg-primary border-primary'
                           : 'border-gray-300'
                       )}
                     >
                       {item.selected && <Check className="h-4 w-4 text-white" />}
                     </button>
 
-                    <div className="w-10 h-10 flex items-center justify-center flex-shrink-0">
-                      <FoodIcon size={36} />
-                    </div>
+                    <FoodThumbnail
+                      name={item.name}
+                      category={item.category}
+                      iconSize={20}
+                      className="w-10 h-10 rounded-lg flex-shrink-0"
+                    />
 
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-gray-900 truncate">
@@ -131,6 +147,10 @@ export function ItemReviewList({
                         {item.quantity} {QUANTITY_UNITS[item.quantityUnit]?.label || item.quantityUnit}
                         {' '}&middot;{' '}
                         {CATEGORIES[item.category]?.label || item.category}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {STORAGE_LOCATIONS[item.storageLocation]?.label || item.storageLocation}
+                        {item.expirationDate && ` · Expires ${formatDateString(item.expirationDate)}`}
                       </p>
                     </div>
 
@@ -156,7 +176,7 @@ export function ItemReviewList({
                         <label className="text-xs text-gray-500 mb-1 block">Name</label>
                         <Input
                           value={item.name}
-                          onChange={(e) => updateItem(item.id, { name: e.target.value })}
+                          onChange={(e) => updateDetails(item, { name: e.target.value })}
                         />
                       </div>
 
@@ -192,7 +212,7 @@ export function ItemReviewList({
                           <div className="relative">
                             <select
                               value={item.category}
-                              onChange={(e) => updateItem(item.id, { category: e.target.value as FoodCategory })}
+                              onChange={(e) => updateDetails(item, { category: e.target.value as FoodCategory })}
                               className="w-full px-3 py-2 border border-gray-300 rounded-lg appearance-none bg-white"
                             >
                               {Object.entries(CATEGORIES).map(([key, config]) => (
@@ -207,7 +227,7 @@ export function ItemReviewList({
                           <div className="relative">
                             <select
                               value={item.storageLocation}
-                              onChange={(e) => updateItem(item.id, { storageLocation: e.target.value as StorageLocation })}
+                              onChange={(e) => updateDetails(item, { storageLocation: e.target.value as StorageLocation })}
                               className="w-full px-3 py-2 border border-gray-300 rounded-lg appearance-none bg-white"
                             >
                               {Object.entries(STORAGE_LOCATIONS).map(([key, config]) => (
@@ -218,6 +238,21 @@ export function ItemReviewList({
                           </div>
                         </div>
                       </div>
+
+                      {item.expirationDate !== undefined && (
+                        <div>
+                          <label className="text-xs text-gray-500 mb-1 block">Expiration date</label>
+                          <input
+                            type="date"
+                            value={item.expirationDate}
+                            onChange={(e) => updateItem(item.id, { expirationDate: e.target.value, expirationEdited: true })}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white"
+                          />
+                          {!item.expirationEdited && (
+                            <p className="text-xs text-gray-500 mt-1">Estimated based on item type and storage</p>
+                          )}
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
@@ -244,7 +279,7 @@ export function ItemReviewList({
             onClick={handleConfirm}
             loading={loading}
             disabled={selectedCount === 0}
-            className="flex-1 bg-purple-600 hover:bg-purple-700"
+            className="flex-1 bg-primary hover:bg-primary-hover"
           >
             Add {selectedCount} {selectedCount === 1 ? 'Item' : 'Items'}
           </Button>

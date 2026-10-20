@@ -19,9 +19,9 @@ const DIFFICULTY_OPTIONS: { key: RecipeDifficulty; label: string }[] = [
 const DIETARY_OPTIONS: { key: DietaryRestriction; label: string }[] = [
   { key: 'vegetarian', label: 'Vegetarian' },
   { key: 'vegan', label: 'Vegan' },
-  { key: 'gluten_free', label: 'Gluten-Free' },
-  { key: 'dairy_free', label: 'Dairy-Free' },
-  { key: 'low_carb', label: 'Low Carb' },
+  { key: 'gluten_free', label: 'Gluten-free' },
+  { key: 'dairy_free', label: 'Dairy-free' },
+  { key: 'low_carb', label: 'Low carb' },
   { key: 'keto', label: 'Keto' },
 ]
 
@@ -141,10 +141,10 @@ export function RecipeFilterSheet({
         </div>
 
         <div className="flex items-center justify-between px-4 pb-3 border-b border-gray-100">
-          <h2 className="text-lg font-semibold text-gray-900">Recipe Filters</h2>
+          <h2 className="text-lg font-semibold text-gray-900">Recipe filters</h2>
           <div className="flex items-center gap-3">
             {activeFilterCount > 0 && (
-              <button onClick={onReset} className="text-sm text-purple-600 font-medium">
+              <button onClick={onReset} className="text-sm text-primary font-medium">
                 Reset
               </button>
             )}
@@ -166,7 +166,7 @@ export function RecipeFilterSheet({
                   className={cn(
                     'px-3 py-1.5 rounded-full text-sm font-medium transition-all border',
                     cuisine === c
-                      ? 'bg-purple-600 text-white border-transparent'
+                      ? 'bg-primary text-white border-transparent'
                       : 'bg-white text-gray-600 border-gray-300 hover:border-gray-400'
                   )}
                 >
@@ -187,12 +187,12 @@ export function RecipeFilterSheet({
                   className={cn(
                     'w-full flex items-center justify-between px-4 py-3 rounded-lg text-left',
                     difficulty === option.key
-                      ? 'bg-purple-50 text-purple-700'
+                      ? 'bg-primary-soft text-primary'
                       : 'hover:bg-gray-50 text-gray-700'
                   )}
                 >
                   <span className="text-sm">{option.label}</span>
-                  {difficulty === option.key && <Check className="h-4 w-4 text-purple-600" />}
+                  {difficulty === option.key && <Check className="h-4 w-4 text-primary" />}
                 </button>
               ))}
             </div>
@@ -209,7 +209,7 @@ export function RecipeFilterSheet({
                   className={cn(
                     'px-3 py-1.5 rounded-full text-sm font-medium transition-all border',
                     dietaryFilters.has(option.key)
-                      ? 'bg-purple-600 text-white border-transparent'
+                      ? 'bg-primary text-white border-transparent'
                       : 'bg-white text-gray-600 border-gray-300 hover:border-gray-400'
                   )}
                 >
@@ -219,9 +219,9 @@ export function RecipeFilterSheet({
             </div>
           </div>
 
-          {/* Max Cook Time */}
+          {/* Max cook time */}
           <div>
-            <h3 className="text-sm font-medium text-gray-700 mb-3">Max Cook Time</h3>
+            <h3 className="text-sm font-medium text-gray-700 mb-3">Max cook time</h3>
             <div className="flex flex-wrap gap-2">
               {MAX_COOK_TIME_OPTIONS.map((option) => (
                 <button
@@ -230,7 +230,7 @@ export function RecipeFilterSheet({
                   className={cn(
                     'px-3 py-1.5 rounded-full text-sm font-medium transition-all border',
                     maxCookTime === option.key
-                      ? 'bg-purple-600 text-white border-transparent'
+                      ? 'bg-primary text-white border-transparent'
                       : 'bg-white text-gray-600 border-gray-300 hover:border-gray-400'
                   )}
                 >
@@ -244,9 +244,9 @@ export function RecipeFilterSheet({
         <div className="p-4 border-t border-gray-100 safe-area-bottom">
           <button
             onClick={onClose}
-            className="w-full py-3 bg-purple-600 text-white font-medium rounded-lg hover:bg-purple-700 transition-colors"
+            className="w-full py-3 bg-primary text-white font-medium rounded-lg hover:bg-primary-hover transition-colors"
           >
-            Apply Filters{activeFilterCount > 0 && ` (${activeFilterCount})`}
+            Apply filters{activeFilterCount > 0 && ` (${activeFilterCount})`}
           </button>
         </div>
       </div>

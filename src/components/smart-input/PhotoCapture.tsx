@@ -8,7 +8,7 @@ interface PhotoCaptureProps {
   title?: string
 }
 
-export function PhotoCapture({ onCapture, onCancel, title = 'Take Photo' }: PhotoCaptureProps) {
+export function PhotoCapture({ onCapture, onCancel, title = 'Take photo' }: PhotoCaptureProps) {
   const [mode, setMode] = useState<'select' | 'camera' | 'preview'>('select')
   const [stream, setStream] = useState<MediaStream | null>(null)
   const [capturedImage, setCapturedImage] = useState<string | null>(null)
@@ -138,11 +138,11 @@ export function PhotoCapture({ onCapture, onCancel, title = 'Take Photo' }: Phot
             onClick={startCamera}
             className="w-full max-w-xs flex items-center gap-4 p-6 bg-white/10 rounded-2xl hover:bg-white/20 transition-colors"
           >
-            <div className="w-14 h-14 bg-purple-600 rounded-full flex items-center justify-center">
-              <Camera className="h-7 w-7 text-white" />
+            <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center">
+              <Camera className="h-7 w-7 text-primary" />
             </div>
             <div className="text-left">
-              <p className="text-white font-medium">Take Photo</p>
+              <p className="text-white font-medium">Take photo</p>
               <p className="text-white/60 text-sm">Use your camera</p>
             </div>
           </button>
@@ -151,11 +151,11 @@ export function PhotoCapture({ onCapture, onCancel, title = 'Take Photo' }: Phot
             onClick={() => fileInputRef.current?.click()}
             className="w-full max-w-xs flex items-center gap-4 p-6 bg-white/10 rounded-2xl hover:bg-white/20 transition-colors"
           >
-            <div className="w-14 h-14 bg-blue-600 rounded-full flex items-center justify-center">
+            <div className="w-14 h-14 bg-white/20 rounded-full flex items-center justify-center">
               <Upload className="h-7 w-7 text-white" />
             </div>
             <div className="text-left">
-              <p className="text-white font-medium">Upload Photo</p>
+              <p className="text-white font-medium">Upload photo</p>
               <p className="text-white/60 text-sm">Choose from gallery</p>
             </div>
           </button>
@@ -217,9 +217,9 @@ export function PhotoCapture({ onCapture, onCancel, title = 'Take Photo' }: Phot
               </Button>
               <Button
                 onClick={handleConfirm}
-                className="flex-1 bg-purple-600 hover:bg-purple-700"
+                className="flex-1 bg-primary hover:bg-primary-hover"
               >
-                Use Photo
+                Use photo
               </Button>
             </div>
           </div>

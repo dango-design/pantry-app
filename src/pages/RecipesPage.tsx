@@ -1,9 +1,9 @@
 import { useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Search, SlidersHorizontal, Plus, Sparkles, UtensilsCrossed } from 'lucide-react'
+import { SlidersHorizontal, UtensilsCrossed } from 'lucide-react'
 import { RecipeCard } from '@/components/recipes'
+import { TabHeader, TabSearchField } from '@/components/layout'
 import { RecipeFilterSheet, type RecipeDifficulty } from '@/components/recipes/RecipeFilterSheet'
-import { Snackbar } from '@/components/common'
 import { useDemoStore } from '@/stores/demoStore'
 import { matchAllRecipes } from '@/utils/recipeMatching'
 import { cn } from '@/utils/cn'
@@ -13,7 +13,7 @@ type QuickFilter = 'all' | 'can_cook' | 'almost' | 'quick' | 'favorites'
 
 const QUICK_FILTER_CHIPS: { key: QuickFilter; label: string }[] = [
   { key: 'all', label: 'All' },
-  { key: 'can_cook', label: 'Can Cook' },
+  { key: 'can_cook', label: 'Can cook' },
   { key: 'almost', label: 'Almost' },
   { key: 'quick', label: 'Quick' },
   { key: 'favorites', label: 'Favorites' },
@@ -25,7 +25,6 @@ export function RecipesPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [quickFilter, setQuickFilter] = useState<QuickFilter>('all')
   const [showFilterSheet, setShowFilterSheet] = useState(false)
-  const [snackbar, setSnackbar] = useState({ open: false, message: '' })
 
   // Filter sheet state
   const [cuisine, setCuisine] = useState('All')
@@ -110,54 +109,23 @@ export function RecipesPage() {
     return results
   }, [matchResults, searchQuery, quickFilter, cuisine, difficulty, dietaryFilters, maxCookTime])
 
-  const handleAiSuggest = () => {
-    setSnackbar({
-      open: true,
-      message: 'AI suggestions require Supabase. Configure your .env to enable this feature.',
-    })
-  }
-
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-lg mx-auto pb-24">
-        {/* Header */}
-        <header className="sticky top-0 z-40 bg-white px-4 pt-4 pb-3">
-          {/* Search row */}
-          <div className="flex items-center gap-2">
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search Recipes"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full h-10 pl-10 pr-4 bg-white border border-gray-200 rounded-lg text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-              />
-            </div>
-            <button
-              onClick={handleAiSuggest}
-              className="w-10 h-10 flex items-center justify-center text-purple-600 hover:text-purple-700"
-              title="AI Suggest"
-            >
-              <Sparkles className="h-5 w-5" />
-            </button>
-            <button
-              onClick={() => navigate('/recipe/new')}
-              className="w-10 h-10 flex items-center justify-center text-gray-600 hover:text-gray-800"
-            >
-              <Plus className="h-5 w-5" />
-            </button>
-          </div>
-
+        {/* New recipes come from the + in the bottom nav (Add sheet) */}
+        <TabHeader
+          title="Recipes"
+          tool={<TabSearchField value={searchQuery} onChange={setSearchQuery} placeholder="Search recipes" />}
+        >
           {/* Filter + Quick filter chips */}
-          <div className="flex items-center gap-2 mt-3">
+          <div className="flex items-center gap-2">
             <button
               onClick={() => setShowFilterSheet(true)}
               className="relative w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-700 flex-shrink-0"
             >
               <SlidersHorizontal className="h-4 w-4" />
               {activeFilterCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-4 h-4 bg-purple-600 text-white text-xs rounded-full flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 w-4 h-4 bg-primary text-white text-xs rounded-full flex items-center justify-center">
                   {activeFilterCount}
                 </span>
               )}
@@ -172,7 +140,7 @@ export function RecipesPage() {
                     className={cn(
                       'flex-shrink-0 px-4 py-1.5 rounded-full text-sm font-medium transition-all border',
                       quickFilter === chip.key
-                        ? 'bg-purple-600 text-white border-transparent'
+                        ? 'bg-primary text-white border-transparent'
                         : 'bg-white text-gray-600 border-gray-300 hover:border-gray-400'
                     )}
                   >
@@ -182,7 +150,7 @@ export function RecipesPage() {
               </div>
             </div>
           </div>
-        </header>
+        </TabHeader>
 
         {/* Content */}
         <div className="px-4 pt-2 space-y-2">
@@ -203,9 +171,9 @@ export function RecipesPage() {
               {recipes.length === 0 && (
                 <button
                   onClick={() => navigate('/recipe/new')}
-                  className="mt-4 px-6 py-2 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 transition-colors"
+                  className="mt-4 px-6 py-2 bg-primary text-white rounded-lg font-medium hover:bg-primary-hover transition-colors"
                 >
-                  Add Recipe
+                  Add recipe
                 </button>
               )}
             </div>
@@ -233,12 +201,6 @@ export function RecipesPage() {
         maxCookTime={maxCookTime}
         onMaxCookTimeChange={setMaxCookTime}
         onReset={handleResetFilters}
-      />
-
-      <Snackbar
-        open={snackbar.open}
-        message={snackbar.message}
-        onClose={() => setSnackbar({ open: false, message: '' })}
       />
     </div>
   )

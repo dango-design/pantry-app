@@ -10,9 +10,9 @@ export type ExpirationFilter = 'all' | 'expired' | 'today' | 'week' | 'month'
 export const EXPIRATION_OPTIONS: { key: ExpirationFilter; label: string }[] = [
   { key: 'all', label: 'All' },
   { key: 'expired', label: 'Expired' },
-  { key: 'today', label: 'Expiring Today' },
-  { key: 'week', label: 'Within 7 Days' },
-  { key: 'month', label: 'Within 30 Days' },
+  { key: 'today', label: 'Expiring today' },
+  { key: 'week', label: 'Within 7 days' },
+  { key: 'month', label: 'Within 30 days' },
 ]
 
 interface FilterSheetProps {
@@ -170,7 +170,7 @@ export function FilterSheet({
             {activeFilterCount > 0 && (
               <button
                 onClick={onReset}
-                className="text-sm text-purple-600 font-medium"
+                className="text-sm text-primary font-medium"
               >
                 Reset
               </button>
@@ -188,7 +188,7 @@ export function FilterSheet({
         <div className="overflow-y-auto p-4 space-y-6 max-h-[calc(85vh-100px)]">
           {/* Category Section */}
           <div>
-            <h3 className="text-sm font-medium text-gray-700 mb-3">Type of Food</h3>
+            <h3 className="text-sm font-medium text-gray-700 mb-3">Type of food</h3>
             <div className="flex flex-wrap gap-2">
               <FilterChip
                 label="All"
@@ -238,13 +238,13 @@ export function FilterSheet({
                   className={cn(
                     'w-full flex items-center justify-between px-4 py-3 rounded-lg text-left',
                     expirationFilter === option.key
-                      ? 'bg-purple-50 text-purple-700'
+                      ? 'bg-primary-soft text-primary'
                       : 'hover:bg-gray-50 text-gray-700'
                   )}
                 >
                   <span className="text-sm">{option.label}</span>
                   {expirationFilter === option.key && (
-                    <Check className="h-4 w-4 text-purple-600" />
+                    <Check className="h-4 w-4 text-primary" />
                   )}
                 </button>
               ))}
@@ -256,9 +256,9 @@ export function FilterSheet({
         <div className="p-4 border-t border-gray-100 safe-area-bottom">
           <button
             onClick={onClose}
-            className="w-full py-3 bg-purple-600 text-white font-medium rounded-lg hover:bg-purple-700 transition-colors"
+            className="w-full py-3 bg-primary text-white font-medium rounded-lg hover:bg-primary-hover transition-colors"
           >
-            Apply Filters
+            Apply filters
             {activeFilterCount > 0 && ` (${activeFilterCount})`}
           </button>
         </div>
@@ -281,13 +281,11 @@ function FilterChip({ label, selected, onClick, color }: FilterChipProps) {
       className={cn(
         'px-3 py-1.5 rounded-full text-sm font-medium transition-all border',
         selected
-          ? 'text-white border-transparent'
+          ? 'bg-primary text-white border-transparent'
           : 'bg-white text-gray-600 border-gray-300 hover:border-gray-400'
       )}
-      style={selected ? {
-        backgroundColor: color || '#8B5CF6',
-        borderColor: color || '#8B5CF6'
-      } : undefined}
+      // Category/location chips pass their own color; the rest use the primary token
+      style={selected && color ? { backgroundColor: color, borderColor: color } : undefined}
     >
       {label}
     </button>

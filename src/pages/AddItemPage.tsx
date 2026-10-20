@@ -1,12 +1,14 @@
 import { useState, useEffect, useMemo } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { MoreVertical, ChevronDown, Camera, Barcode, Receipt, Loader2 } from 'lucide-react'
-import { format, addDays } from 'date-fns'
 import { Button } from '@/components/common'
 import { PhotoCapture, BarcodeScanner, ItemReviewList, type ReviewItem } from '@/components/smart-input'
 import { useDemoStore, DEMO_HOUSEHOLD, DEMO_USER } from '@/stores/demoStore'
 import { CATEGORIES, QUANTITY_UNITS, STORAGE_LOCATIONS } from '@/utils/constants'
-import { getFoodIcon } from '@/components/icons'
+import { todayDateString } from '@/utils/dates'
+import { calculateFreshnessScore } from '@/utils/freshness'
+import { estimateExpirationDate, getDefaultStorageLocation, lookupFood } from '@/utils/foodDatabase'
+import { FoodThumbnail } from '@/components/icons'
 import {
   processGroceryImage,
   processReceipt,
@@ -15,43 +17,6 @@ import {
   type BarcodeProduct,
 } from '@/services'
 import type { FoodCategory, StorageLocation, QuantityUnit } from '@/types'
-
-// Food item database for autofill
-const FOOD_DATABASE: Record<string, {
-  category: FoodCategory
-  unit: QuantityUnit
-  defaultQty: number
-  storage: StorageLocation
-  expirationDays: number
-}> = {
-  'almond milk': { category: 'dairy', unit: 'count', defaultQty: 1, storage: 'refrigerator', expirationDays: 7 },
-  'milk': { category: 'dairy', unit: 'count', defaultQty: 1, storage: 'refrigerator', expirationDays: 7 },
-  'banana': { category: 'produce', unit: 'count', defaultQty: 1, storage: 'counter', expirationDays: 5 },
-  'bananas': { category: 'produce', unit: 'count', defaultQty: 6, storage: 'counter', expirationDays: 5 },
-  'apple': { category: 'produce', unit: 'count', defaultQty: 1, storage: 'refrigerator', expirationDays: 14 },
-  'apples': { category: 'produce', unit: 'count', defaultQty: 6, storage: 'refrigerator', expirationDays: 14 },
-  'honeycrisp apple': { category: 'produce', unit: 'count', defaultQty: 1, storage: 'refrigerator', expirationDays: 14 },
-  'chicken thighs': { category: 'meat', unit: 'lb', defaultQty: 1, storage: 'refrigerator', expirationDays: 2 },
-  'chicken breast': { category: 'meat', unit: 'lb', defaultQty: 1, storage: 'refrigerator', expirationDays: 2 },
-  'ground beef': { category: 'meat', unit: 'lb', defaultQty: 1, storage: 'freezer', expirationDays: 120 },
-  'eggs': { category: 'dairy', unit: 'count', defaultQty: 12, storage: 'refrigerator', expirationDays: 21 },
-  'bread': { category: 'bakery', unit: 'count', defaultQty: 1, storage: 'counter', expirationDays: 5 },
-  'cheese': { category: 'dairy', unit: 'count', defaultQty: 1, storage: 'refrigerator', expirationDays: 30 },
-  'cheddar cheese': { category: 'dairy', unit: 'count', defaultQty: 1, storage: 'refrigerator', expirationDays: 30 },
-  'yogurt': { category: 'dairy', unit: 'count', defaultQty: 1, storage: 'refrigerator', expirationDays: 14 },
-  'greek yogurt': { category: 'dairy', unit: 'count', defaultQty: 1, storage: 'refrigerator', expirationDays: 14 },
-  'spinach': { category: 'produce', unit: 'count', defaultQty: 1, storage: 'refrigerator', expirationDays: 5 },
-  'pasta': { category: 'pantry', unit: 'count', defaultQty: 1, storage: 'pantry', expirationDays: 365 },
-  'spaghetti': { category: 'pantry', unit: 'count', defaultQty: 1, storage: 'pantry', expirationDays: 365 },
-  'rice': { category: 'pantry', unit: 'lb', defaultQty: 2, storage: 'pantry', expirationDays: 365 },
-  'olive oil': { category: 'condiments', unit: 'count', defaultQty: 1, storage: 'pantry', expirationDays: 180 },
-  'butter': { category: 'dairy', unit: 'count', defaultQty: 1, storage: 'refrigerator', expirationDays: 30 },
-  'pork gyoza': { category: 'frozen', unit: 'count', defaultQty: 1, storage: 'freezer', expirationDays: 90 },
-  'avocado': { category: 'produce', unit: 'count', defaultQty: 1, storage: 'counter', expirationDays: 4 },
-  'avocados': { category: 'produce', unit: 'count', defaultQty: 3, storage: 'counter', expirationDays: 4 },
-  'tomatoes': { category: 'produce', unit: 'count', defaultQty: 4, storage: 'counter', expirationDays: 7 },
-  'salsa': { category: 'condiments', unit: 'count', defaultQty: 1, storage: 'refrigerator', expirationDays: 30 },
-}
 
 // Quick add items - commonly added items
 const QUICK_ADD_ITEMS = [
@@ -69,97 +34,90 @@ type SmartInputMode = null | 'photo' | 'barcode' | 'receipt' | 'review'
 
 // Helper to map detected items to review items
 function mapToReviewItem(item: DetectedItem | ReceiptItem, index: number): ReviewItem {
+  const category = (item.category as FoodCategory) || 'other'
+  const storageLocation = getDefaultStorageLocation(item.name, category)
   return {
     id: `detected-${index}`,
     name: item.name,
-    category: (item.category as FoodCategory) || 'other',
+    category,
     quantity: item.quantity,
     quantityUnit: (item.quantityUnit as QuantityUnit) || 'count',
-    storageLocation: 'refrigerator', // Default, will be updated based on category
+    storageLocation,
+    expirationDate: estimateExpirationDate(item.name, category, storageLocation),
     brand: 'brand' in item ? item.brand : undefined,
     selected: true,
   }
 }
 
-// Map category to default storage location
-function getDefaultStorage(category: FoodCategory): StorageLocation {
-  switch (category) {
-    case 'produce':
-      return 'refrigerator'
-    case 'dairy':
-      return 'refrigerator'
-    case 'meat':
-    case 'seafood':
-      return 'refrigerator'
-    case 'frozen':
-      return 'freezer'
-    case 'bakery':
-      return 'counter'
-    case 'beverages':
-      return 'refrigerator'
-    case 'condiments':
-      return 'refrigerator'
-    case 'snacks':
-    case 'pantry':
-      return 'pantry'
-    default:
-      return 'refrigerator'
-  }
-}
-
 export function AddItemPage() {
   const navigate = useNavigate()
-  const { addItem, inventory } = useDemoStore()
+  // On /item/:id/edit this page edits an existing item instead of adding one
+  const { id } = useParams<{ id: string }>()
+  const isEditing = id !== undefined
+  const { addItem, updateItem, inventory } = useDemoStore()
+  const editingItem = isEditing ? inventory.find((i) => i.id === id) : undefined
   const [loading, setLoading] = useState(false)
 
-  // Smart input state
-  const [smartInputMode, setSmartInputMode] = useState<SmartInputMode>(null)
+  // Smart input state. /add?mode=barcode (or photo, receipt) opens that scanner
+  // straight away, e.g. from the Add sheet's shortcuts.
+  const [searchParams] = useSearchParams()
+  const [smartInputMode, setSmartInputMode] = useState<SmartInputMode>(() => {
+    const mode = searchParams.get('mode')
+    return !isEditing && (mode === 'photo' || mode === 'barcode' || mode === 'receipt') ? mode : null
+  })
   const [reviewItems, setReviewItems] = useState<ReviewItem[]>([])
   const [processingImage, setProcessingImage] = useState(false)
 
   // Form state
-  const [name, setName] = useState('')
-  const [brand, setBrand] = useState('')
-  const [quantity, setQuantity] = useState(1)
-  const [unit, setUnit] = useState<QuantityUnit>('count')
-  const [category, setCategory] = useState<FoodCategory>('other')
-  const [storageLocation, setStorageLocation] = useState<StorageLocation>('refrigerator')
-  const [purchaseDate, setPurchaseDate] = useState(format(new Date(), 'yyyy-MM-dd'))
-  const [expirationDate, setExpirationDate] = useState(format(addDays(new Date(), 7), 'yyyy-MM-dd'))
-  const [isEstimated, setIsEstimated] = useState(true)
+  const [name, setName] = useState(editingItem?.name ?? '')
+  const [brand, setBrand] = useState(editingItem?.brand ?? '')
+  // Kept as text so values like "0.5" can be typed
+  const [quantity, setQuantity] = useState(String(editingItem?.quantity ?? 1))
+  const [unit, setUnit] = useState<QuantityUnit>(editingItem?.quantityUnit ?? 'count')
+  const [category, setCategory] = useState<FoodCategory>(editingItem?.category ?? 'other')
+  const [storageLocation, setStorageLocation] = useState<StorageLocation>(editingItem?.storageLocation ?? 'refrigerator')
+  const [purchaseDate, setPurchaseDate] = useState(editingItem?.purchaseDate ?? todayDateString())
+  const [expirationDate, setExpirationDate] = useState(
+    editingItem?.expirationDate ?? estimateExpirationDate('', 'other', 'refrigerator')
+  )
+  const [isEstimated, setIsEstimated] = useState(editingItem ? editingItem.expirationSource === 'calculated' : true)
 
-  // Get food icon for current name
-  const FoodIcon = getFoodIcon(name)
+  const quantityValue = Number(quantity)
+  const isValid = name.trim() !== '' && quantityValue > 0 && purchaseDate !== '' && expirationDate !== ''
 
-  // Autofill when name changes
+  // Autofill when name changes (not when editing: fixing a typo in the name
+  // shouldn't reset the item's quantity and dates)
   useEffect(() => {
-    if (!name.trim()) return
+    if (isEditing || !name.trim()) return
 
-    const normalizedName = name.toLowerCase().trim()
-    const match = FOOD_DATABASE[normalizedName]
-
+    const match = lookupFood(name)
     if (match) {
       setCategory(match.category)
       setUnit(match.unit)
-      setQuantity(match.defaultQty)
+      setQuantity(String(match.defaultQty))
       setStorageLocation(match.storage)
-      setExpirationDate(format(addDays(new Date(), match.expirationDays), 'yyyy-MM-dd'))
+      setExpirationDate(estimateExpirationDate(name, match.category, match.storage, purchaseDate))
       setIsEstimated(true)
-    } else {
-      // Try partial match
-      for (const [key, data] of Object.entries(FOOD_DATABASE)) {
-        if (normalizedName.includes(key) || key.includes(normalizedName)) {
-          setCategory(data.category)
-          setUnit(data.unit)
-          setQuantity(data.defaultQty)
-          setStorageLocation(data.storage)
-          setExpirationDate(format(addDays(new Date(), data.expirationDays), 'yyyy-MM-dd'))
-          setIsEstimated(true)
-          break
-        }
-      }
     }
-  }, [name])
+    // Only re-run on name changes; purchaseDate is read for the estimate
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [name, isEditing])
+
+  // Keep an estimated expiration in step with category, location and purchase date
+  const updateEstimate = (updates: {
+    name?: string
+    category?: FoodCategory
+    storageLocation?: StorageLocation
+    purchaseDate?: string
+  }) => {
+    if (!isEstimated) return
+    setExpirationDate(estimateExpirationDate(
+      updates.name ?? name,
+      updates.category ?? category,
+      updates.storageLocation ?? storageLocation,
+      updates.purchaseDate ?? purchaseDate
+    ))
+  }
 
   // Personalized quick adds based on frequently added items
   const personalizedQuickAdds = useMemo(() => {
@@ -183,19 +141,47 @@ export function AddItemPage() {
   }
 
   const handleSubmit = async () => {
-    if (!name.trim()) return
+    if (!isValid) return
 
     setLoading(true)
 
-    const freshnessScore = 100
+    const freshnessScore = calculateFreshnessScore(purchaseDate, expirationDate)
+
+    if (editingItem) {
+      const expirationChanged = expirationDate !== editingItem.expirationDate
+      updateItem(editingItem.id, {
+        name: name.trim(),
+        brand: brand.trim() || undefined,
+        category,
+        quantity: quantityValue,
+        quantityUnit: unit,
+        // A new unit makes the old starting amount meaningless; more than the
+        // starting amount means more was bought than first recorded
+        originalQuantity: unit !== editingItem.quantityUnit
+          ? quantityValue
+          : Math.max(editingItem.originalQuantity, quantityValue),
+        storageLocation,
+        purchaseDate,
+        expirationDate,
+        expirationSource: expirationChanged
+          ? (isEstimated ? 'calculated' : 'manual')
+          : editingItem.expirationSource,
+        freshnessScore,
+      })
+
+      setLoading(false)
+      navigate(-1)
+      return
+    }
 
     addItem({
       householdId: DEMO_HOUSEHOLD.id,
       name: name.trim(),
+      brand: brand.trim() || undefined,
       category,
-      quantity,
+      quantity: quantityValue,
       quantityUnit: unit,
-      originalQuantity: quantity,
+      originalQuantity: quantityValue,
       storageLocation,
       purchaseDate,
       expirationDate,
@@ -219,12 +205,7 @@ export function AddItemPage() {
     try {
       const result = await processGroceryImage(imageBase64)
       if (result.success && result.items.length > 0) {
-        const items = result.items.map((item, index) => {
-          const reviewItem = mapToReviewItem(item, index)
-          reviewItem.storageLocation = getDefaultStorage(reviewItem.category)
-          return reviewItem
-        })
-        setReviewItems(items)
+        setReviewItems(result.items.map(mapToReviewItem))
         setSmartInputMode('review')
       } else {
         alert(result.error || 'No items detected in the image')
@@ -245,12 +226,7 @@ export function AddItemPage() {
     try {
       const result = await processReceipt(imageBase64)
       if (result.success && result.items.length > 0) {
-        const items = result.items.map((item, index) => {
-          const reviewItem = mapToReviewItem(item, index)
-          reviewItem.storageLocation = getDefaultStorage(reviewItem.category)
-          return reviewItem
-        })
-        setReviewItems(items)
+        setReviewItems(result.items.map(mapToReviewItem))
         setSmartInputMode('review')
       } else {
         alert(result.error || 'No items detected in the receipt')
@@ -268,16 +244,22 @@ export function AddItemPage() {
     setSmartInputMode(null)
     setName(product.name)
     if (product.brand) setBrand(product.brand)
-    setCategory((product.category as FoodCategory) || 'other')
-    setStorageLocation(getDefaultStorage((product.category as FoodCategory) || 'other'))
+    const productCategory = (product.category as FoodCategory) || 'other'
+    const productStorage = getDefaultStorageLocation(product.name, productCategory)
+    setCategory(productCategory)
+    setStorageLocation(productStorage)
+    updateEstimate({ name: product.name, category: productCategory, storageLocation: productStorage })
   }
 
   // Handle adding reviewed items
   const handleAddReviewedItems = async (items: ReviewItem[]) => {
     setLoading(true)
 
+    const today = todayDateString()
+
     for (const item of items) {
-      const expirationDays = FOOD_DATABASE[item.name.toLowerCase()]?.expirationDays || 14
+      const itemExpirationDate = item.expirationDate ||
+        estimateExpirationDate(item.name, item.category, item.storageLocation)
 
       addItem({
         householdId: DEMO_HOUSEHOLD.id,
@@ -287,10 +269,11 @@ export function AddItemPage() {
         quantityUnit: item.quantityUnit,
         originalQuantity: item.quantity,
         storageLocation: item.storageLocation,
-        purchaseDate: format(new Date(), 'yyyy-MM-dd'),
-        expirationDate: format(addDays(new Date(), expirationDays), 'yyyy-MM-dd'),
-        expirationSource: 'calculated',
-        freshnessScore: 100,
+        brand: item.brand,
+        purchaseDate: today,
+        expirationDate: itemExpirationDate,
+        expirationSource: item.expirationEdited ? 'manual' : 'calculated',
+        freshnessScore: calculateFreshnessScore(today, itemExpirationDate),
         tags: [],
         addedBy: DEMO_USER.id,
         addedVia: 'photo',
@@ -303,13 +286,24 @@ export function AddItemPage() {
     navigate('/')
   }
 
+  if (isEditing && !editingItem) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-gray-500 mb-4">Item not found</p>
+          <Button onClick={() => navigate('/')}>Go home</Button>
+        </div>
+      </div>
+    )
+  }
+
   // Smart input modals
   if (smartInputMode === 'photo') {
     return (
       <PhotoCapture
         onCapture={handlePhotoCapture}
         onCancel={() => setSmartInputMode(null)}
-        title="Scan Groceries"
+        title="Scan groceries"
       />
     )
   }
@@ -319,7 +313,7 @@ export function AddItemPage() {
       <PhotoCapture
         onCapture={handleReceiptCapture}
         onCancel={() => setSmartInputMode(null)}
-        title="Scan Receipt"
+        title="Scan receipt"
       />
     )
   }
@@ -363,76 +357,78 @@ export function AddItemPage() {
       <div className="max-w-lg mx-auto flex flex-col flex-1 w-full">
         {/* Header */}
         <header className="bg-white px-4 py-4 flex items-center justify-between">
-          <h1 className="text-lg font-semibold text-gray-900">Add Item</h1>
+          <h1 className="text-lg font-semibold text-gray-900">{isEditing ? 'Edit item' : 'Add item'}</h1>
           <button className="p-2 text-gray-500 hover:text-gray-700">
             <MoreVertical className="h-5 w-5" />
           </button>
         </header>
 
         {/* Smart Input Buttons */}
-        <div className="bg-white border-b border-gray-100 px-4 py-3">
-          <p className="text-xs text-gray-500 mb-2">Quick add with</p>
-          <div className="flex gap-2">
-            <button
-              onClick={() => setSmartInputMode('photo')}
-              className="flex-1 flex items-center justify-center gap-2 py-3 bg-purple-50 text-purple-700 rounded-xl hover:bg-purple-100 transition-colors"
-            >
-              <Camera className="h-5 w-5" />
-              <span className="font-medium">Photo</span>
-            </button>
-            <button
-              onClick={() => setSmartInputMode('barcode')}
-              className="flex-1 flex items-center justify-center gap-2 py-3 bg-blue-50 text-blue-700 rounded-xl hover:bg-blue-100 transition-colors"
-            >
-              <Barcode className="h-5 w-5" />
-              <span className="font-medium">Barcode</span>
-            </button>
-            <button
-              onClick={() => setSmartInputMode('receipt')}
-              className="flex-1 flex items-center justify-center gap-2 py-3 bg-green-50 text-green-700 rounded-xl hover:bg-green-100 transition-colors"
-            >
-              <Receipt className="h-5 w-5" />
-              <span className="font-medium">Receipt</span>
-            </button>
+        {!isEditing && (
+          <div className="bg-white border-b border-gray-100 px-4 py-3">
+            <p className="text-xs text-gray-500 mb-2">Quick add with</p>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setSmartInputMode('photo')}
+                className="flex-1 flex items-center justify-center gap-2 py-3 bg-primary-soft text-primary rounded-xl hover:bg-primary-muted transition-colors"
+              >
+                <Camera className="h-5 w-5" />
+                <span className="font-medium">Photo</span>
+              </button>
+              <button
+                onClick={() => setSmartInputMode('barcode')}
+                className="flex-1 flex items-center justify-center gap-2 py-3 bg-primary-soft text-primary rounded-xl hover:bg-primary-muted transition-colors"
+              >
+                <Barcode className="h-5 w-5" />
+                <span className="font-medium">Barcode</span>
+              </button>
+              <button
+                onClick={() => setSmartInputMode('receipt')}
+                className="flex-1 flex items-center justify-center gap-2 py-3 bg-primary-soft text-primary rounded-xl hover:bg-primary-muted transition-colors"
+              >
+                <Receipt className="h-5 w-5" />
+                <span className="font-medium">Receipt</span>
+              </button>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Food Icon Preview */}
         <div className="bg-gray-100 py-6 flex items-center justify-center">
-          <div className="w-20 h-20 flex items-center justify-center">
-            <FoodIcon size={72} />
-          </div>
+          <FoodThumbnail name={name} category={category} iconSize={36} className="w-20 h-20 rounded-2xl" />
         </div>
 
         {/* Form */}
         <div className="bg-white rounded-t-3xl -mt-2 px-4 pt-6 pb-32 flex-1">
           <div className="space-y-4">
             {/* Quick Add Chips */}
-            <div>
-              <p className="text-xs text-gray-500 mb-2">Quick add</p>
-              <div className="flex flex-wrap gap-2">
-                {personalizedQuickAdds.map((item) => (
-                  <button
-                    key={item}
-                    onClick={() => handleQuickAdd(item)}
-                    className="px-3 py-1.5 bg-purple-50 text-purple-700 rounded-full text-sm font-medium hover:bg-purple-100 transition-colors"
-                  >
-                    {item}
-                  </button>
-                ))}
+            {!isEditing && (
+              <div>
+                <p className="text-xs text-gray-500 mb-2">Quick add</p>
+                <div className="flex flex-wrap gap-2">
+                  {personalizedQuickAdds.map((item) => (
+                    <button
+                      key={item}
+                      onClick={() => handleQuickAdd(item)}
+                      className="px-3 py-1.5 bg-primary-soft text-primary rounded-full text-sm font-medium hover:bg-primary-muted transition-colors"
+                    >
+                      {item}
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Name Field */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Name of Item <span className="text-red-500">*</span>
+                Name of item <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                 placeholder="e.g. Chicken Breast"
               />
             </div>
@@ -446,7 +442,7 @@ export function AddItemPage() {
                 type="text"
                 value={brand}
                 onChange={(e) => setBrand(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                 placeholder="Optional"
               />
             </div>
@@ -460,10 +456,11 @@ export function AddItemPage() {
                 <input
                   type="number"
                   value={quantity}
-                  onChange={(e) => setQuantity(Number(e.target.value) || 1)}
+                  onChange={(e) => setQuantity(e.target.value)}
                   min="0.01"
-                  step="0.01"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  step="any"
+                  inputMode="decimal"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                 />
               </div>
               <div className="flex-1">
@@ -474,7 +471,7 @@ export function AddItemPage() {
                   <select
                     value={unit}
                     onChange={(e) => setUnit(e.target.value as QuantityUnit)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base appearance-none focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base appearance-none focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-white"
                   >
                     {Object.entries(QUANTITY_UNITS).map(([key, config]) => (
                       <option key={key} value={key}>
@@ -495,8 +492,12 @@ export function AddItemPage() {
               <div className="relative">
                 <select
                   value={category}
-                  onChange={(e) => setCategory(e.target.value as FoodCategory)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base appearance-none focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white"
+                  onChange={(e) => {
+                    const newCategory = e.target.value as FoodCategory
+                    setCategory(newCategory)
+                    updateEstimate({ category: newCategory })
+                  }}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base appearance-none focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-white"
                 >
                   {Object.entries(CATEGORIES).map(([key, config]) => (
                     <option key={key} value={key}>
@@ -516,8 +517,12 @@ export function AddItemPage() {
               <div className="relative">
                 <select
                   value={storageLocation}
-                  onChange={(e) => setStorageLocation(e.target.value as StorageLocation)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base appearance-none focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white"
+                  onChange={(e) => {
+                    const newLocation = e.target.value as StorageLocation
+                    setStorageLocation(newLocation)
+                    updateEstimate({ storageLocation: newLocation })
+                  }}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base appearance-none focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-white"
                 >
                   {Object.entries(STORAGE_LOCATIONS).map(([key, config]) => (
                     <option key={key} value={key}>
@@ -529,23 +534,26 @@ export function AddItemPage() {
               </div>
             </div>
 
-            {/* Purchase Date */}
+            {/* Purchase date */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Purchase Date
+                Purchase date
               </label>
               <input
                 type="date"
                 value={purchaseDate}
-                onChange={(e) => setPurchaseDate(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white"
+                onChange={(e) => {
+                  setPurchaseDate(e.target.value)
+                  if (e.target.value) updateEstimate({ purchaseDate: e.target.value })
+                }}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-white"
               />
             </div>
 
-            {/* Expiration Date */}
+            {/* Expiration date */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Expiration Date <span className="text-red-500">*</span>
+                Expiration date <span className="text-red-500">*</span>
               </label>
               <input
                 type="date"
@@ -554,10 +562,10 @@ export function AddItemPage() {
                   setExpirationDate(e.target.value)
                   setIsEstimated(false)
                 }}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-white"
               />
               {isEstimated && (
-                <p className="text-xs text-gray-500 mt-1">Estimated based on item type</p>
+                <p className="text-xs text-gray-500 mt-1">Estimated based on item type and storage</p>
               )}
             </div>
           </div>
@@ -579,8 +587,8 @@ export function AddItemPage() {
             <Button
               onClick={handleSubmit}
               loading={loading}
-              disabled={!name.trim()}
-              className="flex-1 bg-purple-600 hover:bg-purple-700"
+              disabled={!isValid}
+              className="flex-1 bg-primary hover:bg-primary-hover"
             >
               Save
             </Button>

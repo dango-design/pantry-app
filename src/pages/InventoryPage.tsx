@@ -1,8 +1,9 @@
 import { useState, useMemo, useCallback } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { Search, SlidersHorizontal, ArrowUpDown, Check, Settings } from 'lucide-react'
-import { FoodItemCard } from '@/components/inventory'
+import { SlidersHorizontal, ArrowUpDown, Check } from 'lucide-react'
+import { FoodItemCard, useAddToList } from '@/components/inventory'
 import { FilterSheet, type ExpirationFilter } from '@/components/inventory/FilterSheet'
+import { TonightBanner } from '@/components/plan'
+import { TabHeader, TabSearchField } from '@/components/layout'
 import { Snackbar } from '@/components/common'
 import { useDemoStore } from '@/stores/demoStore'
 import { cn } from '@/utils/cn'
@@ -26,8 +27,8 @@ const CATEGORY_CHIPS: { key: FoodCategory | 'all'; label: string; color: string 
 // Sort options
 type SortOption = 'expiration' | 'category' | 'location' | 'name'
 const SORT_OPTIONS: { key: SortOption; label: string }[] = [
-  { key: 'expiration', label: 'Expiration Date' },
-  { key: 'category', label: 'Type of Food' },
+  { key: 'expiration', label: 'Expiration date' },
+  { key: 'category', label: 'Type of food' },
   { key: 'location', label: 'Location' },
   { key: 'name', label: 'Name' },
 ]
@@ -40,7 +41,6 @@ interface SnackbarState {
 }
 
 export function InventoryPage() {
-  const navigate = useNavigate()
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategories, setSelectedCategories] = useState<Set<FoodCategory | 'all'>>(new Set(['all']))
   const [selectedLocations, setSelectedLocations] = useState<Set<StorageLocation | 'all'>>(new Set(['all']))
@@ -50,7 +50,7 @@ export function InventoryPage() {
   const [showFilterSheet, setShowFilterSheet] = useState(false)
   const [snackbar, setSnackbar] = useState<SnackbarState>({ open: false, message: '' })
 
-  const { inventory, consumeItem, updateItem, addShoppingItem } = useDemoStore()
+  const { inventory, consumeItem, updateItem } = useDemoStore()
 
   // Count active filters for badge
   const activeFilterCount =
@@ -78,34 +78,10 @@ export function InventoryPage() {
     })
   }, [consumeItem, updateItem])
 
-  // Handle adding item to cart (mark used + add to shopping list)
-  const handleAddToCart = useCallback((item: FoodItem) => {
-    const previousQuantity = item.quantity
-    consumeItem(item.id, item.quantity) // Sets quantity to 0
-
-    // Add to shopping list
-    const newShoppingItem = addShoppingItem({
-      shoppingListId: 'demo-list',
-      name: item.name,
-      quantity: item.quantity,
-      quantityUnit: item.quantityUnit,
-      category: item.category,
-      isChecked: false,
-      source: 'low_stock',
-      sourceItemId: item.id,
-      priority: 'normal',
-    })
-
-    setSnackbar({
-      open: true,
-      message: `${item.name} removed from pantry and added to grocery list`,
-      undoAction: () => {
-        updateItem(item.id, { quantity: previousQuantity, status: 'active', consumedAt: undefined })
-        // Remove from shopping list - we need the ID from the returned item
-        useDemoStore.getState().removeShoppingItem(newShoppingItem.id)
-      },
-    })
-  }, [consumeItem, updateItem, addShoppingItem])
+  // Cart action on a card: asks first when the item is still in stock
+  const { requestAdd, sheet: addToListSheet } = useAddToList(({ message, undo }) => {
+    setSnackbar({ open: true, message, undoAction: undo })
+  })
 
   // Filter active items
   const activeItems = useMemo(() => {
@@ -200,30 +176,12 @@ export function InventoryPage() {
     <div className="min-h-screen bg-gray-50">
       {/* Responsive container */}
       <div className="max-w-lg mx-auto pb-24">
-        {/* Header with Search Bar */}
-        <header className="sticky top-0 z-40 bg-white px-4 pt-4 pb-3">
-          {/* Search row */}
-          <div className="flex items-center gap-3">
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search Pantry"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full h-10 pl-10 pr-4 bg-white border border-gray-200 rounded-lg text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-              />
-            </div>
-            <button
-              onClick={() => navigate('/settings')}
-              className="w-10 h-10 flex items-center justify-center text-gray-500 hover:text-gray-700"
-            >
-              <Settings className="h-5 w-5" />
-            </button>
-          </div>
-
+        <TabHeader
+          title="Pantry"
+          tool={<TabSearchField value={searchQuery} onChange={setSearchQuery} placeholder="Search pantry" />}
+        >
           {/* Filter, Sort, and chips row */}
-          <div className="flex items-center gap-2 mt-3">
+          <div className="flex items-center gap-2">
             {/* Filter icon */}
             <button
               onClick={() => setShowFilterSheet(true)}
@@ -231,7 +189,7 @@ export function InventoryPage() {
             >
               <SlidersHorizontal className="h-4 w-4" />
               {activeFilterCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-4 h-4 bg-purple-600 text-white text-xs rounded-full flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 w-4 h-4 bg-primary text-white text-xs rounded-full flex items-center justify-center">
                   {activeFilterCount}
                 </span>
               )}
@@ -262,7 +220,7 @@ export function InventoryPage() {
                         }}
                         className={cn(
                           'w-full px-4 py-2 text-left text-sm flex items-center justify-between hover:bg-gray-50',
-                          sortBy === option.key && 'text-purple-600'
+                          sortBy === option.key && 'text-primary'
                         )}
                       >
                         {option.label}
@@ -298,10 +256,12 @@ export function InventoryPage() {
               </div>
             </div>
           </div>
-        </header>
+        </TabHeader>
 
         {/* Content */}
         <div className="px-4 pt-2 space-y-2">
+          <TonightBanner />
+
           {filteredInventory.length === 0 ? (
             <div className="text-center py-16 text-gray-500">
               <p className="text-lg font-medium mb-1">No items found</p>
@@ -315,7 +275,7 @@ export function InventoryPage() {
                 key={item.id}
                 item={item}
                 onMarkUsed={handleMarkUsed}
-                onAddToCart={handleAddToCart}
+                onAddToCart={requestAdd}
               />
             ))
           )}
@@ -334,6 +294,9 @@ export function InventoryPage() {
         onExpirationChange={setExpirationFilter}
         onReset={handleResetFilters}
       />
+
+      {/* "You still have …" confirmation for the cart action */}
+      {addToListSheet}
 
       {/* Snackbar */}
       <Snackbar

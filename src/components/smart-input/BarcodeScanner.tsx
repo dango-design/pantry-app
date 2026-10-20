@@ -131,7 +131,7 @@ export function BarcodeScanner({ onScan, onCancel }: BarcodeScannerProps) {
         <button onClick={handleCancel} className="p-2 text-white">
           <X className="h-6 w-6" />
         </button>
-        <h2 className="text-white font-medium">Scan Barcode</h2>
+        <h2 className="text-white font-medium">Scan barcode</h2>
         <div className="w-10" />
       </div>
 
@@ -148,11 +148,11 @@ export function BarcodeScanner({ onScan, onCancel }: BarcodeScannerProps) {
             onClick={startCamera}
             className="w-full max-w-xs flex items-center gap-4 p-6 bg-white/10 rounded-2xl hover:bg-white/20 transition-colors"
           >
-            <div className="w-14 h-14 bg-purple-600 rounded-full flex items-center justify-center">
-              <Camera className="h-7 w-7 text-white" />
+            <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center">
+              <Camera className="h-7 w-7 text-primary" />
             </div>
             <div className="text-left">
-              <p className="text-white font-medium">Scan with Camera</p>
+              <p className="text-white font-medium">Scan with camera</p>
               <p className="text-white/60 text-sm">
                 {hasBarcodeDetector ? 'Auto-detect barcode' : 'Capture barcode image'}
               </p>
@@ -163,11 +163,11 @@ export function BarcodeScanner({ onScan, onCancel }: BarcodeScannerProps) {
             onClick={() => setMode('manual')}
             className="w-full max-w-xs flex items-center gap-4 p-6 bg-white/10 rounded-2xl hover:bg-white/20 transition-colors"
           >
-            <div className="w-14 h-14 bg-blue-600 rounded-full flex items-center justify-center">
+            <div className="w-14 h-14 bg-white/20 rounded-full flex items-center justify-center">
               <Keyboard className="h-7 w-7 text-white" />
             </div>
             <div className="text-left">
-              <p className="text-white font-medium">Enter Manually</p>
+              <p className="text-white font-medium">Enter manually</p>
               <p className="text-white/60 text-sm">Type the barcode number</p>
             </div>
           </button>
@@ -196,10 +196,10 @@ export function BarcodeScanner({ onScan, onCancel }: BarcodeScannerProps) {
                 )}
               </div>
               {/* Corner markers */}
-              <div className="absolute top-0 left-0 w-6 h-6 border-t-4 border-l-4 border-purple-500" />
-              <div className="absolute top-0 right-0 w-6 h-6 border-t-4 border-r-4 border-purple-500" />
-              <div className="absolute bottom-0 left-0 w-6 h-6 border-b-4 border-l-4 border-purple-500" />
-              <div className="absolute bottom-0 right-0 w-6 h-6 border-b-4 border-r-4 border-purple-500" />
+              <div className="absolute top-0 left-0 w-6 h-6 border-t-4 border-l-4 border-white" />
+              <div className="absolute top-0 right-0 w-6 h-6 border-t-4 border-r-4 border-white" />
+              <div className="absolute bottom-0 left-0 w-6 h-6 border-b-4 border-l-4 border-white" />
+              <div className="absolute bottom-0 right-0 w-6 h-6 border-b-4 border-r-4 border-white" />
             </div>
           </div>
 
@@ -220,9 +220,9 @@ export function BarcodeScanner({ onScan, onCancel }: BarcodeScannerProps) {
             {!hasBarcodeDetector && (
               <Button
                 onClick={() => setMode('manual')}
-                className="w-full bg-purple-600 hover:bg-purple-700"
+                className="w-full bg-primary hover:bg-primary-hover"
               >
-                Enter Manually
+                Enter manually
               </Button>
             )}
           </div>
@@ -266,7 +266,7 @@ export function BarcodeScanner({ onScan, onCancel }: BarcodeScannerProps) {
                   type="submit"
                   loading={loading}
                   disabled={!manualCode.trim()}
-                  className="flex-1 bg-purple-600 hover:bg-purple-700"
+                  className="flex-1 bg-primary hover:bg-primary-hover"
                 >
                   Lookup
                 </Button>

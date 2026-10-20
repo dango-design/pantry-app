@@ -207,3 +207,19 @@ export type DietaryRestriction =
   | 'keto'
   | 'halal'
   | 'kosher'
+
+// Meal Plan
+export type MealSlot = 'breakfast' | 'lunch' | 'dinner'
+
+export type MealPlanStatus = 'planned' | 'cooked' | 'skipped'
+
+export interface MealPlanEntry {
+  id: string
+  date: string // local calendar date, yyyy-MM-dd
+  slot: MealSlot
+  recipeId: string
+  servings: number
+  status: MealPlanStatus
+  createdAt: string
+  updatedAt: string
+}
