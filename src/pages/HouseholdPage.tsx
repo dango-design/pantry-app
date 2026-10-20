@@ -102,6 +102,9 @@ export function HouseholdPage() {
 
   async function handleJoinHousehold() {
     if (!inviteCode.trim()) return
+    if (joinDeletesHousehold && !confirm('Joining will delete your current household and its items. Continue?')) {
+      return
+    }
     try {
       setJoining(true)
       setError(null)
@@ -141,6 +144,9 @@ export function HouseholdPage() {
   }
 
   const isOwner = household?.owner_id === user?.id
+  const isAdmin = members.some(m => m.user_id === user?.id && m.role === 'admin')
+  // Joining moves you out, and a household with nobody left is deleted
+  const joinDeletesHousehold = !!household && members.length <= 1
 
   function getRoleIcon(role: string) {
     switch (role) {
@@ -207,9 +213,15 @@ export function HouseholdPage() {
             </CardContent>
           </Card>
 
-          <p className="text-sm text-gray-500 text-center">
-            Note: Joining a new household will move you out of your current household.
-          </p>
+          {household && (
+            <p className="text-sm text-gray-500 text-center">
+              {joinDeletesHousehold
+                ? 'You’re the only member of your current household, so joining will delete it along with its items and lists.'
+                : isOwner
+                  ? 'Joining moves you out of your current household. Ownership passes to the member who joined first.'
+                  : 'Joining moves you out of your current household.'}
+            </p>
+          )}
         </div>
       </div>
     )
@@ -319,6 +331,8 @@ export function HouseholdPage() {
               {members.map((member) => {
                 const RoleIcon = getRoleIcon(member.role)
                 const isCurrentUser = member.user_id === user?.id
+                // The owner can remove anyone else; admins can remove plain members
+                const canRemove = !isCurrentUser && (isOwner || (isAdmin && member.role === 'member'))
                 return (
                   <div
                     key={member.id}
@@ -342,7 +356,7 @@ export function HouseholdPage() {
                         <span className="capitalize">{member.role}</span>
                       </div>
                     </div>
-                    {isOwner && !isCurrentUser && (
+                    {canRemove && (
                       <Button
                         onClick={() =>
                           handleRemoveMember(

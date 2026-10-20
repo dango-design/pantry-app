@@ -408,6 +408,29 @@ export type Database = {
         }
         Returns: string
       }
+      leave_household: {
+        Args: Record<string, never>
+        Returns: string
+      }
+      regenerate_invite_code: {
+        Args: {
+          p_household_id: string
+        }
+        Returns: string | null
+      }
+      set_household_member_role: {
+        Args: {
+          p_member_id: string
+          p_role: string
+        }
+        Returns: Database['public']['Tables']['household_members']['Row']
+      }
+      transfer_household_ownership: {
+        Args: {
+          p_member_id: string
+        }
+        Returns: Database['public']['Tables']['household_members']['Row']
+      }
       update_all_freshness_scores: {
         Args: Record<string, never>
         Returns: undefined
