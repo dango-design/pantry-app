@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback, createContext, useContext, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
+import { CART_TARGET_ATTR } from '@/components/layout/navItems'
 
 interface AnimationItem {
   id: string
@@ -69,6 +70,16 @@ export function FlyToCartProvider({ children }: FlyToCartProviderProps) {
   )
 }
 
+// The shopping tab's icon in whichever nav is showing: the bottom nav on phones, the side nav on wider screens
+function getCartPosition(): { x: number; y: number } {
+  for (const el of document.querySelectorAll<HTMLElement>(`[${CART_TARGET_ATTR}]`)) {
+    const rect = el.getBoundingClientRect()
+    if (rect.width > 0) return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 }
+  }
+  // No nav on screen: aim for the bottom right corner
+  return { x: window.innerWidth - 40, y: window.innerHeight - 32 }
+}
+
 type FlyingIconProps = AnimationItem
 
 function FlyingIcon({ startX, startY, icon }: FlyingIconProps) {
@@ -80,15 +91,7 @@ function FlyingIcon({ startX, startY, icon }: FlyingIconProps) {
   })
 
   useEffect(() => {
-    // Find the cart icon in the bottom nav
-    // The nav is max-w-lg (512px) centered, with 3 sections: list (w-20), spacer (w-20), cart (w-20)
-    // Cart is in the rightmost w-20 section
-    const viewportWidth = window.innerWidth
-    const maxWidth = Math.min(viewportWidth, 512) // max-w-lg = 512px
-    const containerLeft = (viewportWidth - maxWidth) / 2
-    // Cart icon is at the right: containerLeft + maxWidth - 40px (half of w-20=80px)
-    const cartX = containerLeft + maxWidth - 40
-    const cartY = window.innerHeight - 32 // Bottom nav is ~64px, target middle
+    const { x: cartX, y: cartY } = getCartPosition()
 
     // Start the animation after a small delay
     requestAnimationFrame(() => {
@@ -122,12 +125,7 @@ function FlyingIcon({ startX, startY, icon }: FlyingIconProps) {
 
 // Cart bounce/pulse effect when item arrives
 function CartBounceEffect() {
-  const viewportWidth = window.innerWidth
-  const maxWidth = Math.min(viewportWidth, 512)
-  const containerLeft = (viewportWidth - maxWidth) / 2
-  // Cart icon is at the right: containerLeft + maxWidth - 40px (half of w-20=80px)
-  const cartX = containerLeft + maxWidth - 40
-  const cartY = window.innerHeight - 32
+  const { x: cartX, y: cartY } = getCartPosition()
 
   return createPortal(
     <div

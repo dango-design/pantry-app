@@ -1,5 +1,5 @@
-import { useState, useRef, useEffect } from 'react'
-import { X, Check } from 'lucide-react'
+import { Check } from 'lucide-react'
+import { BottomSheet } from '@/components/common'
 import { cn } from '@/utils/cn'
 import type { DietaryRestriction } from '@/types'
 
@@ -59,39 +59,6 @@ export function RecipeFilterSheet({
   onMaxCookTimeChange,
   onReset,
 }: RecipeFilterSheetProps) {
-  const sheetRef = useRef<HTMLDivElement>(null)
-  const [isVisible, setIsVisible] = useState(false)
-  const [dragY, setDragY] = useState(0)
-  const [isDragging, setIsDragging] = useState(false)
-  const dragStartY = useRef(0)
-
-  useEffect(() => {
-    if (open) {
-      requestAnimationFrame(() => setIsVisible(true))
-    } else {
-      setIsVisible(false)
-    }
-  }, [open])
-
-  const handleTouchStart = (e: React.TouchEvent) => {
-    dragStartY.current = e.touches[0].clientY
-    setIsDragging(true)
-  }
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (!isDragging) return
-    const currentY = e.touches[0].clientY
-    const diff = currentY - dragStartY.current
-    if (diff > 0) setDragY(diff)
-  }
-
-  const handleTouchEnd = () => {
-    if (!isDragging) return
-    setIsDragging(false)
-    if (dragY > 100) onClose()
-    setDragY(0)
-  }
-
   if (!open) return null
 
   const activeFilterCount =
@@ -111,145 +78,112 @@ export function RecipeFilterSheet({
   }
 
   return (
-    <div className="fixed inset-0 z-50">
-      <div
-        className={cn(
-          'absolute inset-0 bg-black/50 transition-opacity duration-300',
-          isVisible ? 'opacity-100' : 'opacity-0'
-        )}
-        onClick={onClose}
-      />
-
-      <div
-        ref={sheetRef}
-        className={cn(
-          'absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl max-h-[85vh] overflow-hidden transition-transform duration-300 ease-out'
-        )}
-        style={{
-          transform: isVisible
-            ? `translateY(${isDragging ? dragY : 0}px)`
-            : 'translateY(100%)',
-        }}
-      >
-        <div
-          className="flex justify-center pt-3 pb-2 cursor-grab active:cursor-grabbing touch-none"
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
-        >
-          <div className="w-10 h-1 bg-gray-300 rounded-full" />
-        </div>
-
-        <div className="flex items-center justify-between px-4 pb-3 border-b border-gray-100">
-          <h2 className="text-lg font-semibold text-gray-900">Recipe filters</h2>
-          <div className="flex items-center gap-3">
-            {activeFilterCount > 0 && (
-              <button onClick={onReset} className="text-sm text-primary font-medium">
-                Reset
-              </button>
-            )}
-            <button onClick={onClose} className="p-2 -mr-2 text-gray-500 hover:text-gray-700">
-              <X className="h-5 w-5" />
-            </button>
-          </div>
-        </div>
-
-        <div className="overflow-y-auto p-4 space-y-6 max-h-[calc(85vh-100px)]">
-          {/* Cuisine */}
-          <div>
-            <h3 className="text-sm font-medium text-gray-700 mb-3">Cuisine</h3>
-            <div className="flex flex-wrap gap-2">
-              {CUISINE_OPTIONS.map((c) => (
-                <button
-                  key={c}
-                  onClick={() => onCuisineChange(c)}
-                  className={cn(
-                    'px-3 py-1.5 rounded-full text-sm font-medium transition-all border',
-                    cuisine === c
-                      ? 'bg-primary text-white border-transparent'
-                      : 'bg-white text-gray-600 border-gray-300 hover:border-gray-400'
-                  )}
-                >
-                  {c}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Difficulty */}
-          <div>
-            <h3 className="text-sm font-medium text-gray-700 mb-3">Difficulty</h3>
-            <div className="space-y-1">
-              {DIFFICULTY_OPTIONS.map((option) => (
-                <button
-                  key={option.key}
-                  onClick={() => onDifficultyChange(option.key)}
-                  className={cn(
-                    'w-full flex items-center justify-between px-4 py-3 rounded-lg text-left',
-                    difficulty === option.key
-                      ? 'bg-primary-soft text-primary'
-                      : 'hover:bg-gray-50 text-gray-700'
-                  )}
-                >
-                  <span className="text-sm">{option.label}</span>
-                  {difficulty === option.key && <Check className="h-4 w-4 text-primary" />}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Dietary */}
-          <div>
-            <h3 className="text-sm font-medium text-gray-700 mb-3">Dietary</h3>
-            <div className="flex flex-wrap gap-2">
-              {DIETARY_OPTIONS.map((option) => (
-                <button
-                  key={option.key}
-                  onClick={() => handleDietaryClick(option.key)}
-                  className={cn(
-                    'px-3 py-1.5 rounded-full text-sm font-medium transition-all border',
-                    dietaryFilters.has(option.key)
-                      ? 'bg-primary text-white border-transparent'
-                      : 'bg-white text-gray-600 border-gray-300 hover:border-gray-400'
-                  )}
-                >
-                  {option.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Max cook time */}
-          <div>
-            <h3 className="text-sm font-medium text-gray-700 mb-3">Max cook time</h3>
-            <div className="flex flex-wrap gap-2">
-              {MAX_COOK_TIME_OPTIONS.map((option) => (
-                <button
-                  key={option.key}
-                  onClick={() => onMaxCookTimeChange(option.key)}
-                  className={cn(
-                    'px-3 py-1.5 rounded-full text-sm font-medium transition-all border',
-                    maxCookTime === option.key
-                      ? 'bg-primary text-white border-transparent'
-                      : 'bg-white text-gray-600 border-gray-300 hover:border-gray-400'
-                  )}
-                >
-                  {option.label}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <div className="p-4 border-t border-gray-100 safe-area-bottom">
-          <button
-            onClick={onClose}
-            className="w-full py-3 bg-primary text-white font-medium rounded-lg hover:bg-primary-hover transition-colors"
-          >
-            Apply filters{activeFilterCount > 0 && ` (${activeFilterCount})`}
+    <BottomSheet
+      open={open}
+      onClose={onClose}
+      title="Recipe filters"
+      headerAction={
+        activeFilterCount > 0 && (
+          <button onClick={onReset} className="text-sm text-primary font-medium">
+            Reset
           </button>
+        )
+      }
+      footer={
+        <button
+          onClick={onClose}
+          className="w-full py-3 bg-primary text-white font-medium rounded-lg hover:bg-primary-hover transition-colors"
+        >
+          Apply filters{activeFilterCount > 0 && ` (${activeFilterCount})`}
+        </button>
+      }
+    >
+      <div className="p-4 space-y-6">
+        {/* Cuisine */}
+        <div>
+          <h3 className="text-sm font-medium text-gray-700 mb-3">Cuisine</h3>
+          <div className="flex flex-wrap gap-2">
+            {CUISINE_OPTIONS.map((c) => (
+              <button
+                key={c}
+                onClick={() => onCuisineChange(c)}
+                className={cn(
+                  'px-3 py-1.5 rounded-full text-sm font-medium transition-all border',
+                  cuisine === c
+                    ? 'bg-primary text-white border-transparent'
+                    : 'bg-white text-gray-600 border-gray-300 hover:border-gray-400'
+                )}
+              >
+                {c}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Difficulty */}
+        <div>
+          <h3 className="text-sm font-medium text-gray-700 mb-3">Difficulty</h3>
+          <div className="space-y-1">
+            {DIFFICULTY_OPTIONS.map((option) => (
+              <button
+                key={option.key}
+                onClick={() => onDifficultyChange(option.key)}
+                className={cn(
+                  'w-full flex items-center justify-between px-4 py-3 rounded-lg text-left',
+                  difficulty === option.key
+                    ? 'bg-primary-soft text-primary'
+                    : 'hover:bg-gray-50 text-gray-700'
+                )}
+              >
+                <span className="text-sm">{option.label}</span>
+                {difficulty === option.key && <Check className="h-4 w-4 text-primary" />}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Dietary */}
+        <div>
+          <h3 className="text-sm font-medium text-gray-700 mb-3">Dietary</h3>
+          <div className="flex flex-wrap gap-2">
+            {DIETARY_OPTIONS.map((option) => (
+              <button
+                key={option.key}
+                onClick={() => handleDietaryClick(option.key)}
+                className={cn(
+                  'px-3 py-1.5 rounded-full text-sm font-medium transition-all border',
+                  dietaryFilters.has(option.key)
+                    ? 'bg-primary text-white border-transparent'
+                    : 'bg-white text-gray-600 border-gray-300 hover:border-gray-400'
+                )}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Max cook time */}
+        <div>
+          <h3 className="text-sm font-medium text-gray-700 mb-3">Max cook time</h3>
+          <div className="flex flex-wrap gap-2">
+            {MAX_COOK_TIME_OPTIONS.map((option) => (
+              <button
+                key={option.key}
+                onClick={() => onMaxCookTimeChange(option.key)}
+                className={cn(
+                  'px-3 py-1.5 rounded-full text-sm font-medium transition-all border',
+                  maxCookTime === option.key
+                    ? 'bg-primary text-white border-transparent'
+                    : 'bg-white text-gray-600 border-gray-300 hover:border-gray-400'
+                )}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
-    </div>
+    </BottomSheet>
   )
 }

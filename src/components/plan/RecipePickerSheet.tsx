@@ -62,7 +62,7 @@ export function RecipePickerSheet({ date, slot, onClose, onPick }: RecipePickerS
                 placeholder="Search recipes"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full h-10 pl-10 pr-4 bg-white border border-gray-200 rounded-lg text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                className="w-full h-10 pl-10 pr-4 bg-white border border-gray-200 rounded-lg text-base md:text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
               />
             </div>
             <p className="text-xs text-gray-500 mt-2">Recipes that use food expiring soon come first</p>

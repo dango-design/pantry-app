@@ -13,6 +13,10 @@ const meta = {
     },
   },
   tags: ['autodocs'],
+  args: {
+    addOpen: false,
+    onAddClick: () => {},
+  },
   decorators: [
     (Story) => (
       <div className="h-screen bg-gray-100 relative">

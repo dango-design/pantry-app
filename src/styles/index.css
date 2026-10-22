@@ -3,8 +3,28 @@
 @tailwind utilities;
 
 @layer base {
+  /* Width of the side nav that the page content and fixed bars inset by: none on phones
+     (they have the bottom nav), an icon rail on tablets, a labeled sidebar on desktop */
+  :root {
+    --side-nav-width: 0px;
+  }
+
+  @screen md {
+    :root {
+      --side-nav-width: calc(5rem + env(safe-area-inset-left, 0px));
+    }
+  }
+
+  @screen lg {
+    :root {
+      --side-nav-width: calc(15rem + env(safe-area-inset-left, 0px));
+    }
+  }
+
   body {
     @apply bg-gray-50 text-gray-900 antialiased;
+    /* Taps get the app's own pressed states instead of the browser's gray flash */
+    -webkit-tap-highlight-color: transparent;
   }
 }
 
@@ -73,5 +93,10 @@
   /* Safe area for bottom nav on iOS devices */
   .safe-area-bottom {
     padding-bottom: env(safe-area-inset-bottom, 0);
+  }
+
+  /* Room under the page for the bottom nav (64px plus the home indicator) */
+  .pb-bottom-nav {
+    padding-bottom: calc(4rem + env(safe-area-inset-bottom, 0px));
   }
 }

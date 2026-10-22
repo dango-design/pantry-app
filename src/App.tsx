@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate, Outlet } from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider, useAuth } from '@/contexts/AuthContext'
 import { ProtectedRoute } from '@/components/auth'
 import { AppLayout, AuthLayout } from '@/components/layout'
@@ -34,11 +34,6 @@ function AuthRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>
 }
 
-// Simple layout without bottom nav for modal-like pages
-function SimpleLayout() {
-  return <Outlet />
-}
-
 function AppRoutes() {
   return (
     <Routes>
@@ -55,11 +50,11 @@ function AppRoutes() {
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
       </Route>
 
-      {/* Protected app routes with bottom nav */}
+      {/* Main tabs: bottom nav on phones, side nav from tablet width up */}
       <Route
         element={
           <ProtectedRoute>
-            <AppLayout />
+            <AppLayout bottomNav />
           </ProtectedRoute>
         }
       >
@@ -69,11 +64,11 @@ function AppRoutes() {
         <Route path="/shopping" element={<ShoppingListPage />} />
       </Route>
 
-      {/* Protected routes without bottom nav */}
+      {/* Sub-pages: their own back button and action bars on phones, side nav from tablet width up */}
       <Route
         element={
           <ProtectedRoute>
-            <SimpleLayout />
+            <AppLayout />
           </ProtectedRoute>
         }
       >

@@ -7,9 +7,9 @@ import {
   HelpCircle,
   LogOut,
   ChevronRight,
-  ArrowLeft,
 } from 'lucide-react'
 import { Card, CardContent } from '@/components/common'
+import { PageHeader, pageContainer } from '@/components/layout'
 import { useAuth } from '@/contexts/AuthContext'
 import { cn } from '@/utils/cn'
 
@@ -61,20 +61,10 @@ export function SettingsPage() {
 
   return (
     <div className="min-h-screen">
-      {/* Custom header with back button */}
-      <header className="sticky top-0 z-20 bg-white border-b border-gray-200 px-4 py-3">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => navigate(-1)}
-            className="p-2 -ml-2 text-gray-600 hover:text-gray-900"
-          >
-            <ArrowLeft className="h-5 w-5" />
-          </button>
-          <h1 className="text-xl font-bold text-gray-900">Settings</h1>
-        </div>
-      </header>
+      {/* The side nav links here on wider screens, so only phones need the way back */}
+      <PageHeader title="Settings" hideBackOnDesktop />
 
-      <div className="p-4 space-y-4">
+      <div className={cn(pageContainer('narrow'), 'py-4 space-y-4 md:py-6')}>
         {/* Profile Card */}
         <Card>
           <CardContent className="p-4">

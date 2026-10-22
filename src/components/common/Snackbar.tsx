@@ -42,7 +42,8 @@ export function Snackbar({
   return (
     <div
       className={cn(
-        'fixed bottom-20 left-4 right-4 z-50 max-w-lg mx-auto',
+        // Phones: above the bottom nav or action bar. Wider screens: bottom center of the content, past the side nav.
+        'fixed bottom-20 md:bottom-6 left-[calc(var(--side-nav-width)+1rem)] right-4 z-50 max-w-lg md:max-w-md mx-auto',
         'transition-all duration-200',
         isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4',
         className

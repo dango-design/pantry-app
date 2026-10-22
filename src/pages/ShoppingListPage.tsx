@@ -1,7 +1,8 @@
 import { useState, useMemo } from 'react'
 import { Lightbulb, Trash2, Home } from 'lucide-react'
-import { TabHeader, TabSearchField } from '@/components/layout'
+import { TabHeader, TabSearchField, pageContainer } from '@/components/layout'
 import { Badge, Button } from '@/components/common'
+import { useIsDesktop } from '@/hooks/useMediaQuery'
 import { QuickAddToList } from '@/components/shopping'
 import { ItemReviewList, type ReviewItem } from '@/components/smart-input'
 import { useDemoStore, DEMO_HOUSEHOLD, DEMO_USER } from '@/stores/demoStore'
@@ -41,6 +42,7 @@ export function ShoppingListPage() {
     addItem: addInventoryItem,
   } = useDemoStore()
 
+  const isDesktop = useIsDesktop()
   const [reviewItems, setReviewItems] = useState<ReviewItem[] | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
   const query = searchQuery.trim().toLowerCase()
@@ -130,156 +132,183 @@ export function ShoppingListPage() {
 
   const checkedCount = shoppingList.filter((i) => i.isChecked).length
 
+  const checkedSummary = `${checkedCount} item${checkedCount > 1 ? 's' : ''} checked`
+
   return (
-    <div className="min-h-screen pb-24">
+    <div className="min-h-screen">
       <TabHeader
         title="Shopping list"
+        width="regular"
         tool={<TabSearchField value={searchQuery} onChange={setSearchQuery} placeholder="Search shopping list" />}
       >
-        <QuickAddToList placeholder="Add to shopping list" />
+        {/* Phones keep the add field in the sticky header; wider screens put it at the top of the list */}
+        {!isDesktop && <QuickAddToList placeholder="Add to shopping list" />}
       </TabHeader>
 
-      <div className="px-4 pt-2 pb-4 space-y-4">
-        {/* Suggestions */}
-        {visibleSuggestions.length > 0 && (
-          <section>
-            <div className="flex items-center gap-2 mb-2">
-              <Lightbulb className="h-4 w-4 text-yellow-500" />
-              <span className="text-sm font-medium text-gray-700">
-                Suggested ({visibleSuggestions.length})
-              </span>
-            </div>
-            <div className="space-y-1">
-              {visibleSuggestions.slice(0, 5).map((suggestion, index) => (
-                <button
-                  key={`${suggestion.name}-${index}`}
-                  onClick={() => handleAcceptSuggestion(suggestion)}
-                  className="w-full flex items-center gap-3 p-3 bg-yellow-50 border border-yellow-100 rounded-lg text-left hover:bg-yellow-100 transition-colors"
-                >
-                  <div className="w-5 h-5 rounded border-2 border-dashed border-yellow-400" />
-                  <span className="flex-1 text-gray-700">{suggestion.name}</span>
-                  <Badge variant="warning" size="sm">
-                    {suggestion.reason}
-                  </Badge>
-                </button>
-              ))}
-            </div>
-          </section>
+      {/* Desktop: the list, with checked items and suggestions in a side column */}
+      <div
+        className={cn(
+          pageContainer('regular'),
+          'pt-2 pb-4 space-y-4 md:pt-6 md:pb-10 lg:space-y-0 lg:grid lg:grid-cols-[minmax(0,1fr)_18rem] lg:gap-8 lg:items-start',
+          checkedCount > 0 && 'pb-24 md:pb-28 lg:pb-10'
+        )}
+      >
+        {(checkedCount > 0 || visibleSuggestions.length > 0) && (
+          <aside className="space-y-4 lg:order-last lg:sticky lg:top-28">
+            {checkedCount > 0 && (
+              <div className="hidden lg:block p-4 bg-white border border-gray-200 rounded-xl">
+                <p className="text-sm text-gray-500 mb-3">{checkedSummary}</p>
+                {/* Secondary so the + in the nav stays the only filled button on screen */}
+                <Button variant="secondary" className="w-full" onClick={handleReviewChecked}>
+                  Add to pantry
+                </Button>
+              </div>
+            )}
+
+            {/* Suggestions */}
+            {visibleSuggestions.length > 0 && (
+              <section>
+                <div className="flex items-center gap-2 mb-2">
+                  <Lightbulb className="h-4 w-4 text-yellow-500" />
+                  <span className="text-sm font-medium text-gray-700">
+                    Suggested ({visibleSuggestions.length})
+                  </span>
+                </div>
+                <div className="space-y-1">
+                  {visibleSuggestions.slice(0, 5).map((suggestion, index) => (
+                    <button
+                      key={`${suggestion.name}-${index}`}
+                      onClick={() => handleAcceptSuggestion(suggestion)}
+                      className="w-full flex items-center gap-3 p-3 bg-yellow-50 border border-yellow-100 rounded-lg text-left hover:bg-yellow-100 transition-colors"
+                    >
+                      <div className="w-5 h-5 rounded border-2 border-dashed border-yellow-400" />
+                      <span className="flex-1 text-gray-700">{suggestion.name}</span>
+                      <Badge variant="warning" size="sm">
+                        {suggestion.reason}
+                      </Badge>
+                    </button>
+                  ))}
+                </div>
+              </section>
+            )}
+          </aside>
         )}
 
-        {/* Items by category */}
-        {Object.entries(groupedItems).map(([category, categoryItems]) => {
-          const categoryConfig = CATEGORIES[category as FoodCategory]
-          return (
-            <section key={category}>
-              <div className="flex items-center gap-2 mb-2">
-                <div
-                  className="w-4 h-4 rounded"
-                  style={{ backgroundColor: categoryConfig?.color || '#6B7280' }}
-                />
-                <span className="text-sm font-medium text-gray-700">
-                  {categoryConfig?.label || category}
-                </span>
-              </div>
-              <div className="space-y-1">
-                {categoryItems.map((item) => {
-                  // Flag list items that are still stocked at home (e.g. added from a recipe)
-                  const atHome = item.isChecked ? undefined : findStockedInPantry(item.name, inventory)
-                  return (
+        <div className="space-y-4">
+          {isDesktop && <QuickAddToList placeholder="Add to shopping list" />}
+
+          {/* Items by category */}
+          {Object.entries(groupedItems).map(([category, categoryItems]) => {
+            const categoryConfig = CATEGORIES[category as FoodCategory]
+            return (
+              <section key={category}>
+                <div className="flex items-center gap-2 mb-2">
                   <div
-                    key={item.id}
-                    className={cn(
-                      'flex items-center gap-3 p-3 bg-white border border-gray-200 rounded-lg transition-colors',
-                      item.isChecked && 'bg-gray-50'
-                    )}
-                  >
-                    <button
-                      onClick={() => toggleShoppingItem(item.id)}
+                    className="w-4 h-4 rounded"
+                    style={{ backgroundColor: categoryConfig?.color || '#6B7280' }}
+                  />
+                  <span className="text-sm font-medium text-gray-700">
+                    {categoryConfig?.label || category}
+                  </span>
+                </div>
+                <div className="space-y-1">
+                  {categoryItems.map((item) => {
+                    // Flag list items that are still stocked at home (e.g. added from a recipe)
+                    const atHome = item.isChecked ? undefined : findStockedInPantry(item.name, inventory)
+                    return (
+                    <div
+                      key={item.id}
                       className={cn(
-                        'w-5 h-5 rounded border-2 flex items-center justify-center transition-colors flex-shrink-0',
-                        item.isChecked
-                          ? 'bg-primary border-primary'
-                          : 'border-gray-300 hover:border-gray-400'
+                        'flex items-center gap-3 p-3 bg-white border border-gray-200 rounded-lg transition-colors',
+                        item.isChecked && 'bg-gray-50'
                       )}
                     >
-                      {item.isChecked && (
-                        <svg
-                          className="w-3 h-3 text-white"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={3}
-                            d="M5 13l4 4L19 7"
-                          />
-                        </svg>
-                      )}
-                    </button>
+                      <button
+                        onClick={() => toggleShoppingItem(item.id)}
+                        className={cn(
+                          'w-5 h-5 rounded border-2 flex items-center justify-center transition-colors flex-shrink-0',
+                          item.isChecked
+                            ? 'bg-primary border-primary'
+                            : 'border-gray-300 hover:border-gray-400'
+                        )}
+                      >
+                        {item.isChecked && (
+                          <svg
+                            className="w-3 h-3 text-white"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={3}
+                              d="M5 13l4 4L19 7"
+                            />
+                          </svg>
+                        )}
+                      </button>
 
-                    <span
-                      className={cn(
-                        'flex-1',
-                        item.isChecked && 'line-through text-gray-400'
-                      )}
-                    >
-                      {item.name}
-                      {item.quantity && (
-                        <span className="text-gray-500">
-                          {' '}({item.quantityUnit ? formatQuantity(item.quantity, item.quantityUnit) : item.quantity})
-                        </span>
-                      )}
-                      {item.notes && (
-                        <span className="block text-xs text-gray-400">{item.notes}</span>
-                      )}
-                      {atHome && (
-                        <span className="mt-0.5 flex items-center gap-1 text-xs text-amber-700">
-                          <Home className="h-3 w-3 flex-shrink-0" />
-                          {formatQuantity(atHome.quantity, atHome.quantityUnit)} at home
-                          {!isSameName(atHome.name, item.name) && ` (${atHome.name})`}
-                        </span>
-                      )}
-                    </span>
+                      <span
+                        className={cn(
+                          'flex-1',
+                          item.isChecked && 'line-through text-gray-400'
+                        )}
+                      >
+                        {item.name}
+                        {item.quantity && (
+                          <span className="text-gray-500">
+                            {' '}({item.quantityUnit ? formatQuantity(item.quantity, item.quantityUnit) : item.quantity})
+                          </span>
+                        )}
+                        {item.notes && (
+                          <span className="block text-xs text-gray-400">{item.notes}</span>
+                        )}
+                        {atHome && (
+                          <span className="mt-0.5 flex items-center gap-1 text-xs text-amber-700">
+                            <Home className="h-3 w-3 flex-shrink-0" />
+                            {formatQuantity(atHome.quantity, atHome.quantityUnit)} at home
+                            {!isSameName(atHome.name, item.name) && ` (${atHome.name})`}
+                          </span>
+                        )}
+                      </span>
 
-                    <button
-                      onClick={() => removeShoppingItem(item.id)}
-                      aria-label={`Remove ${item.name} from list`}
-                      className="p-1 text-gray-400 hover:text-red-500 transition-colors"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
-                  </div>
-                  )
-                })}
-              </div>
-            </section>
-          )
-        })}
+                      <button
+                        onClick={() => removeShoppingItem(item.id)}
+                        aria-label={`Remove ${item.name} from list`}
+                        className="p-1 text-gray-400 hover:text-red-500 transition-colors"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                    )
+                  })}
+                </div>
+              </section>
+            )
+          })}
 
-        {/* Empty states */}
-        {!query && shoppingList.length === 0 && suggestions.length === 0 && (
-          <div className="text-center py-12 text-gray-500">
-            <p className="mb-2">Your shopping list is empty</p>
-            <p className="text-sm">Add items above or accept suggestions</p>
-          </div>
-        )}
-        {query && Object.keys(groupedItems).length === 0 && visibleSuggestions.length === 0 && (
-          <div className="text-center py-12 text-gray-500">
-            <p className="mb-2">Nothing on your list matches "{searchQuery.trim()}"</p>
-            <p className="text-sm">Add it with the field above</p>
-          </div>
-        )}
+          {/* Empty states */}
+          {!query && shoppingList.length === 0 && suggestions.length === 0 && (
+            <div className="text-center py-12 text-gray-500">
+              <p className="mb-2">Your shopping list is empty</p>
+              <p className="text-sm">Add items above or accept suggestions</p>
+            </div>
+          )}
+          {query && Object.keys(groupedItems).length === 0 && visibleSuggestions.length === 0 && (
+            <div className="text-center py-12 text-gray-500">
+              <p className="mb-2">Nothing on your list matches "{searchQuery.trim()}"</p>
+              <p className="text-sm">Add it with the field above</p>
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* Footer */}
+      {/* Phones and tablets: a bar over the bottom nav. Desktop shows this in the side column. */}
       {checkedCount > 0 && (
-        <div className="fixed bottom-16 left-0 right-0 p-4 bg-white border-t border-gray-200">
-          <div className="max-w-lg mx-auto flex items-center justify-between">
-            <span className="text-sm text-gray-500">
-              {checkedCount} item{checkedCount > 1 ? 's' : ''} checked
-            </span>
+        <div className="lg:hidden fixed bottom-16 md:bottom-0 left-[var(--side-nav-width)] right-0 py-4 bg-white border-t border-gray-200">
+          <div className={cn(pageContainer('regular'), 'flex items-center justify-between')}>
+            <span className="text-sm text-gray-500">{checkedSummary}</span>
             {/* Secondary so the + in the nav stays the only filled button on screen */}
             <Button
               size="sm"

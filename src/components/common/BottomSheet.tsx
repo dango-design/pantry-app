@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { X } from 'lucide-react'
+import { useIsDesktop } from '@/hooks/useMediaQuery'
 import { cn } from '@/utils/cn'
 
 interface BottomSheetProps {
@@ -7,13 +8,19 @@ interface BottomSheetProps {
   onClose: () => void
   title: string
   subtitle?: string
+  /** Extra control beside the close button, like a Reset link */
+  headerAction?: ReactNode
   children: ReactNode
   footer?: ReactNode
   className?: string
 }
 
-// Slide-up sheet with a drag handle, matching the filter sheets
-export function BottomSheet({ open, onClose, title, subtitle, children, footer, className }: BottomSheetProps) {
+/**
+ * Phones: a slide-up sheet with a drag handle (swipe down to close).
+ * Tablets and desktop: the same content in a centered dialog.
+ */
+export function BottomSheet({ open, onClose, title, subtitle, headerAction, children, footer, className }: BottomSheetProps) {
+  const isDesktop = useIsDesktop()
   const [isVisible, setIsVisible] = useState(false)
   const [dragY, setDragY] = useState(0)
   const [isDragging, setIsDragging] = useState(false)
@@ -58,7 +65,7 @@ export function BottomSheet({ open, onClose, title, subtitle, children, footer, 
   if (!open) return null
 
   return (
-    <div className="fixed inset-0 z-50">
+    <div className={cn('fixed inset-0 z-50', isDesktop && 'flex items-center justify-center p-6')}>
       <div
         className={cn(
           'absolute inset-0 bg-black/50 transition-opacity duration-300',
@@ -72,40 +79,52 @@ export function BottomSheet({ open, onClose, title, subtitle, children, footer, 
         aria-modal="true"
         aria-label={title}
         className={cn(
-          'absolute bottom-0 left-0 right-0 max-w-lg mx-auto bg-white rounded-t-2xl max-h-[85vh] flex flex-col transition-transform duration-300 ease-out',
+          'bg-white flex flex-col',
+          isDesktop
+            ? 'relative w-full max-w-lg max-h-[min(85dvh,48rem)] rounded-2xl shadow-xl transition-[opacity,transform] duration-200 ease-out'
+            : 'absolute bottom-0 left-0 right-0 max-w-lg mx-auto rounded-t-2xl max-h-[85dvh] transition-transform duration-300 ease-out',
           className
         )}
-        style={{
-          transform: isVisible ? `translateY(${isDragging ? dragY : 0}px)` : 'translateY(100%)',
-        }}
+        style={
+          isDesktop
+            ? { opacity: isVisible ? 1 : 0, transform: isVisible ? 'none' : 'scale(0.96)' }
+            : { transform: isVisible ? `translateY(${isDragging ? dragY : 0}px)` : 'translateY(100%)' }
+        }
       >
-        <div
-          className="flex justify-center pt-3 pb-2 cursor-grab active:cursor-grabbing touch-none"
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
-        >
-          <div className="w-10 h-1 bg-gray-300 rounded-full" />
-        </div>
+        {!isDesktop && (
+          <div
+            className="flex justify-center pt-3 pb-2 cursor-grab active:cursor-grabbing touch-none"
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+          >
+            <div className="w-10 h-1 bg-gray-300 rounded-full" />
+          </div>
+        )}
 
-        <div className="flex items-start justify-between gap-3 px-4 pb-3 border-b border-gray-100">
+        <div className={cn('flex items-start justify-between gap-3 px-4 pb-3 border-b border-gray-100', isDesktop && 'pt-4')}>
           <div className="min-w-0">
             <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
             {subtitle && <p className="text-sm text-gray-500 mt-0.5">{subtitle}</p>}
           </div>
-          <button
-            onClick={onClose}
-            aria-label="Close"
-            className="p-2 -mr-2 -mt-1 text-gray-500 hover:text-gray-700"
-          >
-            <X className="h-5 w-5" />
-          </button>
+          <div className="flex items-center gap-3 -mr-2 -mt-1 flex-shrink-0">
+            {headerAction}
+            <button
+              onClick={onClose}
+              aria-label="Close"
+              className="p-2 rounded-full text-gray-500 hover:text-gray-700 hover:bg-gray-100"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto">{children}</div>
+        <div className="flex-1 overflow-y-auto overscroll-contain">{children}</div>
 
         {footer && (
-          <div className="p-4 border-t border-gray-100 safe-area-bottom">{footer}</div>
+          <div className="p-4 border-t border-gray-100" style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
+            {footer}
+          </div>
         )}
       </div>
     </div>

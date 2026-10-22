@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom'
 import { format, isValid, parseISO } from 'date-fns'
 import { ChevronLeft, ChevronRight, Plus, ShoppingCart } from 'lucide-react'
 import { Snackbar } from '@/components/common'
-import { TabHeader } from '@/components/layout'
+import { TabHeader, pageContainer } from '@/components/layout'
 import { MealPlanEntryCard, MoveMealSheet, RecipePickerSheet, ShopForWeekSheet } from '@/components/plan'
 import { useMealDrag } from '@/components/plan/useMealDrag'
 import { useDemoStore } from '@/stores/demoStore'
@@ -35,6 +35,9 @@ interface SnackbarState {
 }
 
 const SLOT_ORDER: Record<MealSlot, number> = { breakfast: 0, lunch: 1, dinner: 2 }
+
+// Desktop week board: the day, then a column per meal slot
+const BOARD_COLUMNS = 'lg:grid lg:grid-cols-[9rem_repeat(3,minmax(0,1fr))]'
 
 export function PlanPage() {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -189,160 +192,182 @@ export function PlanPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-lg mx-auto pb-24">
-        <TabHeader
-          title="Meal plan"
-          tool={
-            <div className="h-10 flex items-center rounded-lg border border-gray-200">
-              <button
-                onClick={() => goToWeek(shiftWeek(weekStart, -1))}
-                aria-label="Previous week"
-                className="w-10 h-full flex items-center justify-center rounded-l-lg text-gray-600 hover:bg-gray-50"
-              >
-                <ChevronLeft className="h-5 w-5" />
-              </button>
-              <p className="flex-1 min-w-0 truncate text-center text-sm" aria-live="polite">
-                <span className="font-medium text-gray-900">{weekTitle}</span>
-                <span className="text-gray-500"> · {formatWeekRange(weekStart)}</span>
-              </p>
-              <button
-                onClick={() => goToWeek(shiftWeek(weekStart, 1))}
-                aria-label="Next week"
-                className="w-10 h-full flex items-center justify-center rounded-r-lg text-gray-600 hover:bg-gray-50"
-              >
-                <ChevronRight className="h-5 w-5" />
-              </button>
-            </div>
-          }
+      <TabHeader
+        title="Meal plan"
+        tool={
+          <div className="h-10 flex items-center rounded-lg border border-gray-200">
+            <button
+              onClick={() => goToWeek(shiftWeek(weekStart, -1))}
+              aria-label="Previous week"
+              className="w-10 h-full flex items-center justify-center rounded-l-lg text-gray-600 hover:bg-gray-50"
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </button>
+            <p className="flex-1 min-w-0 truncate text-center text-sm" aria-live="polite">
+              <span className="font-medium text-gray-900">{weekTitle}</span>
+              <span className="text-gray-500"> · {formatWeekRange(weekStart)}</span>
+            </p>
+            <button
+              onClick={() => goToWeek(shiftWeek(weekStart, 1))}
+              aria-label="Next week"
+              className="w-10 h-full flex items-center justify-center rounded-r-lg text-gray-600 hover:bg-gray-50"
+            >
+              <ChevronRight className="h-5 w-5" />
+            </button>
+          </div>
+        }
+      >
+        {!isCurrentWeek && (
+          <div className="flex justify-center md:justify-end">
+            <button
+              onClick={() => goToWeek(getWeekStart(new Date()))}
+              className="px-3 py-1 rounded-full border border-gray-300 text-xs font-medium text-gray-600 hover:border-gray-400"
+            >
+              Back to this week
+            </button>
+          </div>
+        )}
+      </TabHeader>
+
+      {/* Phones and tablets: a card per day with its meals stacked.
+          Desktop: a week board, one row per day and a column per meal. */}
+      <div className={cn(pageContainer('wide'), 'pt-2 pb-6 space-y-3 md:pt-6 md:pb-10')}>
+        {/* Shop for the week: full width on phones, sized to its text on wider screens */}
+        <button
+          onClick={() => setShowShopSheet(true)}
+          disabled={shoppableEntries.length === 0}
+          className="w-full md:w-auto md:min-w-[22rem] md:pr-4 flex items-center gap-3 p-3 rounded-xl bg-primary text-white text-left shadow-sm hover:bg-primary-hover transition-colors disabled:bg-gray-200 disabled:text-gray-500 disabled:shadow-none"
         >
-          {!isCurrentWeek && (
-            <div className="flex justify-center">
-              <button
-                onClick={() => goToWeek(getWeekStart(new Date()))}
-                className="px-3 py-1 rounded-full border border-gray-300 text-xs font-medium text-gray-600 hover:border-gray-400"
-              >
-                Back to this week
-              </button>
-            </div>
-          )}
-        </TabHeader>
+          <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
+            <ShoppingCart className="h-5 w-5" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="font-medium">{shopTitle}</p>
+            <p className="text-xs opacity-80">{shopSummary}</p>
+          </div>
+          {shoppableEntries.length > 0 && <ChevronRight className="h-5 w-5 opacity-80" />}
+        </button>
 
-        <div className="px-4 pt-2 space-y-3">
-          {/* Shop for the week */}
-          <button
-            onClick={() => setShowShopSheet(true)}
-            disabled={shoppableEntries.length === 0}
-            className="w-full flex items-center gap-3 p-3 rounded-xl bg-primary text-white text-left shadow-sm hover:bg-primary-hover transition-colors disabled:bg-gray-200 disabled:text-gray-500 disabled:shadow-none"
-          >
-            <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
-              <ShoppingCart className="h-5 w-5" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="font-medium">{shopTitle}</p>
-              <p className="text-xs opacity-80">{shopSummary}</p>
-            </div>
-            {shoppableEntries.length > 0 && <ChevronRight className="h-5 w-5 opacity-80" />}
-          </button>
-
-          {/* Days */}
-          {weekDates.map((date) => {
-            const entries = entriesByDate.get(date) ?? []
-            const isPast = date < today
-            const isToday = date === today
-            const day = parseISO(date)
-
-            return (
-              <section
-                key={date}
-                aria-label={format(day, 'EEEE, MMMM d')}
-                className={cn(
-                  'bg-white rounded-xl border shadow-sm',
-                  isToday ? 'border-primary/40' : 'border-gray-200'
-                )}
-              >
-                <div className={cn('flex items-center gap-2 px-3', isPast && entries.length === 0 ? 'py-2.5' : 'pt-3 pb-1')}>
-                  <h2 className={cn('font-semibold', isPast ? 'text-gray-400' : 'text-gray-900')}>
-                    {format(day, 'EEEE')}
-                  </h2>
-                  <span className={cn('text-sm', isPast ? 'text-gray-400' : 'text-gray-500')}>
-                    {format(day, 'MMM d')}
-                  </span>
-                  {isToday && (
-                    <span className="px-2 py-0.5 rounded-full bg-primary-muted text-primary text-xs font-medium">
-                      Today
-                    </span>
-                  )}
-                  {isPast && entries.length === 0 && (
-                    <span className="ml-auto text-xs text-gray-400">Nothing planned</span>
-                  )}
-                </div>
-
-                {(!isPast || entries.length > 0) && (
-                  <div className="px-3 pb-2 divide-y divide-gray-100">
-                    {MEAL_SLOTS.map(({ key: slot, label }) => {
-                      const slotEntries = entries.filter((e) => e.slot === slot)
-                      // Past days only show what was planned
-                      if (isPast && slotEntries.length === 0) return null
-                      const isDropTarget = drag?.target?.date === date && drag.target.slot === slot
-
-                      return (
-                        <div
-                          key={slot}
-                          // Meals can be dragged onto today and later
-                          data-drop-date={isPast ? undefined : date}
-                          data-drop-slot={isPast ? undefined : slot}
-                          className={cn(
-                            'flex gap-3 py-2 -mx-2 px-2 rounded-lg transition-colors',
-                            isDropTarget && 'bg-primary-soft ring-2 ring-inset ring-primary/30'
-                          )}
-                        >
-                          {/* Label lines up with the dashed Add button, or with the first card's title */}
-                          <div className={cn('w-[4.5rem] flex-shrink-0', slotEntries.length > 0 ? 'pt-3.5' : 'pt-2.5')}>
-                            <p className="text-xs font-medium text-gray-500">{label}</p>
-                          </div>
-                          <div className="flex-1 min-w-0 space-y-2">
-                            {slotEntries.map((entry) => {
-                              const recipe = recipesById.get(entry.recipeId)
-                              if (!recipe) return null
-                              return (
-                                <MealPlanEntryCard
-                                  key={entry.id}
-                                  entry={entry}
-                                  recipe={recipe}
-                                  matchResult={matchByRecipeId.get(recipe.id)}
-                                  onServingsChange={(servings) => updateMealPlanEntry(entry.id, { servings })}
-                                  onStatusChange={(status) => updateMealPlanEntry(entry.id, { status })}
-                                  onRemove={() => handleRemove(entry)}
-                                  onMove={() => setMoveTarget(entry)}
-                                  onMoveToDate={(newDate) => moveEntry(entry, newDate, entry.slot)}
-                                  dragHandleProps={getHandleProps(entry.id, recipe.name, () => setMoveTarget(entry))}
-                                  cardProps={getCardProps(entry.id, recipe.name, () => setMoveTarget(entry))}
-                                  isDragging={drag?.entryId === entry.id}
-                                />
-                              )
-                            })}
-
-                            {/* Empty slots and filled ones both end in the same Add button; past days are read-only */}
-                            {!isPast && (
-                              <button
-                                onClick={() => setPickerTarget({ date, slot })}
-                                aria-label={`Add ${slotEntries.length > 0 ? 'another ' : ''}${label.toLowerCase()} on ${format(day, 'EEEE')}`}
-                                className="w-full h-9 flex items-center justify-center gap-1 rounded-xl border border-dashed border-gray-300 text-sm text-gray-500 hover:border-primary/40 hover:text-primary hover:bg-primary-soft/50 transition-colors"
-                              >
-                                <Plus className="h-4 w-4" />
-                                {isDropTarget ? 'Drop here' : 'Add'}
-                              </button>
-                            )}
-                          </div>
-                        </div>
-                      )
-                    })}
-                  </div>
-                )}
-              </section>
-            )
-          })}
+        {/* Desktop: meal names over the board's columns */}
+        <div aria-hidden="true" className={cn('hidden px-px pt-1', BOARD_COLUMNS)}>
+          <span />
+          {MEAL_SLOTS.map(({ key, label }) => (
+            <p key={key} className="px-3 text-xs font-medium text-gray-500">{label}</p>
+          ))}
         </div>
+
+        {/* Days */}
+        {weekDates.map((date) => {
+          const entries = entriesByDate.get(date) ?? []
+          const isPast = date < today
+          const isToday = date === today
+          const day = parseISO(date)
+
+          return (
+            <section
+              key={date}
+              aria-label={format(day, 'EEEE, MMMM d')}
+              className={cn(
+                'bg-white rounded-xl border shadow-sm',
+                BOARD_COLUMNS,
+                isToday ? 'border-primary/40' : 'border-gray-200'
+              )}
+            >
+              <div
+                className={cn(
+                  'flex items-center gap-2 px-3',
+                  isPast && entries.length === 0 ? 'py-2.5' : 'pt-3 pb-1',
+                  'lg:flex-col lg:items-start lg:gap-1 lg:p-3 lg:border-r lg:border-gray-100'
+                )}
+              >
+                <h2 className={cn('font-semibold', isPast ? 'text-gray-400' : 'text-gray-900')}>
+                  {format(day, 'EEEE')}
+                </h2>
+                <span className={cn('text-sm', isPast ? 'text-gray-400' : 'text-gray-500')}>
+                  {format(day, 'MMM d')}
+                </span>
+                {isToday && (
+                  <span className="px-2 py-0.5 rounded-full bg-primary-muted text-primary text-xs font-medium">
+                    Today
+                  </span>
+                )}
+                {isPast && entries.length === 0 && (
+                  <span className="ml-auto lg:ml-0 text-xs text-gray-400">Nothing planned</span>
+                )}
+              </div>
+
+              {(!isPast || entries.length > 0) && (
+                // On the desktop board the slots become the row's cells
+                <div className="px-3 pb-2 divide-y divide-gray-100 lg:contents">
+                  {MEAL_SLOTS.map(({ key: slot, label }, slotIndex) => {
+                    const slotEntries = entries.filter((e) => e.slot === slot)
+                    const cellBorder = slotIndex > 0 && 'lg:border-l lg:border-gray-100'
+                    // Past days only show what was planned. The board keeps an empty cell so columns line up.
+                    if (isPast && slotEntries.length === 0) {
+                      return <div key={slot} hidden className={cn('lg:block', cellBorder)} />
+                    }
+                    const isDropTarget = drag?.target?.date === date && drag.target.slot === slot
+
+                    return (
+                      <div
+                        key={slot}
+                        // Meals can be dragged onto today and later
+                        data-drop-date={isPast ? undefined : date}
+                        data-drop-slot={isPast ? undefined : slot}
+                        className={cn(
+                          'flex gap-3 py-2 -mx-2 px-2 rounded-lg transition-colors',
+                          'lg:block lg:m-0 lg:p-2 lg:rounded-none lg:last:rounded-r-xl',
+                          cellBorder,
+                          isDropTarget && 'bg-primary-soft ring-2 ring-inset ring-primary/30'
+                        )}
+                      >
+                        {/* Label lines up with the dashed Add button, or with the first card's title.
+                            The board has column headings instead. */}
+                        <div className={cn('w-[4.5rem] flex-shrink-0 lg:hidden', slotEntries.length > 0 ? 'pt-3.5' : 'pt-2.5')}>
+                          <p className="text-xs font-medium text-gray-500">{label}</p>
+                        </div>
+                        <div className="flex-1 min-w-0 space-y-2">
+                          {slotEntries.map((entry) => {
+                            const recipe = recipesById.get(entry.recipeId)
+                            if (!recipe) return null
+                            return (
+                              <MealPlanEntryCard
+                                key={entry.id}
+                                entry={entry}
+                                recipe={recipe}
+                                matchResult={matchByRecipeId.get(recipe.id)}
+                                onServingsChange={(servings) => updateMealPlanEntry(entry.id, { servings })}
+                                onStatusChange={(status) => updateMealPlanEntry(entry.id, { status })}
+                                onRemove={() => handleRemove(entry)}
+                                onMove={() => setMoveTarget(entry)}
+                                onMoveToDate={(newDate) => moveEntry(entry, newDate, entry.slot)}
+                                dragHandleProps={getHandleProps(entry.id, recipe.name, () => setMoveTarget(entry))}
+                                cardProps={getCardProps(entry.id, recipe.name, () => setMoveTarget(entry))}
+                                isDragging={drag?.entryId === entry.id}
+                              />
+                            )
+                          })}
+
+                          {/* Empty slots and filled ones both end in the same Add button; past days are read-only */}
+                          {!isPast && (
+                            <button
+                              onClick={() => setPickerTarget({ date, slot })}
+                              aria-label={`Add ${slotEntries.length > 0 ? 'another ' : ''}${label.toLowerCase()} on ${format(day, 'EEEE')}`}
+                              className="w-full h-9 flex items-center justify-center gap-1 rounded-xl border border-dashed border-gray-300 text-sm text-gray-500 hover:border-primary/40 hover:text-primary hover:bg-primary-soft/50 transition-colors"
+                            >
+                              <Plus className="h-4 w-4" />
+                              {isDropTarget ? 'Drop here' : 'Add'}
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
+            </section>
+          )
+        })}
       </div>
 
       {pickerTarget && (
