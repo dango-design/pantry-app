@@ -396,12 +396,6 @@ export type Database = {
         }
         Returns: number
       }
-      get_user_household_id: {
-        Args: {
-          p_user_id: string
-        }
-        Returns: string
-      }
       join_household_by_invite: {
         Args: {
           p_invite_code: string
