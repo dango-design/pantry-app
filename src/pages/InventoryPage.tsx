@@ -3,7 +3,7 @@ import { SlidersHorizontal, ArrowUpDown, Check } from 'lucide-react'
 import { FoodItemCard, useAddToList } from '@/components/inventory'
 import { FilterSheet, type ExpirationFilter } from '@/components/inventory/FilterSheet'
 import { TonightBanner } from '@/components/plan'
-import { TabHeader, TabSearchField } from '@/components/layout'
+import { CARD_GRID, TabHeader, TabSearchField, pageContainer } from '@/components/layout'
 import { Snackbar } from '@/components/common'
 import { useDemoStore } from '@/stores/demoStore'
 import { cn } from '@/utils/cn'
@@ -174,112 +174,115 @@ export function InventoryPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Responsive container */}
-      <div className="max-w-lg mx-auto pb-24">
-        <TabHeader
-          title="Pantry"
-          tool={<TabSearchField value={searchQuery} onChange={setSearchQuery} placeholder="Search pantry" />}
-        >
-          {/* Filter, Sort, and chips row */}
-          <div className="flex items-center gap-2">
-            {/* Filter icon */}
+      <TabHeader
+        title="Pantry"
+        tool={<TabSearchField value={searchQuery} onChange={setSearchQuery} placeholder="Search pantry" />}
+      >
+        {/* Filter, Sort, and chips row. Top-aligned so the icons sit with the first row when chips wrap. */}
+        <div className="flex items-center gap-2 md:items-start">
+          {/* Filter icon */}
+          <button
+            onClick={() => setShowFilterSheet(true)}
+            aria-label="Filters"
+            title="Filters"
+            className="relative w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-700 flex-shrink-0"
+          >
+            <SlidersHorizontal className="h-4 w-4" />
+            {activeFilterCount > 0 && (
+              <span className="absolute -top-1 -right-1 w-4 h-4 bg-primary text-white text-xs rounded-full flex items-center justify-center">
+                {activeFilterCount}
+              </span>
+            )}
+          </button>
+
+          {/* Sort dropdown */}
+          <div className="relative">
             <button
-              onClick={() => setShowFilterSheet(true)}
-              className="relative w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-700 flex-shrink-0"
+              onClick={() => setShowSortMenu(!showSortMenu)}
+              aria-label="Sort"
+              title="Sort"
+              className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-700 flex-shrink-0"
             >
-              <SlidersHorizontal className="h-4 w-4" />
-              {activeFilterCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-4 h-4 bg-primary text-white text-xs rounded-full flex items-center justify-center">
-                  {activeFilterCount}
-                </span>
-              )}
+              <ArrowUpDown className="h-4 w-4" />
             </button>
 
-            {/* Sort dropdown */}
-            <div className="relative">
-              <button
-                onClick={() => setShowSortMenu(!showSortMenu)}
-                className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-700 flex-shrink-0"
-              >
-                <ArrowUpDown className="h-4 w-4" />
-              </button>
-
-              {showSortMenu && (
-                <>
-                  <div
-                    className="fixed inset-0 z-40"
-                    onClick={() => setShowSortMenu(false)}
-                  />
-                  <div className="absolute top-full left-0 mt-1 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50 min-w-[160px]">
-                    {SORT_OPTIONS.map((option) => (
-                      <button
-                        key={option.key}
-                        onClick={() => {
-                          setSortBy(option.key)
-                          setShowSortMenu(false)
-                        }}
-                        className={cn(
-                          'w-full px-4 py-2 text-left text-sm flex items-center justify-between hover:bg-gray-50',
-                          sortBy === option.key && 'text-primary'
-                        )}
-                      >
-                        {option.label}
-                        {sortBy === option.key && <Check className="h-4 w-4" />}
-                      </button>
-                    ))}
-                  </div>
-                </>
-              )}
-            </div>
-
-            {/* Category chips - scrollable container */}
-            <div className="flex-1 overflow-x-auto scrollbar-hide -mr-4 pr-4">
-              <div className="flex gap-2 w-max">
-                {CATEGORY_CHIPS.map((chip) => {
-                  const isSelected = selectedCategories.has(chip.key)
-                  return (
+            {showSortMenu && (
+              <>
+                <div
+                  className="fixed inset-0 z-40"
+                  onClick={() => setShowSortMenu(false)}
+                />
+                <div className="absolute top-full left-0 mt-1 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50 min-w-[160px]">
+                  {SORT_OPTIONS.map((option) => (
                     <button
-                      key={chip.key}
-                      onClick={() => handleChipClick(chip.key)}
+                      key={option.key}
+                      onClick={() => {
+                        setSortBy(option.key)
+                        setShowSortMenu(false)
+                      }}
                       className={cn(
-                        'flex-shrink-0 px-4 py-1.5 rounded-full text-sm font-medium transition-all border',
-                        isSelected
-                          ? 'text-white border-transparent'
-                          : 'bg-white text-gray-600 border-gray-300 hover:border-gray-400'
+                        'w-full px-4 py-2 text-left text-sm flex items-center justify-between hover:bg-gray-50',
+                        sortBy === option.key && 'text-primary'
                       )}
-                      style={isSelected ? { backgroundColor: chip.color, borderColor: chip.color } : undefined}
                     >
-                      {chip.label}
+                      {option.label}
+                      {sortBy === option.key && <Check className="h-4 w-4" />}
                     </button>
-                  )
-                })}
-              </div>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+
+          {/* Category chips: a sideways-scrolling strip on phones, wrapping rows on wider screens */}
+          <div className="flex-1 overflow-x-auto scrollbar-hide -mr-4 pr-4 md:mr-0 md:pr-0 md:overflow-visible">
+            <div className="flex gap-2 w-max md:w-auto md:flex-wrap">
+              {CATEGORY_CHIPS.map((chip) => {
+                const isSelected = selectedCategories.has(chip.key)
+                return (
+                  <button
+                    key={chip.key}
+                    onClick={() => handleChipClick(chip.key)}
+                    className={cn(
+                      'flex-shrink-0 px-4 py-1.5 rounded-full text-sm font-medium transition-all border',
+                      isSelected
+                        ? 'text-white border-transparent'
+                        : 'bg-white text-gray-600 border-gray-300 hover:border-gray-400'
+                    )}
+                    style={isSelected ? { backgroundColor: chip.color, borderColor: chip.color } : undefined}
+                  >
+                    {chip.label}
+                  </button>
+                )
+              })}
             </div>
           </div>
-        </TabHeader>
+        </div>
+      </TabHeader>
 
-        {/* Content */}
-        <div className="px-4 pt-2 space-y-2">
-          <TonightBanner />
+      {/* Content: one column of cards on phones, a grid on wider screens */}
+      <div className={cn(pageContainer('wide'), 'pt-2 pb-6 space-y-2 md:pt-6 md:pb-10 md:space-y-3')}>
+        <TonightBanner />
 
-          {filteredInventory.length === 0 ? (
-            <div className="text-center py-16 text-gray-500">
-              <p className="text-lg font-medium mb-1">No items found</p>
-              <p className="text-sm">
-                {searchQuery ? 'Try a different search' : 'Add items to get started'}
-              </p>
-            </div>
-          ) : (
-            filteredInventory.map((item) => (
+        {filteredInventory.length === 0 ? (
+          <div className="text-center py-16 text-gray-500">
+            <p className="text-lg font-medium mb-1">No items found</p>
+            <p className="text-sm">
+              {searchQuery ? 'Try a different search' : 'Add items to get started'}
+            </p>
+          </div>
+        ) : (
+          <div className={CARD_GRID}>
+            {filteredInventory.map((item) => (
               <FoodItemCard
                 key={item.id}
                 item={item}
                 onMarkUsed={handleMarkUsed}
                 onAddToCart={requestAdd}
               />
-            ))
-          )}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Filter Sheet */}

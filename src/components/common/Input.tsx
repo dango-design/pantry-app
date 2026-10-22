@@ -22,7 +22,8 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           ref={ref}
           id={inputId}
           className={cn(
-            'w-full rounded-lg border border-gray-300 px-4 py-2 text-sm transition-colors',
+            // 16px on phones so iOS doesn't zoom in on focus
+            'w-full rounded-lg border border-gray-300 px-4 py-2 text-base md:text-sm transition-colors',
             'placeholder:text-gray-400',
             'focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20',
             error && 'border-red-500 focus:border-red-500 focus:ring-red-500/20',

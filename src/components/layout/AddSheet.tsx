@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { Barcode, BookOpen, CalendarPlus, Camera, ChevronRight, Link, Pencil, Receipt, ShoppingCart } from 'lucide-react'
 import { PantryIcon } from '@/components/icons'
 import { QuickAddToList } from '@/components/shopping'
+import { useIsDesktop } from '@/hooks/useMediaQuery'
 import { useDemoStore } from '@/stores/demoStore'
 import { cn } from '@/utils/cn'
 import { CATEGORY_TONES } from '@/utils/constants'
@@ -96,14 +97,17 @@ interface AddSheetProps {
 }
 
 /**
- * What the + in the bottom nav opens: add a pantry item (or jump into a scanner),
+ * What the + in the nav opens: add a pantry item (or jump into a scanner),
  * type a shopping list item in place, plan a meal in the next open slot, or
- * start a recipe. It sits just above the nav so the + can turn into a close button.
+ * start a recipe. On phones it slides up just above the bottom nav; on wider
+ * screens it pops out beside the side nav's Add button. Either way the nav stays
+ * above the backdrop so the + can turn into a close button.
  */
 export function AddSheet({ open, onClose }: AddSheetProps) {
   const navigate = useNavigate()
   const { pathname } = useLocation()
   const mealPlan = useDemoStore((state) => state.mealPlan)
+  const isDesktop = useIsDesktop()
   const [isVisible, setIsVisible] = useState(false)
 
   useEffect(() => {
@@ -173,7 +177,8 @@ export function AddSheet({ open, onClose }: AddSheetProps) {
     <>
       <div
         className={cn(
-          'fixed inset-0 z-50 bg-black/40 transition-opacity duration-200',
+          'fixed inset-0 z-50 transition-opacity duration-200',
+          isDesktop ? 'bg-black/10' : 'bg-black/40',
           isVisible ? 'opacity-100' : 'opacity-0'
         )}
         onClick={onClose}
@@ -183,15 +188,22 @@ export function AddSheet({ open, onClose }: AddSheetProps) {
         aria-modal="true"
         aria-label="Add"
         className={cn(
-          'fixed left-0 right-0 z-[51] max-w-lg mx-auto max-h-[75vh] overflow-y-auto bg-white rounded-t-2xl shadow-lg transition-transform duration-200 ease-out',
-          isVisible ? 'translate-y-0' : 'translate-y-full'
+          'fixed z-[51] overflow-y-auto overscroll-contain bg-white ease-out',
+          isDesktop
+            ? 'top-16 left-[calc(var(--side-nav-width)+0.5rem)] w-[26rem] max-h-[calc(100dvh-5rem)] rounded-2xl border border-gray-200 shadow-xl origin-top-left transition-[opacity,transform] duration-150'
+            : 'left-0 right-0 max-w-lg mx-auto max-h-[75dvh] rounded-t-2xl shadow-lg transition-transform duration-200',
+          isDesktop
+            ? isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
+            : isVisible ? 'translate-y-0' : 'translate-y-full'
         )}
-        style={{ bottom: 'calc(4rem + env(safe-area-inset-bottom, 0px))' }}
+        style={isDesktop ? undefined : { bottom: 'calc(4rem + env(safe-area-inset-bottom, 0px))' }}
       >
-        <div className="flex justify-center pt-3 pb-1">
-          <div className="w-10 h-1 bg-gray-300 rounded-full" />
-        </div>
-        <div className="px-4 pb-3">
+        {!isDesktop && (
+          <div className="flex justify-center pt-3 pb-1">
+            <div className="w-10 h-1 bg-gray-300 rounded-full" />
+          </div>
+        )}
+        <div className={cn('px-4 pb-3', isDesktop && 'pt-4')}>
           <h2 className="text-lg font-semibold text-gray-900 mb-1">Add</h2>
           {order.map((option) => (
             <Fragment key={option}>{rows[option]}</Fragment>

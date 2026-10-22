@@ -8,7 +8,7 @@ function AppLayoutPreview({ children }: { children?: React.ReactNode }) {
       <main className="pb-20 max-w-lg mx-auto">
         {children}
       </main>
-      <BottomNav />
+      <BottomNav addOpen={false} onAddClick={() => {}} />
     </div>
   )
 }

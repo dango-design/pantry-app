@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
-import { ArrowLeft, Plus, X, Link, Loader2 } from 'lucide-react'
+import { Plus, X, Link, Loader2 } from 'lucide-react'
 import { Button, Dialog, DialogActions, Snackbar } from '@/components/common'
+import { PAGE_WIDTHS, PageHeader } from '@/components/layout'
+import { cn } from '@/utils/cn'
 import { useDemoStore, DEMO_USER, DEMO_HOUSEHOLD } from '@/stores/demoStore'
 import { importRecipeFromUrl } from '@/services/aiApi'
 import type { QuantityUnit, DietaryRestriction } from '@/types'
@@ -215,25 +217,13 @@ export function RecipeFormPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      <div className="max-w-lg mx-auto flex flex-col flex-1 w-full">
-        {/* Header */}
-        <header className="sticky top-0 z-40 bg-white border-b border-gray-200">
-          <div className="flex items-center justify-between h-14 px-4">
-            <button
-              onClick={() => navigate(-1)}
-              className="p-2 -ml-2 text-gray-600 hover:text-gray-900"
-            >
-              <ArrowLeft className="h-5 w-5" />
-            </button>
-            <h1 className="text-lg font-semibold text-gray-900">
-              {isEditing ? 'Edit recipe' : 'New recipe'}
-            </h1>
-            <div className="w-9" />
-          </div>
-        </header>
+      <PageHeader title={isEditing ? 'Edit recipe' : 'New recipe'} />
+
+      {/* Phones: the form fills the screen. Wider screens: a card, with its buttons at the end. */}
+      <div className={cn('mx-auto w-full flex flex-col flex-1 md:flex-none md:my-6 md:rounded-2xl md:border md:border-gray-200 md:overflow-hidden md:bg-white', PAGE_WIDTHS.narrow)}>
 
         {/* Import button */}
-        <div className="bg-white border-b border-gray-100 px-4 py-3">
+        <div className="bg-white border-b border-gray-100 px-4 py-3 md:px-6 md:pt-6 md:pb-4">
           <button
             onClick={() => setShowImportDialog(true)}
             className="w-full flex items-center justify-center gap-2 py-3 bg-primary-soft text-primary rounded-xl hover:bg-primary-muted transition-colors"
@@ -244,7 +234,7 @@ export function RecipeFormPage() {
         </div>
 
         {/* Form */}
-        <div className="bg-white px-4 pt-4 pb-32 flex-1">
+        <div className="bg-white px-4 pt-4 pb-32 flex-1 md:px-6 md:pb-6">
           <div className="space-y-4">
             {/* Name */}
             <div>
@@ -284,14 +274,14 @@ export function RecipeFormPage() {
                           type="number"
                           value={ing.quantity}
                           onChange={(e) => handleIngredientChange(index, 'quantity', Number(e.target.value) || 0)}
-                          className="w-16 px-2 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                          className="w-16 px-2 py-2 border border-gray-300 rounded-lg text-base md:text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                           min="0"
                           step="0.25"
                         />
                         <select
                           value={ing.unit}
                           onChange={(e) => handleIngredientChange(index, 'unit', e.target.value as QuantityUnit)}
-                          className="w-20 px-2 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary bg-white"
+                          className="w-20 px-2 py-2 border border-gray-300 rounded-lg text-base md:text-sm focus:outline-none focus:ring-2 focus:ring-primary bg-white"
                         >
                           <option value="count">ct</option>
                           <option value="cup">cup</option>
@@ -309,7 +299,7 @@ export function RecipeFormPage() {
                           type="text"
                           value={ing.name}
                           onChange={(e) => handleIngredientChange(index, 'name', e.target.value)}
-                          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-base md:text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                           placeholder="Ingredient name"
                         />
                       </div>
@@ -318,7 +308,7 @@ export function RecipeFormPage() {
                           type="text"
                           value={ing.preparation}
                           onChange={(e) => handleIngredientChange(index, 'preparation', e.target.value)}
-                          className="flex-1 px-3 py-1.5 border border-gray-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-primary"
+                          className="flex-1 px-3 py-1.5 border border-gray-200 rounded-lg text-base md:text-xs focus:outline-none focus:ring-2 focus:ring-primary"
                           placeholder="Prep (e.g. diced)"
                         />
                         <label className="flex items-center gap-1 text-xs text-gray-500 whitespace-nowrap">
@@ -362,7 +352,7 @@ export function RecipeFormPage() {
                       value={step}
                       onChange={(e) => handleInstructionChange(index, e.target.value)}
                       rows={2}
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary resize-none"
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-base md:text-sm focus:outline-none focus:ring-2 focus:ring-primary resize-none"
                       placeholder={`Step ${index + 1}...`}
                     />
                     <button
@@ -514,19 +504,19 @@ export function RecipeFormPage() {
           </div>
         </div>
 
-        {/* Action buttons */}
+        {/* Phones: a bar fixed along the bottom. Wider screens: the end of the form card. */}
         <div
-          className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4"
+          className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 md:static md:px-6"
           style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}
         >
-          <div className="flex gap-3 max-w-lg mx-auto">
-            <Button variant="secondary" onClick={() => navigate(-1)} className="flex-1">
+          <div className="flex gap-3 max-w-lg mx-auto md:max-w-none md:justify-end">
+            <Button variant="secondary" onClick={() => navigate(-1)} className="flex-1 md:flex-none md:min-w-28">
               Cancel
             </Button>
             <Button
               onClick={handleSubmit}
               disabled={!name.trim()}
-              className="flex-1 bg-primary hover:bg-primary-hover"
+              className="flex-1 md:flex-none md:min-w-28 bg-primary hover:bg-primary-hover"
             >
               {isEditing ? 'Save changes' : 'Create recipe'}
             </Button>

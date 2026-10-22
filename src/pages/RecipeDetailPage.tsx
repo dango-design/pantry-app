@@ -1,9 +1,10 @@
 import { useState, useMemo } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { ArrowLeft, Heart, Clock, Users, ChefHat, Edit2, Trash2, CookingPot, ShoppingCart, CalendarDays, Plus } from 'lucide-react'
+import { Heart, Clock, Users, ChefHat, Edit2, Trash2, CookingPot, ShoppingCart, CalendarDays, Plus } from 'lucide-react'
 import { Button, Card, CardContent, Dialog, DialogActions, Snackbar } from '@/components/common'
 import { IngredientMatchList, IngredientRing } from '@/components/recipes'
 import { AddToPlanSheet } from '@/components/plan'
+import { PageHeader, pageContainer } from '@/components/layout'
 import { useDemoStore } from '@/stores/demoStore'
 import { countRequiredIngredients, matchRecipeToInventory, type IngredientMatch } from '@/utils/recipeMatching'
 import { convertQuantity, formatUnit, roundQuantity } from '@/utils/units'
@@ -171,26 +172,43 @@ export function RecipeDetailPage() {
     ? matchResult.missingIngredients.filter((m) => !m.ingredient.isOptional).length
     : 0
 
+  // One row on small phones: labels never wrap, and the bar stays one 48px button tall.
+  // "I made this" takes the full width when nothing is missing. On wider screens they sit in the hero card.
+  const actionButtons = (
+    <>
+      {requiredMissingCount > 0 && (
+        <Button
+          onClick={handleAddMissingToList}
+          variant="secondary"
+          className="flex-1 md:flex-none min-w-0 h-12 md:h-11 px-3 md:px-5 whitespace-nowrap"
+        >
+          <ShoppingCart className="h-4 w-4 mr-1.5 flex-shrink-0" />
+          Add missing ({requiredMissingCount})
+        </Button>
+      )}
+      <Button
+        onClick={handleOpenCookDialog}
+        className="flex-1 md:flex-none min-w-0 h-12 md:h-11 px-3 md:px-5 whitespace-nowrap"
+      >
+        <CookingPot className="h-4 w-4 mr-1.5 flex-shrink-0" />
+        I made this
+      </Button>
+    </>
+  )
+
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="sticky top-0 z-40 bg-white border-b border-gray-200">
-        <div className="flex items-center justify-between h-14 px-4 max-w-lg mx-auto">
-          <button
-            onClick={() => navigate(-1)}
-            aria-label="Back"
-            className="p-2 -ml-2 text-gray-600 hover:text-gray-900"
-          >
-            <ArrowLeft className="h-5 w-5" />
-          </button>
-          <h1 className="text-lg font-semibold text-gray-900 truncate mx-4">Recipe</h1>
-          {/* Favorite, edit, and delete. Delete lives up here, away from "I made this". */}
-          <div className="flex items-center -mr-2">
+      {/* Favorite, edit, and delete. Delete lives up here, away from "I made this". */}
+      <PageHeader
+        title="Recipe"
+        width="regular"
+        actions={
+          <>
             <button
               onClick={() => toggleRecipeFavorite(recipe.id)}
               aria-label={recipe.isFavorite ? 'Remove from favorites' : 'Add to favorites'}
               aria-pressed={recipe.isFavorite}
-              className="p-2 text-gray-500 hover:text-red-500"
+              className="p-2 rounded-full text-gray-500 hover:text-red-500 hover:bg-gray-100"
             >
               <Heart
                 className={cn('h-5 w-5', recipe.isFavorite && 'fill-red-500 text-red-500')}
@@ -199,22 +217,22 @@ export function RecipeDetailPage() {
             <button
               onClick={() => navigate(`/recipe/${recipe.id}/edit`)}
               aria-label="Edit recipe"
-              className="p-2 text-gray-500 hover:text-gray-700"
+              className="p-2 rounded-full text-gray-500 hover:text-gray-700 hover:bg-gray-100"
             >
               <Edit2 className="h-5 w-5" />
             </button>
             <button
               onClick={() => setShowDeleteDialog(true)}
               aria-label="Delete recipe"
-              className="p-2 text-gray-500 hover:text-red-600"
+              className="p-2 rounded-full text-gray-500 hover:text-red-600 hover:bg-gray-100"
             >
               <Trash2 className="h-5 w-5" />
             </button>
-          </div>
-        </div>
-      </header>
+          </>
+        }
+      />
 
-      <div className="p-4 max-w-lg mx-auto space-y-4 pb-32">
+      <div className={cn(pageContainer('regular'), 'py-4 space-y-4 pb-32 md:py-6 md:pb-10')}>
         {/* Hero section */}
         <Card>
           <CardContent className="p-4">
@@ -282,121 +300,112 @@ export function RecipeDetailPage() {
                 {recipe.lastCookedAt && ` · Last: ${new Date(recipe.lastCookedAt).toLocaleDateString()}`}
               </p>
             )}
+
+            {/* Wider screens: the actions sit here instead of in a bar along the bottom */}
+            <div className="hidden md:flex gap-3 mt-4">{actionButtons}</div>
           </CardContent>
         </Card>
 
-        {/* Meal plan: when this recipe is next planned (links to that week), and a way to plan it */}
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <span
-                className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-                style={{ backgroundColor: CATEGORY_TONES.dairy.tint, color: CATEGORY_TONES.dairy.ink }}
-              >
-                <CalendarDays className="h-5 w-5" />
-              </span>
-              {upcomingPlans.length > 0 ? (
-                <button
-                  onClick={() => navigate(`/plan?week=${upcomingPlans[0].date}`)}
-                  className="flex-1 min-w-0 text-left"
-                >
-                  {/* Short enough to sit beside the button on a 360px phone; wraps rather than truncates */}
-                  <span className="block font-medium text-gray-900">
-                    {capitalize(formatMealTime(upcomingPlans[0].date, upcomingPlans[0].slot))}
+        {/* Desktop: plan and ingredients beside the instructions */}
+        <div className="space-y-4 lg:space-y-0 lg:grid lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-4 lg:items-start">
+          <div className="space-y-4">
+
+            {/* Meal plan: when this recipe is next planned (links to that week), and a way to plan it */}
+            <Card>
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <span
+                    className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+                    style={{ backgroundColor: CATEGORY_TONES.dairy.tint, color: CATEGORY_TONES.dairy.ink }}
+                  >
+                    <CalendarDays className="h-5 w-5" />
                   </span>
-                  <span className="block text-sm text-gray-500">
-                    {upcomingPlans.length > 1 && `+${upcomingPlans.length - 1} more · `}View in plan ›
-                  </span>
-                </button>
-              ) : (
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium text-gray-900">Not planned</p>
-                  <p className="text-sm text-gray-500">Pick a day</p>
+                  {upcomingPlans.length > 0 ? (
+                    <button
+                      onClick={() => navigate(`/plan?week=${upcomingPlans[0].date}`)}
+                      className="flex-1 min-w-0 text-left"
+                    >
+                      {/* Short enough to sit beside the button on a 360px phone; wraps rather than truncates */}
+                      <span className="block font-medium text-gray-900">
+                        {capitalize(formatMealTime(upcomingPlans[0].date, upcomingPlans[0].slot))}
+                      </span>
+                      <span className="block text-sm text-gray-500">
+                        {upcomingPlans.length > 1 && `+${upcomingPlans.length - 1} more · `}View in plan ›
+                      </span>
+                    </button>
+                  ) : (
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-gray-900">Not planned</p>
+                      <p className="text-sm text-gray-500">Pick a day</p>
+                    </div>
+                  )}
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => setShowPlanSheet(true)}
+                    className="flex-shrink-0 whitespace-nowrap"
+                  >
+                    <Plus className="h-4 w-4 mr-1" />
+                    {upcomingPlans.length > 0 ? 'Plan again' : 'Add to plan'}
+                  </Button>
                 </div>
-              )}
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={() => setShowPlanSheet(true)}
-                className="flex-shrink-0 whitespace-nowrap"
-              >
-                <Plus className="h-4 w-4 mr-1" />
-                {upcomingPlans.length > 0 ? 'Plan again' : 'Add to plan'}
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+              </CardContent>
+            </Card>
 
-        {/* Ingredients */}
-        <Card>
-          <CardContent className="p-4">
-            <h3 className="font-semibold text-gray-900 mb-3">
-              Ingredients ({recipe.ingredients.length})
-            </h3>
-            {matchResult && (
-              <IngredientMatchList
-                available={matchResult.availableIngredients}
-                missing={matchResult.missingIngredients}
-                onAddToList={handleAddSingleToList}
-              />
+            {/* Ingredients */}
+            <Card>
+              <CardContent className="p-4">
+                <h3 className="font-semibold text-gray-900 mb-3">
+                  Ingredients ({recipe.ingredients.length})
+                </h3>
+                {matchResult && (
+                  <IngredientMatchList
+                    available={matchResult.availableIngredients}
+                    missing={matchResult.missingIngredients}
+                    onAddToList={handleAddSingleToList}
+                  />
+                )}
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="space-y-4">
+            {/* Instructions */}
+            <Card>
+              <CardContent className="p-4">
+                <h3 className="font-semibold text-gray-900 mb-3">Instructions</h3>
+                <ol className="space-y-3">
+                  {recipe.instructions.map((step, index) => (
+                    <li key={index} className="flex gap-3">
+                      <span className="flex-shrink-0 w-6 h-6 bg-primary-muted text-primary rounded-full flex items-center justify-center text-xs font-medium">
+                        {index + 1}
+                      </span>
+                      <p className="text-sm text-gray-700 leading-relaxed pt-0.5">{step}</p>
+                    </li>
+                  ))}
+                </ol>
+              </CardContent>
+            </Card>
+
+            {/* Notes */}
+            {recipe.notes && (
+              <Card>
+                <CardContent className="p-4">
+                  <h3 className="font-semibold text-gray-900 mb-2">Notes</h3>
+                  <p className="text-sm text-gray-600">{recipe.notes}</p>
+                </CardContent>
+              </Card>
             )}
-          </CardContent>
-        </Card>
-
-        {/* Instructions */}
-        <Card>
-          <CardContent className="p-4">
-            <h3 className="font-semibold text-gray-900 mb-3">Instructions</h3>
-            <ol className="space-y-3">
-              {recipe.instructions.map((step, index) => (
-                <li key={index} className="flex gap-3">
-                  <span className="flex-shrink-0 w-6 h-6 bg-primary-muted text-primary rounded-full flex items-center justify-center text-xs font-medium">
-                    {index + 1}
-                  </span>
-                  <p className="text-sm text-gray-700 leading-relaxed pt-0.5">{step}</p>
-                </li>
-              ))}
-            </ol>
-          </CardContent>
-        </Card>
-
-        {/* Notes */}
-        {recipe.notes && (
-          <Card>
-            <CardContent className="p-4">
-              <h3 className="font-semibold text-gray-900 mb-2">Notes</h3>
-              <p className="text-sm text-gray-600">{recipe.notes}</p>
-            </CardContent>
-          </Card>
-        )}
+          </div>
+        </div>
       </div>
 
-      {/* Fixed action buttons */}
+      {/* Phones: the actions in a bar along the bottom */}
       <div
-        className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4"
+        className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4"
         style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}
       >
-        {/* One row on small phones: labels never wrap, and the bar stays one 48px button tall.
-            "I made this" takes the full width when nothing is missing. */}
-        <div className="flex gap-3 max-w-lg mx-auto">
-          {requiredMissingCount > 0 && (
-            <Button
-              onClick={handleAddMissingToList}
-              variant="secondary"
-              className="flex-1 min-w-0 h-12 px-3 whitespace-nowrap"
-            >
-              <ShoppingCart className="h-4 w-4 mr-1.5 flex-shrink-0" />
-              Add missing ({requiredMissingCount})
-            </Button>
-          )}
-          <Button
-            onClick={handleOpenCookDialog}
-            className="flex-1 min-w-0 h-12 px-3 whitespace-nowrap"
-          >
-            <CookingPot className="h-4 w-4 mr-1.5 flex-shrink-0" />
-            I made this
-          </Button>
-        </div>
+        <div className="flex gap-3 max-w-lg mx-auto">{actionButtons}</div>
       </div>
 
       {/* Delete Dialog */}
@@ -456,7 +465,7 @@ export function RecipeDetailPage() {
                     value={usedAmounts[index] ?? ''}
                     onChange={(e) => setUsedAmounts({ ...usedAmounts, [index]: e.target.value })}
                     aria-label={`Amount of ${pantryItem.name} used, in ${pantryUnit}`}
-                    className="w-20 px-2 py-1.5 border border-gray-300 rounded-lg text-sm text-right focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                    className="w-20 px-2 py-1.5 border border-gray-300 rounded-lg text-base md:text-sm text-right focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                   />
                   <span className="w-10 text-sm text-gray-500">{pantryUnit}</span>
                 </div>

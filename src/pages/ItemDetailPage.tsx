@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { ArrowLeft, Minus, Plus, Clock, MapPin, Tag, ShoppingCart, CheckCircle2, Edit2, SlidersHorizontal, Trash2 } from 'lucide-react'
+import { Minus, Plus, Clock, MapPin, Tag, ShoppingCart, CheckCircle2, Edit2, SlidersHorizontal, Trash2 } from 'lucide-react'
 import { Button, Card, CardContent, Dialog, DialogActions, Snackbar } from '@/components/common'
 import { useDemoStore } from '@/stores/demoStore'
 import { CATEGORIES, CATEGORY_TONES, STORAGE_LOCATIONS, QUANTITY_UNITS } from '@/utils/constants'
@@ -8,6 +8,8 @@ import { calculateFreshnessScore, formatExpirationText, getFreshnessLevel, FRESH
 import { formatDateString } from '@/utils/dates'
 import { FoodThumbnail } from '@/components/icons'
 import { useAddToList } from '@/components/inventory'
+import { PageHeader, pageContainer } from '@/components/layout'
+import { cn } from '@/utils/cn'
 
 // Snackbar state type
 interface SnackbarState {
@@ -89,27 +91,20 @@ export function ItemDetailPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="sticky top-0 z-40 bg-white border-b border-gray-200">
-        <div className="flex items-center justify-between h-14 px-4 max-w-lg mx-auto">
-          <button
-            onClick={() => navigate(-1)}
-            className="p-2 -ml-2 text-gray-600 hover:text-gray-900"
-          >
-            <ArrowLeft className="h-5 w-5" />
-          </button>
-          <h1 className="text-lg font-semibold text-gray-900">Item details</h1>
+      <PageHeader
+        title="Item details"
+        actions={
           <button
             onClick={() => navigate(`/item/${item.id}/edit`)}
-            className="p-2 -mr-2 text-gray-500 hover:text-gray-700"
+            className="p-2 rounded-full text-gray-500 hover:text-gray-700 hover:bg-gray-100"
             aria-label="Edit item"
           >
             <Edit2 className="h-5 w-5" />
           </button>
-        </div>
-      </header>
+        }
+      />
 
-      <div className="p-4 max-w-lg mx-auto space-y-4">
+      <div className={cn(pageContainer('narrow'), 'py-4 space-y-4 md:py-6')}>
         {/* Main Info Card */}
         <Card>
           <CardContent className="p-4">

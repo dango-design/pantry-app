@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
-  ArrowLeft,
   Copy,
   RefreshCw,
   UserPlus,
@@ -13,6 +12,7 @@ import {
   Check,
 } from 'lucide-react'
 import { Card, CardContent, Button, Input } from '@/components/common'
+import { PageHeader, pageContainer } from '@/components/layout'
 import { useAuth } from '@/contexts/AuthContext'
 import {
   getCurrentHousehold,
@@ -156,14 +156,7 @@ export function HouseholdPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <header className="sticky top-0 z-10 bg-white border-b border-gray-200 px-4 py-3">
-          <div className="flex items-center gap-3">
-            <button onClick={() => navigate('/settings')} className="p-2 -ml-2">
-              <ArrowLeft className="h-5 w-5" />
-            </button>
-            <h1 className="text-lg font-semibold">Household</h1>
-          </div>
-        </header>
+        <PageHeader title="Household" onBack={() => navigate('/settings')} />
         <div className="flex items-center justify-center p-8">
           <div className="animate-pulse text-gray-400">Loading...</div>
         </div>
@@ -174,16 +167,9 @@ export function HouseholdPage() {
   if (view === 'join') {
     return (
       <div className="min-h-screen bg-gray-50">
-        <header className="sticky top-0 z-10 bg-white border-b border-gray-200 px-4 py-3">
-          <div className="flex items-center gap-3">
-            <button onClick={() => setView('main')} className="p-2 -ml-2">
-              <ArrowLeft className="h-5 w-5" />
-            </button>
-            <h1 className="text-lg font-semibold">Join household</h1>
-          </div>
-        </header>
+        <PageHeader title="Join household" onBack={() => setView('main')} />
 
-        <div className="p-4 space-y-4">
+        <div className={cn(pageContainer('narrow'), 'py-4 space-y-4 md:py-6')}>
           <Card>
             <CardContent className="p-4 space-y-4">
               <p className="text-sm text-gray-600">
@@ -217,16 +203,9 @@ export function HouseholdPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="sticky top-0 z-10 bg-white border-b border-gray-200 px-4 py-3">
-        <div className="flex items-center gap-3">
-          <button onClick={() => navigate('/settings')} className="p-2 -ml-2">
-            <ArrowLeft className="h-5 w-5" />
-          </button>
-          <h1 className="text-lg font-semibold">Household</h1>
-        </div>
-      </header>
+      <PageHeader title="Household" onBack={() => navigate('/settings')} />
 
-      <div className="p-4 space-y-4">
+      <div className={cn(pageContainer('narrow'), 'py-4 space-y-4 md:py-6')}>
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
             {error}

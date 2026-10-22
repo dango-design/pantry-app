@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
-import { MoreVertical, ChevronDown, Camera, Barcode, Receipt, Loader2 } from 'lucide-react'
+import { ChevronDown, Camera, Barcode, Receipt, Loader2 } from 'lucide-react'
 import { Button } from '@/components/common'
 import { PhotoCapture, BarcodeScanner, ItemReviewList, type ReviewItem } from '@/components/smart-input'
 import { useDemoStore, DEMO_HOUSEHOLD, DEMO_USER } from '@/stores/demoStore'
@@ -9,6 +9,8 @@ import { todayDateString } from '@/utils/dates'
 import { calculateFreshnessScore } from '@/utils/freshness'
 import { estimateExpirationDate, getDefaultStorageLocation, lookupFood } from '@/utils/foodDatabase'
 import { FoodThumbnail } from '@/components/icons'
+import { PAGE_WIDTHS, PageHeader } from '@/components/layout'
+import { cn } from '@/utils/cn'
 import {
   processGroceryImage,
   processReceipt,
@@ -352,20 +354,15 @@ export function AddItemPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col">
-      {/* Responsive container */}
-      <div className="max-w-lg mx-auto flex flex-col flex-1 w-full">
-        {/* Header */}
-        <header className="bg-white px-4 py-4 flex items-center justify-between">
-          <h1 className="text-lg font-semibold text-gray-900">{isEditing ? 'Edit item' : 'Add item'}</h1>
-          <button className="p-2 text-gray-500 hover:text-gray-700">
-            <MoreVertical className="h-5 w-5" />
-          </button>
-        </header>
+    <div className="min-h-screen bg-gray-100 md:bg-gray-50 flex flex-col">
+      <PageHeader title={isEditing ? 'Edit item' : 'Add item'} />
+
+      {/* Phones: the form fills the screen. Wider screens: a card, with its buttons at the end. */}
+      <div className={cn('mx-auto w-full flex flex-col flex-1 md:flex-none md:my-6 md:rounded-2xl md:border md:border-gray-200 md:overflow-hidden md:bg-white', PAGE_WIDTHS.narrow)}>
 
         {/* Smart Input Buttons */}
         {!isEditing && (
-          <div className="bg-white border-b border-gray-100 px-4 py-3">
+          <div className="bg-white border-b border-gray-100 px-4 py-3 md:px-6 md:pt-6 md:pb-4">
             <p className="text-xs text-gray-500 mb-2">Quick add with</p>
             <div className="flex gap-2">
               <button
@@ -393,13 +390,13 @@ export function AddItemPage() {
           </div>
         )}
 
-        {/* Food Icon Preview */}
-        <div className="bg-gray-100 py-6 flex items-center justify-center">
+        {/* Food Icon Preview: on phones the form below overlaps this band like a sheet */}
+        <div className="bg-gray-100 py-6 flex items-center justify-center md:bg-white md:pb-2">
           <FoodThumbnail name={name} category={category} iconSize={36} className="w-20 h-20 rounded-2xl" />
         </div>
 
         {/* Form */}
-        <div className="bg-white rounded-t-3xl -mt-2 px-4 pt-6 pb-32 flex-1">
+        <div className="bg-white rounded-t-3xl -mt-2 px-4 pt-6 pb-32 flex-1 md:rounded-none md:mt-0 md:px-6 md:pb-6">
           <div className="space-y-4">
             {/* Quick Add Chips */}
             {!isEditing && (
@@ -571,24 +568,24 @@ export function AddItemPage() {
           </div>
         </div>
 
-        {/* Sticky Action Buttons */}
+        {/* Phones: a bar fixed along the bottom. Wider screens: the end of the form card. */}
         <div
-          className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4"
+          className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 md:static md:px-6"
           style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}
         >
-          <div className="flex gap-3 max-w-lg mx-auto">
+          <div className="flex gap-3 max-w-lg mx-auto md:max-w-none md:justify-end">
             <Button
               variant="secondary"
               onClick={() => navigate(-1)}
-              className="flex-1"
+              className="flex-1 md:flex-none md:min-w-28"
             >
-              Back
+              Cancel
             </Button>
             <Button
               onClick={handleSubmit}
               loading={loading}
               disabled={!isValid}
-              className="flex-1 bg-primary hover:bg-primary-hover"
+              className="flex-1 md:flex-none md:min-w-28 bg-primary hover:bg-primary-hover"
             >
               Save
             </Button>
