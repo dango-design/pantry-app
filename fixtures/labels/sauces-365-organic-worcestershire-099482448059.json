@@ -1,0 +1,26 @@
+{
+  "id": "off-0099482448059",
+  "name": "Organic worcestershire sauce",
+  "brand": "365 Everyday Value",
+  "gtin": "0099482448059",
+  "source": "off",
+  "sourceUrl": "https://world.openfoodfacts.org/product/0099482448059",
+  "labelRegion": "us",
+  "ingredientsText": "Organic white vinegar, organic molasses, filtered water, organic cane sugar, salt, organic caramel color, organic garlic powder, organic black pepper, organic allspice, organic nutmeg, organic cloves, organic ginger, organic cayenne peppers, xanthan gum.",
+  "containsStatement": null,
+  "mayContainStatement": null,
+  "offAllergenTags": [],
+  "offTraceTags": [],
+  "expected": {
+    "milk": "none",
+    "egg": "none",
+    "peanut": "none",
+    "tree_nut": "none",
+    "wheat": "none",
+    "soy": "none",
+    "fish": "none",
+    "shellfish": "none",
+    "sesame": "none"
+  },
+  "notes": "Nutmeg is not a tree nut. No anchovies."
+}

@@ -1,0 +1,31 @@
+{
+  "id": "off-0810291001002",
+  "name": "Chocolate Chip Cookies",
+  "brand": "Tate's Bake Shop",
+  "gtin": "0810291001002",
+  "source": "off",
+  "sourceUrl": "https://world.openfoodfacts.org/product/0810291001002",
+  "labelRegion": "us",
+  "ingredientsText": "Unbleached flour (wheat flour, niacin, reduced iron, thiamine mononitrate, riboflavin, folic acid, malted barley flour), Semi-sweet chocolate chips (sugar, chocolate liquor, cocoa butter, milkfat, soy lecithin [an emulsifier], natural flavors), Butter, Sugar, Brown sugar, Eggs, Salt, Baking soda, Natural flavor",
+  "containsStatement": null,
+  "mayContainStatement": null,
+  "offAllergenTags": [
+    "en:eggs",
+    "en:gluten",
+    "en:milk",
+    "en:soybeans"
+  ],
+  "offTraceTags": [],
+  "expected": {
+    "milk": "contains",
+    "egg": "contains",
+    "peanut": "none",
+    "tree_nut": "none",
+    "wheat": "contains",
+    "soy": "contains",
+    "fish": "none",
+    "shellfish": "none",
+    "sesame": "none"
+  },
+  "notes": "No Contains line in this text; all four come from the ingredient list."
+}

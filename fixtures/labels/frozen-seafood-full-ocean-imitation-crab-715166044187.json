@@ -1,0 +1,31 @@
+{
+  "id": "off-0715166044187",
+  "name": "Crab Classic Imitation Crab Leg Style",
+  "brand": "Full Ocean",
+  "gtin": "0715166044187",
+  "source": "off",
+  "sourceUrl": "https://world.openfoodfacts.org/product/0715166044187",
+  "labelRegion": "us",
+  "ingredientsText": "Alaska pollock (msc certified), water, egg whites, corn starch, sugar, sorbitol, contains 2% or less of: king crab meat, natural and artificial flavor (extracts of blue crab, snow crab, lobster, and alaska pollock), refined fish oil* (anchovy, sardine), rice wine (water, rice, koji), modified tapioca starch, sea salt, carrageenan, yam flour, potassium chloride, disodium inosinate, sodium pyrophosphate, soy lecithin, carmine, paprika, color added.",
+  "containsStatement": null,
+  "mayContainStatement": null,
+  "offAllergenTags": [
+    "en:crustaceans",
+    "en:eggs",
+    "en:fish",
+    "en:soybeans"
+  ],
+  "offTraceTags": [],
+  "expected": {
+    "milk": "none",
+    "egg": "contains",
+    "peanut": "none",
+    "tree_nut": "none",
+    "wheat": "none",
+    "soy": "contains",
+    "fish": "contains",
+    "shellfish": "contains",
+    "sesame": "none"
+  },
+  "notes": "Imitation crab is pollock (fish) but also lists king crab meat and crab/lobster extracts, so shellfish is contains."
+}

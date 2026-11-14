@@ -1,0 +1,29 @@
+{
+  "id": "off-0018627115656",
+  "name": "Peanut Butter Crunch",
+  "brand": "Kashi GO",
+  "gtin": "0018627115656",
+  "source": "off",
+  "sourceUrl": "https://world.openfoodfacts.org/product/0018627115656",
+  "labelRegion": "us",
+  "ingredientsText": "Soy flakes, brown rice syrup, peanuts, puffed whole grains blend (hard red wheat, triticale grain, brown rice, rye), cane sugar, whole grain oats, acacia gum, expeller pressed canola oil, oat fiber, molasses, sea salt, peanut oil, rosemary extract.",
+  "containsStatement": null,
+  "mayContainStatement": null,
+  "offAllergenTags": [
+    "en:gluten",
+    "en:peanuts"
+  ],
+  "offTraceTags": [],
+  "expected": {
+    "milk": "none",
+    "egg": "none",
+    "peanut": "contains",
+    "tree_nut": "none",
+    "wheat": "contains",
+    "soy": "contains",
+    "fish": "none",
+    "shellfish": "none",
+    "sesame": "none"
+  },
+  "notes": "Soy flakes are soy; hard red wheat and triticale are wheat. No Contains line."
+}

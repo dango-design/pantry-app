@@ -1,0 +1,28 @@
+{
+  "id": "off-0011110127082",
+  "name": "Tahini",
+  "brand": "Simple truth organic",
+  "gtin": "0011110127082",
+  "source": "off",
+  "sourceUrl": "https://world.openfoodfacts.org/product/0011110127082",
+  "labelRegion": "us",
+  "ingredientsText": "ORGANIC SESAME, SALT.",
+  "containsStatement": "CONTAINS: SESAME.",
+  "mayContainStatement": null,
+  "offAllergenTags": [
+    "en:sesame-seeds"
+  ],
+  "offTraceTags": [],
+  "expected": {
+    "milk": "none",
+    "egg": "none",
+    "peanut": "none",
+    "tree_nut": "none",
+    "wheat": "none",
+    "soy": "none",
+    "fish": "none",
+    "shellfish": "none",
+    "sesame": "contains"
+  },
+  "notes": ""
+}

@@ -1,0 +1,16 @@
+{
+  "name": "@allergy/food-data",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Parsers and fetchers for USDA FoodData Central, Open Food Facts, openFDA and FSIS recalls, plus chef-card text.",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "dependencies": {
+    "@allergy/verdict-engine": "*"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit -p .",
+    "lint": "tsc --noEmit -p . --noUnusedLocals --noUnusedParameters"
+  }
+}

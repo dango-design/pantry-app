@@ -1,0 +1,29 @@
+{
+  "id": "off-0096619183289",
+  "name": "Whole Fancy Cashews",
+  "brand": "Kirkland Signature",
+  "gtin": "0096619183289",
+  "source": "off",
+  "sourceUrl": "https://world.openfoodfacts.org/product/0096619183289",
+  "labelRegion": "us",
+  "ingredientsText": "Cashews, Peanut Oil, Sea Salt.",
+  "containsStatement": null,
+  "mayContainStatement": null,
+  "offAllergenTags": [
+    "en:nuts",
+    "en:peanuts"
+  ],
+  "offTraceTags": [],
+  "expected": {
+    "milk": "none",
+    "egg": "none",
+    "peanut": "possible",
+    "tree_nut": "contains",
+    "wheat": "none",
+    "soy": "none",
+    "fish": "none",
+    "shellfish": "none",
+    "sesame": "none"
+  },
+  "notes": "Plain 'Peanut Oil' (not cold-pressed or expeller-pressed) is a highly refined oil, so peanut is possible."
+}

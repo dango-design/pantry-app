@@ -1,0 +1,30 @@
+{
+  "id": "off-0790429232860",
+  "name": "Salted Sesame Sticks",
+  "brand": "Valued Naturals",
+  "gtin": "0790429232860",
+  "source": "off",
+  "sourceUrl": "https://world.openfoodfacts.org/product/0790429232860",
+  "labelRegion": "us",
+  "ingredientsText": "Unbleached wheat flour, malted barley flour (natural enzyme additive), soybean oil, sesame seeds, bulgur wheat, salt, beet powder (color), and turmeric (color).",
+  "containsStatement": null,
+  "mayContainStatement": null,
+  "offAllergenTags": [
+    "en:gluten",
+    "en:sesame-seeds",
+    "en:soybeans"
+  ],
+  "offTraceTags": [],
+  "expected": {
+    "milk": "none",
+    "egg": "none",
+    "peanut": "none",
+    "tree_nut": "none",
+    "wheat": "contains",
+    "soy": "possible",
+    "fish": "none",
+    "shellfish": "none",
+    "sesame": "contains"
+  },
+  "notes": "Bulgur wheat is wheat. Soybean oil makes soy possible. No Contains line."
+}

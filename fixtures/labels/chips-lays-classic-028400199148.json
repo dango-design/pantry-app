@@ -1,0 +1,28 @@
+{
+  "id": "off-0028400199148",
+  "name": "Classic",
+  "brand": "Lay's",
+  "gtin": "0028400199148",
+  "source": "off",
+  "sourceUrl": "https://world.openfoodfacts.org/product/0028400199148",
+  "labelRegion": "us",
+  "ingredientsText": "POTATOES, VEGETABLE OIL (CANOLA, CORN, SOYBEAN AND/OR SUNFLOWER OIL), AND SALT",
+  "containsStatement": null,
+  "mayContainStatement": null,
+  "offAllergenTags": [
+    "en:soybeans"
+  ],
+  "offTraceTags": [],
+  "expected": {
+    "milk": "none",
+    "egg": "none",
+    "peanut": "none",
+    "tree_nut": "none",
+    "wheat": "none",
+    "soy": "possible",
+    "fish": "none",
+    "shellfish": "none",
+    "sesame": "none"
+  },
+  "notes": "Soybean oil is a highly refined oil, so soy is possible, not contains."
+}

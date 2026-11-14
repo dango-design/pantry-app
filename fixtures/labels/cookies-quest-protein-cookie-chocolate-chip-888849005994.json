@@ -1,0 +1,32 @@
+{
+  "id": "off-0888849005994",
+  "name": "Protein Cookie Chocolate Chip",
+  "brand": "Quest",
+  "gtin": "0888849005994",
+  "source": "off",
+  "sourceUrl": "https://world.openfoodfacts.org/product/0888849005994",
+  "labelRegion": "us",
+  "ingredientsText": "PROTEIN BLEND (MILK PROTEIN ISOLATE, WHEY PROTEIN ISOLATE), BUTTER (CREAM, NATURAL FLAVOR), POLYDEXTROSE (PREBIOTIC FIBER), ERYTHRITOL, PALM OIL, UNSWEETENED CHOCOLATE, WATER, CALCIUM CASEINATE, COCOA BUTTER, GLYCERIN, CONTAINS LESS THAN 2% OF THE FOLLOWING: NATURAL FLAVORS, LECITHIN (SUNFLOWER, CANOLA, AND/OR SOY LECITHIN), SEA SALT, BAKING SODA, SODIUM CASEINATE, XANTHAN GUM, SUCRALOSE, STEVIA SWEETENER.",
+  "containsStatement": "CONTAINS: MILK, SOY.",
+  "mayContainStatement": "PROCESSED ON EQUIPMENT THAT ALSO PROCESSES EGGS, WHEAT, PEANUTS, AND TREE NUTS.",
+  "offAllergenTags": [
+    "en:gluten",
+    "en:milk",
+    "en:nuts",
+    "en:peanuts",
+    "en:soybeans"
+  ],
+  "offTraceTags": [],
+  "expected": {
+    "milk": "contains",
+    "egg": "may_contain",
+    "peanut": "may_contain",
+    "tree_nut": "may_contain",
+    "wheat": "may_contain",
+    "soy": "contains",
+    "fish": "none",
+    "shellfish": "none",
+    "sesame": "none"
+  },
+  "notes": "Casein, caseinate, whey and butter are milk. The equipment statement is the only source for egg, wheat, peanut and tree nut."
+}

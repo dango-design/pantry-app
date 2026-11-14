@@ -1,0 +1,26 @@
+{
+  "id": "off-0022506104174",
+  "name": "Organic Peanut Oil",
+  "brand": "Spectrum",
+  "gtin": "0022506104174",
+  "source": "off",
+  "sourceUrl": "https://world.openfoodfacts.org/product/0022506104174",
+  "labelRegion": "us",
+  "ingredientsText": "100% MECHANICALLY (EXPELLER) PRESSED REFINED HIGH OLEIC ORGANIC PEANUT OIL.",
+  "containsStatement": null,
+  "mayContainStatement": null,
+  "offAllergenTags": [],
+  "offTraceTags": [],
+  "expected": {
+    "milk": "none",
+    "egg": "none",
+    "peanut": "contains",
+    "tree_nut": "none",
+    "wheat": "none",
+    "soy": "none",
+    "fish": "none",
+    "shellfish": "none",
+    "sesame": "none"
+  },
+  "notes": "Judgment call: the label says both 'EXPELLER PRESSED' and 'REFINED' (not 'highly refined'). The rules make expeller-pressed peanut oil contains, so peanut is contains."
+}

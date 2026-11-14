@@ -1,0 +1,26 @@
+{
+  "id": "off-0810589032312",
+  "name": "Organic Original Salty-sweet Granola",
+  "brand": "Purely Elizabeth",
+  "gtin": "0810589032312",
+  "source": "off",
+  "sourceUrl": "https://world.openfoodfacts.org/product/0810589032312",
+  "labelRegion": "us",
+  "ingredientsText": "Organic certified gluten-free oats, organic coconut sugar, organic coconut oil, organic sunflower seeds, organic puffed amaranth, organic quinoa flakes, organic chia seeds, organic cinnamon, sea salt",
+  "containsStatement": null,
+  "mayContainStatement": null,
+  "offAllergenTags": [],
+  "offTraceTags": [],
+  "expected": {
+    "milk": "none",
+    "egg": "none",
+    "peanut": "none",
+    "tree_nut": "none",
+    "wheat": "none",
+    "soy": "none",
+    "fish": "none",
+    "shellfish": "none",
+    "sesame": "none"
+  },
+  "notes": "Coconut sugar and coconut oil are not tree nuts. Gluten-free oats and sunflower seeds are not among the 9."
+}

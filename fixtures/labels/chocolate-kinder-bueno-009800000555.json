@@ -1,0 +1,30 @@
+{
+  "id": "off-0009800000555",
+  "name": "bueno Crispy Creamy Chocolate Bar",
+  "brand": "Kinder",
+  "gtin": "0009800000555",
+  "source": "off",
+  "sourceUrl": "https://world.openfoodfacts.org/product/0009800000555",
+  "labelRegion": "us",
+  "ingredientsText": "MILK CHOCOLATE (SUGAR, COCOA BUTTER, COCOA MASS, SKIM MILK POWDER, BUTTER OIL, LECITHIN, VANILLIN), SUGAR, PALM OIL, ENRICHED FLOUR (WHEAT FLOUR, NIACIN, IRON, THIAMINE MONONITRATE, RIBOFLAVIN, FOLIC ACID), HAZELNUTS, SKIM MILK POWDER, MILK POWDER, SEMI-SWEET CHOCOLATE (SUGAR, COCOA MASS, COCOA BUTTER, LECITHIN, VANILLIN), COCOA, LECITHIN, SODIUM BICARBONATE, SALT, VANILLIN",
+  "containsStatement": null,
+  "mayContainStatement": null,
+  "offAllergenTags": [
+    "en:gluten",
+    "en:milk",
+    "en:nuts"
+  ],
+  "offTraceTags": [],
+  "expected": {
+    "milk": "contains",
+    "egg": "none",
+    "peanut": "none",
+    "tree_nut": "contains",
+    "wheat": "contains",
+    "soy": "possible",
+    "fish": "none",
+    "shellfish": "none",
+    "sesame": "none"
+  },
+  "notes": "'LECITHIN' appears with no source named, so soy is possible. Hazelnuts make tree_nut contains. Labels are for this OFF text only: the OFF ingredient photo shows 'LECITHIN AS EMULSIFIER (SOY)' and a Contains line naming soy."
+}

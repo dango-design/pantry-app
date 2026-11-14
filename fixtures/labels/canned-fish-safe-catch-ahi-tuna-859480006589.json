@@ -1,0 +1,28 @@
+{
+  "id": "off-0859480006589",
+  "name": "AHI YELLOWFIN TUNA",
+  "brand": "Safe Catch",
+  "gtin": "0859480006589",
+  "source": "off",
+  "sourceUrl": "https://world.openfoodfacts.org/product/0859480006589",
+  "labelRegion": "us",
+  "ingredientsText": "Yellowfin Tuna (Thunnus albacares), Sea Salt.",
+  "containsStatement": "CONTAINS: FISH (TUNA).",
+  "mayContainStatement": null,
+  "offAllergenTags": [
+    "en:fish"
+  ],
+  "offTraceTags": [],
+  "expected": {
+    "milk": "none",
+    "egg": "none",
+    "peanut": "none",
+    "tree_nut": "none",
+    "wheat": "none",
+    "soy": "none",
+    "fish": "contains",
+    "shellfish": "none",
+    "sesame": "none"
+  },
+  "notes": "'Packed in Thailand.' removed from ingredientsText."
+}

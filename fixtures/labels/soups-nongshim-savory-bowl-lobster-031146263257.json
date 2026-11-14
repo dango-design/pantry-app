@@ -1,0 +1,34 @@
+{
+  "id": "off-0031146263257",
+  "name": "Savory bowl noodle soup, lobster",
+  "brand": "Nongshim",
+  "gtin": "0031146263257",
+  "source": "off",
+  "sourceUrl": "https://world.openfoodfacts.org/product/0031146263257",
+  "labelRegion": "us",
+  "ingredientsText": "Enriched wheat flour (wheat flour, niacin, reduced iron, thiamine mononitrate, riboflavin, folic acid), palm oil, potato starch, modified potato starch, salt, maltodextrin, contains less than 2% of each of the following: artificial lobster flavor, beef extract*, beef fat*, beef stock*, black pepper*, clam*, corn syrup*, crab extract*, cuttlefish*, dehydrated vegetables (carrot, green cabbage), dextrose, disodium guanylate, disodium inosinate, disodium succinate, freeze dried imitation crab (pollock, potato starch, d-sorbitol, sugar, salt, hydrolyzed soy protein, color), garlic*, ginger*, hydrolyzed soy protein, modified tapioca starch, mushroom extract*, mussel*, natural flavors, onion*, oyster*, parsley flakes, potassium carbonate, radish extract*, red chili pepper*, riboflavin (color), rice flour, sand lance concentrate*, sea squirt*, shrimp extract*, sodium carbonate, sodium phosphates, soy sauce (soy, wheat, salt), soybeans*, sugar, tocopherols (antioxidant), tuna extract*, yeast extract, yellow corn flour.",
+  "containsStatement": null,
+  "mayContainStatement": null,
+  "offAllergenTags": [
+    "en:crustaceans",
+    "en:fish",
+    "en:gluten",
+    "en:molluscs",
+    "en:soybeans"
+  ],
+  "offTraceTags": [
+    "en:milk"
+  ],
+  "expected": {
+    "milk": "none",
+    "egg": "none",
+    "peanut": "none",
+    "tree_nut": "none",
+    "wheat": "contains",
+    "soy": "contains",
+    "fish": "contains",
+    "shellfish": "contains",
+    "sesame": "none"
+  },
+  "notes": "Clam, mussel, oyster, cuttlefish and sea squirt are molluscs, not shellfish here; shellfish comes from crab extract and shrimp extract. Fish from pollock, sand lance, tuna extract."
+}

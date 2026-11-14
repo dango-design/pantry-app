@@ -1,0 +1,29 @@
+{
+  "id": "off-0013764001763",
+  "name": "Organic Sandwich Rolls",
+  "brand": "Dave’s Killer Bread",
+  "gtin": "0013764001763",
+  "source": "off",
+  "sourceUrl": "https://world.openfoodfacts.org/product/0013764001763",
+  "labelRegion": "us",
+  "ingredientsText": "Organic whole grains, wheat flour, water, organic quinoa, organic rolled oats, organic buckwheat flour, blue cornmeal, organic amaranth, organic pressed chia oil, salt, organic coconut flour, organic millet flour, organic fermented teff flour, organic sesame flour.",
+  "containsStatement": null,
+  "mayContainStatement": null,
+  "offAllergenTags": [
+    "en:gluten",
+    "en:sesame-seeds"
+  ],
+  "offTraceTags": [],
+  "expected": {
+    "milk": "none",
+    "egg": "none",
+    "peanut": "none",
+    "tree_nut": "none",
+    "wheat": "contains",
+    "soy": "none",
+    "fish": "none",
+    "shellfish": "none",
+    "sesame": "contains"
+  },
+  "notes": "Buckwheat flour and coconut flour are not allergens here. Sesame flour is sesame. No Contains line."
+}

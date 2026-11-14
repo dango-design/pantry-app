@@ -1,0 +1,28 @@
+{
+  "id": "off-0079200558338",
+  "name": "Nerds Candy - Rainbow",
+  "brand": "Nerds",
+  "gtin": "0079200558338",
+  "source": "off",
+  "sourceUrl": "https://world.openfoodfacts.org/product/0079200558338",
+  "labelRegion": "us",
+  "ingredientsText": "DEXTROSE, SUGAR, MALIC ACID, CORN SYRUP, NATURAL FLAVORS, CARNAUBA WAX, COLOR ADDED, CARMINE COLOR, BLUE 1 LAKE, BLUE 1, BLUE 2 LAKE, RED 40 LAKE, YELLOW 5 LAKE, YELLOW 5, YELLOW 6, GUM ACACIA",
+  "containsStatement": null,
+  "mayContainStatement": null,
+  "offAllergenTags": [],
+  "offTraceTags": [
+    "en:eggs"
+  ],
+  "expected": {
+    "milk": "none",
+    "egg": "none",
+    "peanut": "none",
+    "tree_nut": "none",
+    "wheat": "none",
+    "soy": "none",
+    "fish": "none",
+    "shellfish": "none",
+    "sesame": "none"
+  },
+  "notes": "OFF lists egg as a trace, but this text has no egg and no precautionary statement. Carmine is not one of the 9."
+}

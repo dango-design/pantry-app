@@ -1,0 +1,28 @@
+{
+  "id": "off-0856069005193",
+  "name": "Crunchy Almond Flour Cookies Chocolate Chip",
+  "brand": "Simple Mills",
+  "gtin": "0856069005193",
+  "source": "off",
+  "sourceUrl": "https://world.openfoodfacts.org/product/0856069005193",
+  "labelRegion": "us",
+  "ingredientsText": "Nut & Seed Flour Blend (almonds, organic coconut, flaxseeds), Tapioca Starch, Chocolate Chips (cane sugar, unsweetened chocolate, cocoa butter), Organic Coconut Sugar, Organic Coconut Oil, Arrowroot, Vanilla Extract, Sea Salt, Baking Soda, Cream of Tartar, Rosemary Extract (for freshness)",
+  "containsStatement": null,
+  "mayContainStatement": null,
+  "offAllergenTags": [
+    "en:nuts"
+  ],
+  "offTraceTags": [],
+  "expected": {
+    "milk": "none",
+    "egg": "none",
+    "peanut": "none",
+    "tree_nut": "contains",
+    "wheat": "none",
+    "soy": "none",
+    "fish": "none",
+    "shellfish": "none",
+    "sesame": "none"
+  },
+  "notes": "Almonds make tree_nut contains. Coconut (not a tree nut), cocoa butter and cream of tartar are not allergens."
+}

@@ -1,0 +1,92 @@
+[
+  {
+    "file": "chips-jacksons-sweet-potato-sea-salt-850036699187.jpg",
+    "fixture": "off-0850036699187",
+    "imageUrl": "https://images.openfoodfacts.org/images/products/085/003/669/9187/ingredients_en.12.400.jpg",
+    "license": "CC BY-SA 3.0, Open Food Facts contributors",
+    "difficulty": "curved bag",
+    "expectedIngredientsText": "sweet potatoes, avocado oil, sea salt",
+    "notes": "Whole bag back with nutrition panel; ingredients are two short lines at the bottom."
+  },
+  {
+    "file": "baby-food-once-upon-a-farm-coconut-melts-strawberry-banana-810003512642.jpg",
+    "fixture": "off-0810003512642",
+    "imageUrl": "https://images.openfoodfacts.org/images/products/081/000/351/2642/ingredients_en.15.400.jpg",
+    "license": "CC BY-SA 3.0, Open Food Facts contributors",
+    "difficulty": "curved bag",
+    "expectedIngredientsText": "COCONUT CREAM (COCONUT*, WATER), BANANA PUREE STRAWBERRY PUREE*, INULIN* (PREBIOTIC), VITAMIN E (MIXED TOCOPHEROLS TO PROTECT FLAVOR), BIFIDOBACTERIUM LACTIS (PROBIOTIC). *ORGANIC",
+    "notes": "Pouch back; shows CONTAINS: COCONUT and the shared-equipment line under the ingredients."
+  },
+  {
+    "file": "cereal-cheerios-016000275263.jpg",
+    "fixture": "off-0016000275263",
+    "imageUrl": "https://images.openfoodfacts.org/images/products/001/600/027/5263/ingredients_en.81.400.jpg",
+    "license": "CC BY-SA 3.0, Open Food Facts contributors",
+    "difficulty": "clean",
+    "expectedIngredientsText": "Whole Grain Oats. Corn Starch, Sugar, Salt, Tripotassium Phosphate. Vitamin E (mixed tocopherols) Added to Preserve Freshness. Vitamins and Minerals: Calcium Carbonate, Iron and Zinc (mineral nutrients), Vitamin C (sodium ascorbate), A B Vitamin (niacinamide), Vitamin B6 (pyridoxine hydrochloride), Vitamin A (palmitate), Vitamin B₁ (thiamin mononitrate), A B Vitamin (folic acid), Vitamin B12, Vitamin D3.",
+    "notes": "Flat box, large print, tight crop."
+  },
+  {
+    "file": "cereal-natures-path-pumpkin-seed-flax-granola-058449770565.jpg",
+    "fixture": "off-0058449770565",
+    "imageUrl": "https://images.openfoodfacts.org/images/products/005/844/977/0565/ingredients_en.9.400.jpg",
+    "license": "CC BY-SA 3.0, Open Food Facts contributors",
+    "difficulty": "clean",
+    "expectedIngredientsText": "Whole grain rolled oats*, cane sugar, soy oil*, brown rice flour pumpkin seeds, flax seeds* oat syrup solids* [oat syrup solids*, tocopherols (added to enhance freshness)], sea salt, molasses*, cinnamon*. *Organic.",
+    "notes": "Flat box, one narrow column; Contains and facility lines are printed right after the list."
+  },
+  {
+    "file": "soups-maruchan-chicken-ramen-041789001215.jpg",
+    "fixture": "off-0041789001215",
+    "imageUrl": "https://images.openfoodfacts.org/images/products/004/178/900/1215/ingredients_en.73.400.jpg",
+    "license": "CC BY-SA 3.0, Open Food Facts contributors",
+    "difficulty": "small print",
+    "expectedIngredientsText": "ENRICHED WHEAT FLOUR (WHEAT FLOUR, NACIN, REDUCED IRON, THIAMINE MONONITRATE RIBOFLAVIN, FOLIC ACID), VEGETABLE OIL (CONTAINS ONE OR MORE OF THE FOLLOWING: CANOLA COTTONSEED, PALM) PRESERVED BY TBHQ, SALT DEHYDRATED VEGETABLES (CARROT, CORN, GREEN PEAS, GARLIC, ONION, CELERY STALK, CHIVE), CONTAINS LESS THAN 2% OF: MALTODEXTRIN, MONOSODIUM GLUTAMATE, SUGAR, HYDROLYZED CORN PROTEIN, HYDROLYZED WHEAT PROTEIN, HYDROLYZED SOY PROTEIN, CHICKEN FAT POTASSIUM CARBONATE, POWDERED COOKED CHICKEN SPICES (CELERY SEED, YEAST EXTRACT, DEHYDRATED SOY SAUCE (WHEAT, SOYBEANS, SALT), SODIUM CARBONATE, SODIUM HEXAMETAPHOSPHATE, TURMERIC, SODIUM TRIPOLYPHOSPHATE, DISODIUM GUANYLATE, DISODIUM INOSINATE, MONOSODIUM PHOSPHATE, LACTOSE SILICON DIOXIDE (ANTI-CAKING AGENT).",
+    "notes": "Dense all-caps panel, slightly angled; Contains and facility lines at the bottom."
+  },
+  {
+    "file": "soups-blount-new-england-clam-chowder-077958529204.jpg",
+    "fixture": "off-0077958529204",
+    "imageUrl": "https://images.openfoodfacts.org/images/products/007/795/852/9204/ingredients_en.15.400.jpg",
+    "license": "CC BY-SA 3.0, Open Food Facts contributors",
+    "difficulty": "small print",
+    "expectedIngredientsText": "Cream, clam stock (water, cooked clams [clams, water, corn starch, salt, clam broth, sugar, potato flour, natural flavor, onion powder, codfish powder]), potatoes, clam meat, onions, contains 2% or less of: butter (cream, salt), modified corn & tapioca starch, garlic, water, sea salt, nisin preparation, spices.",
+    "notes": "Curved tub, long lines across the label; Contains and May contain lines at the end. Minor wording differences from the fixture text (e.g. 'nisin preparation and spices')."
+  },
+  {
+    "file": "canned-fish-great-value-sardines-in-water-078742237855.jpg",
+    "fixture": "off-0078742237855",
+    "imageUrl": "https://images.openfoodfacts.org/images/products/007/874/223/7855/ingredients_en.38.400.jpg",
+    "license": "CC BY-SA 3.0, Open Food Facts contributors",
+    "difficulty": "small print",
+    "expectedIngredientsText": "Sardines, water, salt.",
+    "notes": "Multi-column can lid label (ingredients, distributor, returns side by side). The photo also shows 'CONTAINS SARDINES.', which is not in the fixture text."
+  },
+  {
+    "file": "cookies-quest-protein-cookie-chocolate-chip-888849005994.jpg",
+    "fixture": "off-0888849005994",
+    "imageUrl": "https://images.openfoodfacts.org/images/products/088/884/900/5994/ingredients_en.74.400.jpg",
+    "license": "CC BY-SA 3.0, Open Food Facts contributors",
+    "difficulty": "glare",
+    "expectedIngredientsText": "PROTEIN BLEND (MILK PROTEIN ISOLATE, WHEY PROTEIN ISOLATE), BUTTER (CREAM, NATURAL FLAVOR), POLYDEXTROSE (PREBIOTIC FIBER), ERYTHRITOL, PALM OIL, UNSWEETENED CHOCOLATE, WATER, CALCIUM CASEINATE, COCOA BUTTER, GLYCERIN, CONTAINS LESS THAN 2% OF THE FOLLOWING: NATURAL FLAVORS, LECITHIN (SUNFLOWER, CANOLA, AND/OR SOY LECITHIN), SEA SALT, BAKING SODA, SODIUM CASEINATE, XANTHAN GUM, SUCRALOSE, STEVIA SWEETENER.",
+    "notes": "Shiny crinkled wrapper with highlights across the text."
+  },
+  {
+    "file": "tahini-simple-truth-organic-tahini-011110127082.jpg",
+    "fixture": "off-0011110127082",
+    "imageUrl": "https://images.openfoodfacts.org/images/products/001/111/012/7082/ingredients_en.4.400.jpg",
+    "license": "CC BY-SA 3.0, Open Food Facts contributors",
+    "difficulty": "glare",
+    "expectedIngredientsText": "ORGANIC SESAME, SALT.",
+    "notes": "Curved jar with sheen; the ingredient line sits under the nutrition panel."
+  },
+  {
+    "file": "hummus-sabra-classic-040822346108.jpg",
+    "fixture": "off-0040822346108",
+    "imageUrl": "https://images.openfoodfacts.org/images/products/004/082/234/6108/ingredients_en.12.400.jpg",
+    "license": "CC BY-SA 3.0, Open Food Facts contributors",
+    "difficulty": "small print",
+    "expectedIngredientsText": "Chickpeas, water, tahini (sesame), soybean oil and/or sunflower oil, salt, garlic, citric acid, potassium sorbate, spices, natural flavor.",
+    "notes": "Tub rim photographed at an angle; small text wraps around the curve. Wording differs a little from the fixture text (the photo adds 'less than 2% of' and 'to maintain freshness')."
+  }
+]

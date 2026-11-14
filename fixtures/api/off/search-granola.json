@@ -1,0 +1,204 @@
+{
+  "count": 6219,
+  "page": 1,
+  "page_count": 10,
+  "page_size": 10,
+  "products": [
+    {
+      "allergens_tags": [
+        "en:gluten",
+        "en:milk",
+        "en:soybeans"
+      ],
+      "brands": "LU",
+      "code": "7622210601988",
+      "countries_tags": [
+        "en:belgium",
+        "en:france",
+        "en:martinique",
+        "en:morocco",
+        "en:reunion",
+        "en:switzerland",
+        "en:united-states"
+      ],
+      "ingredients_text": "Farine de BLÉ 36%, chocolat au LAIT 27 % [sucre, pâte de cacao, beurre de cacao, lactosérum en poudre (de LAIT), LAIT écrémé en poudre, graisses végétales (karité, palme en proportion variable), BEURRE concentré, émulsifiants (lécithines de SOJA, E476), lactose (de LAIT), arôme], huile de palme, farine complète de BLE 12 %, sucre, sirop de sucre, poudres à lever (carbonates de sodium, carbonates d'ammonium), sel, correcteur d'acidité (acide citrique).\r\n\r\nPeut contenir : fruits à coque.",
+      "ingredients_text_en": "wheat flour 48%, milk chocolate 27% sugar, cocoa mass, cocoa butter, whey powder (from milk), skimmed milk powder, vegetable fats (palm, shea in varying proportions), concentrated butter, emulsifiers (soy lecithins, e476), lactose (milk), aromamel, vegetable oils (palm, copra), sugar, sugar syrup, wheat bran, baking powder (sodium carbonates,  ammonium carbonates), salt, wheat germ, acidity regulator (citric acid), may contain eggs, nuts, sesame,",
+      "last_modified_t": 1793773952,
+      "product_name": "Granola L'Original",
+      "traces_tags": [
+        "en:nuts"
+      ]
+    },
+    {
+      "allergens_tags": [
+        "en:gluten",
+        "en:nuts",
+        "en:soybeans"
+      ],
+      "brands": "Kirkland Signature",
+      "code": "0096619194261",
+      "countries_tags": [
+        "en:canada",
+        "en:united-states"
+      ],
+      "ingredients_text": "Whole grain rolled oats, cane sugar, soy oil, khorasan wheat, rolled spelt, almonds, inulin, rice starch, rolled quinoa, rolled amaranth, sea salt, molasses, cinnamon, vanilla flavor, probiotics (Bacillus coagulans GBI-30 6086), tocopherols (vitamin E)",
+      "ingredients_text_en": "Whole grain rolled oats, cane sugar, soy oil, khorasan wheat, rolled spelt, almonds, inulin, rice starch, rolled quinoa, rolled amaranth, sea salt, molasses, cinnamon, vanilla flavor, probiotics (Bacillus coagulans GBI-30 6086), tocopherols (vitamin E)",
+      "last_modified_t": 1792803592,
+      "product_name": "Ancient Grains Probiotic Granola",
+      "traces_tags": [
+        "en:gluten",
+        "en:nuts",
+        "en:peanuts",
+        "en:soybeans"
+      ]
+    },
+    {
+      "allergens_tags": [
+        "en:gluten",
+        "en:soybeans"
+      ],
+      "brands": "Nature Valley",
+      "code": "0016000264694",
+      "countries_tags": [
+        "en:france",
+        "en:united-states"
+      ],
+      "ingredients_text": "Whole Grain Oats, Sugar, Canola Oil, Rice Flour, Honey, Salt, Brown Sugar Syrup, Baking Soda, Soy Lecithin, Natural Flavor. CONTAINS SOY; MAY CONTAIN PEANUT, ALMOND AND PECAN INGREDIENTS",
+      "ingredients_text_en": "Whole Grain Oats, Sugar, Canola Oil, Rice Flour, Honey, Salt, Brown Sugar Syrup, Baking Soda, Soy Lecithin, Natural Flavor. CONTAINS SOY; MAY CONTAIN PEANUT, ALMOND AND PECAN INGREDIENTS",
+      "last_modified_t": 1792149340,
+      "product_name": "Oats 'N Honey Granola Bars",
+      "traces_tags": [
+        "en:nuts",
+        "en:peanuts",
+        "en:3520367101"
+      ]
+    },
+    {
+      "allergens_tags": [],
+      "brands": "Purely Elizabeth",
+      "code": "0810589032312",
+      "countries_tags": [
+        "en:united-states"
+      ],
+      "ingredients_text": "Organic certified gluten-free oats, organic coconut sugar, organic coconut oil, organic sunflower seeds, organic puffed amaranth, organic quinoa flakes, organic chia seeds, organic cinnamon, sea salt",
+      "ingredients_text_en": "Organic certified gluten-free oats, organic coconut sugar, organic coconut oil, organic sunflower seeds, organic puffed amaranth, organic quinoa flakes, organic chia seeds, organic cinnamon, sea salt",
+      "last_modified_t": 1787071345,
+      "product_name": "Organic Original Salty-sweet Granola",
+      "traces_tags": []
+    },
+    {
+      "allergens_tags": [
+        "en:gluten",
+        "en:nuts",
+        "en:peanuts",
+        "en:soybeans"
+      ],
+      "brands": "Nature's Path Organic",
+      "code": "0058449770565",
+      "countries_tags": [
+        "en:france",
+        "en:united-states",
+        "en:world"
+      ],
+      "ingredients_text": "Whole grain rolled oats*, cane sugar, soy oil*, brown rice flour pumpkin seeds, flax seeds* oat syrup solids* [oat syrup solids*, tocopherols (added to enhance freshness)], sea salt, molasses*, cinnamon*. *Organic. Contains soy. Produced in a facility that uses wheat, peanuts and tree nuts",
+      "ingredients_text_en": "Whole grain rolled oats*, cane sugar, soy oil*, brown rice flour pumpkin seeds, flax seeds* oat syrup solids* [oat syrup solids*, tocopherols (added to enhance freshness)], sea salt, molasses*, cinnamon*. *Organic. Contains soy. Produced in a facility that uses wheat, peanuts and tree nuts",
+      "last_modified_t": 1783554192,
+      "product_name": "Pumpkin Seed + Flax Granola",
+      "traces_tags": [
+        "en:gluten",
+        "en:nuts",
+        "en:peanuts"
+      ]
+    },
+    {
+      "allergens_tags": [
+        "en:milk",
+        "en:nuts"
+      ],
+      "brands": "Snacks Generation LLC, nútrail",
+      "code": "0819562022791",
+      "countries_tags": [
+        "en:united-states"
+      ],
+      "ingredients_text": "sunflower seeds, pumpkin seeds, coconut, almonds, pecans, erythritol, butter (pasteurized cream, natural flavor), dried blueberries, cinnamon, salt, monkfruit extract",
+      "ingredients_text_en": "sunflower seeds, pumpkin seeds, coconut, almonds, pecans, erythritol, butter (pasteurized cream, natural flavor), dried blueberries, cinnamon, salt, monkfruit extract",
+      "last_modified_t": 1792743712,
+      "product_name": "nut granola blueberry cinnamon sweet & crunchy",
+      "traces_tags": [
+        "en:gluten",
+        "en:milk",
+        "en:nuts",
+        "en:soybeans",
+        "en:Seeds"
+      ]
+    },
+    {
+      "allergens_tags": [
+        "en:gluten",
+        "en:milk",
+        "en:nuts",
+        "en:soybeans"
+      ],
+      "brands": "Quaker",
+      "code": "0030000436073",
+      "countries_tags": [
+        "en:united-states"
+      ],
+      "ingredients_text": "Avoine complète, blé complet, sucre, raisins secs, huile végétale, lactosérum, inuline, amandes, lait écrémé en poudre, glycérine, mélasse, concentré de protéines de lactosérum, miel, arôme naturel, huile de tournesol, tocophérols",
+      "ingredients_text_en": "Avoine complète, blé complet, sucre, raisins secs, huile végétale, lactosérum, inuline, amandes, lait écrémé en poudre, glycérine, mélasse, concentré de protéines de lactosérum, miel, arôme naturel, huile de tournesol, tocophérols",
+      "last_modified_t": 1793868307,
+      "product_name": "SIMPLY GRANOLA OATS, HONEY, RAISINS & ALMONDS",
+      "traces_tags": []
+    },
+    {
+      "allergens_tags": [
+        "en:Coconut"
+      ],
+      "brands": "purely elizabeth.",
+      "code": "0855140002175",
+      "countries_tags": [
+        "en:panama",
+        "en:united-states",
+        "en:world"
+      ],
+      "ingredients_text": "Organic Certified Gluten-Free Oats, Organic Coconut Sugar, Organic Coconut Oil, Organic Sunflower Seeds, Organic Puffed Amaranth, Organic Quinoa Flakes, Organic Chia Seeds, Organic Cinnamon, Sea Salt.",
+      "ingredients_text_en": "Organic Certified Gluten-Free Oats, Organic Coconut Sugar, Organic Coconut Oil, Organic Sunflower Seeds, Organic Puffed Amaranth, Organic Quinoa Flakes, Organic Chia Seeds, Organic Cinnamon, Sea Salt.",
+      "last_modified_t": 1785864719,
+      "product_name": "ORIGINAL ANCIENT GRAIN GRANOLA",
+      "traces_tags": []
+    },
+    {
+      "allergens_tags": [],
+      "brands": "MADEGOOD",
+      "code": "0687456211091",
+      "countries_tags": [
+        "en:germany",
+        "en:united-states",
+        "en:world"
+      ],
+      "ingredients_text": "Pure Gluten Free Oats*, Agave Syrup*, Chocolate Chips* (Cane Sugar*, Unsweetened Chocolate*, Cocoa Butter*), Brown Rice Syrup*, Sunflower Oil*, Invert Cane Syrup*, Brown Rice Crisps*, Vegetable Extracts (Spinach, Broccoli, Carrots, Tomatoes, Beets, Shiitake Mushrooms), Natural Flavor*, Agar*, Salt. *Organic",
+      "ingredients_text_en": "Pure Gluten Free Oats*, Agave Syrup*, Chocolate Chips* (Cane Sugar*, Unsweetened Chocolate*, Cocoa Butter*), Brown Rice Syrup*, Sunflower Oil*, Invert Cane Syrup*, Brown Rice Crisps*, Vegetable Extracts (Spinach, Broccoli, Carrots, Tomatoes, Beets, Shiitake Mushrooms), Natural Flavor*, Agar*, Salt. *Organic",
+      "last_modified_t": 1793738357,
+      "product_name": "Organic Chewy Granola Bar",
+      "traces_tags": []
+    },
+    {
+      "allergens_tags": [
+        "en:soybeans"
+      ],
+      "brands": "Nature's Path Organic",
+      "code": "0058449890072",
+      "countries_tags": [
+        "en:canada",
+        "en:united-states",
+        "en:world"
+      ],
+      "ingredients_text": "Whole grain rolled oats*, cane sugar*, soy oil*, brown rice flour*, pumpkin seeds*, flax seeds*, brown rice syrup*, sea salt, molasses*, rice starch*, cinnamon*",
+      "ingredients_text_en": "Whole grain rolled oats*, cane sugar*, soy oil*, brown rice flour*, pumpkin seeds*, flax seeds*, brown rice syrup*, sea salt, molasses*, rice starch*, cinnamon*",
+      "last_modified_t": 1790442672,
+      "product_name": "Pumpkin Seed + Flax Granola",
+      "traces_tags": []
+    }
+  ],
+  "skip": 0
+}

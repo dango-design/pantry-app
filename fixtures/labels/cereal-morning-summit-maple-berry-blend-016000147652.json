@@ -1,0 +1,32 @@
+{
+  "id": "off-0016000147652",
+  "name": "Lightly Sweetened Maple Berry Blend Cereal",
+  "brand": "Morning Summit",
+  "gtin": "0016000147652",
+  "source": "off",
+  "sourceUrl": "https://world.openfoodfacts.org/product/0016000147652",
+  "labelRegion": "us",
+  "ingredientsText": "Almonds, Whole Grain Wheat, Organic Maple Syrup, Whole Grain Oats, Sugar, Dried Coconut, Pumpkin Seeds, Organic Coconut Oil, Dried Sweetened Cranberries (cranberries, sugar, glycerin), Dried Sweetened Cherries (cherries, sugar, glycerin), Corn Bran, Brown Sugar Syrup, Salt, Vanilla Extract. Vitamin E (mixed tocopherols).",
+  "containsStatement": "CONTAINS ALMOND, WHEAT, AND COCONUT",
+  "mayContainStatement": "MAY CONTAIN SOY AND SESAME.",
+  "offAllergenTags": [
+    "en:gluten",
+    "en:nuts"
+  ],
+  "offTraceTags": [
+    "en:sesame-seeds",
+    "en:soybeans"
+  ],
+  "expected": {
+    "milk": "none",
+    "egg": "none",
+    "peanut": "none",
+    "tree_nut": "contains",
+    "wheat": "contains",
+    "soy": "may_contain",
+    "fish": "none",
+    "shellfish": "none",
+    "sesame": "may_contain"
+  },
+  "notes": "Coconut appears in the Contains line but not as 'tree nuts (coconut)'; tree_nut is contains from almonds anyway. The printed line joins the two statements with a semicolon."
+}

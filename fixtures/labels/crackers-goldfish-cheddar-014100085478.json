@@ -1,0 +1,30 @@
+{
+  "id": "off-0014100085478",
+  "name": "Goldfish Cheddar",
+  "brand": "Goldfish",
+  "gtin": "0014100085478",
+  "source": "off",
+  "sourceUrl": "https://world.openfoodfacts.org/product/0014100085478",
+  "labelRegion": "us",
+  "ingredientsText": "made with smiles and enriched wheat flour (flour, niacin, reduced iron, thiamine mononitrate, riboflavin, folic acid), cheddar cheese ([cultured milk, salt, enzymes], annatto), canola and/or sunflower oils, contains 2 percent or less of: salt, yeast, sugar, autolyzed yeast, baking soda, monocalcium phosphate, paprika, spices, celery, onion powder",
+  "containsStatement": "contains: wheat, milk",
+  "mayContainStatement": null,
+  "offAllergenTags": [
+    "en:celery",
+    "en:gluten",
+    "en:milk"
+  ],
+  "offTraceTags": [],
+  "expected": {
+    "milk": "contains",
+    "egg": "none",
+    "peanut": "none",
+    "tree_nut": "none",
+    "wheat": "contains",
+    "soy": "none",
+    "fish": "none",
+    "shellfish": "none",
+    "sesame": "none"
+  },
+  "notes": "'made with smiles and' is printed on the label before the first ingredient; kept as is. The OFF photo is a newer recipe that adds soybean oil; labels follow this text."
+}

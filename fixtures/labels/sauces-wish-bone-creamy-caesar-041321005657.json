@@ -1,0 +1,32 @@
+{
+  "id": "off-0041321005657",
+  "name": "Creamy Caesar Dressing",
+  "brand": "Wish-Bone",
+  "gtin": "0041321005657",
+  "source": "off",
+  "sourceUrl": "https://world.openfoodfacts.org/product/0041321005657",
+  "labelRegion": "us",
+  "ingredientsText": "SOYBEAN OIL, WATER, DISTILLED VINEGAR, SUGAR, SALT, PARMESAN CHEESE (PASTEURIZED PART SKIM MILK, CHEESE CULTURES, SALT, ENZYMES), WHEY, EGG YOLKS 2%, MODIFIED CORN STARCH, ANCHOVIES, DRIED GARLIC, SPICES, XANTHAN GUM, SOY SAUCE (WATER, WHEAT, SOYBEANS, SALT, SODIUM BENZOATE [PRESERVATIVE]), DRIED ONION, NATURAL FLAVOR, LEMON JUICE CONCENTRATE, SOY FLOUR, POTASSIUM SORBATE, SODIUM BENZOATE, CALCIUM DISODIUM EDTA.",
+  "containsStatement": null,
+  "mayContainStatement": null,
+  "offAllergenTags": [
+    "en:eggs",
+    "en:fish",
+    "en:gluten",
+    "en:milk",
+    "en:soybeans"
+  ],
+  "offTraceTags": [],
+  "expected": {
+    "milk": "contains",
+    "egg": "contains",
+    "peanut": "none",
+    "tree_nut": "none",
+    "wheat": "contains",
+    "soy": "contains",
+    "fish": "contains",
+    "shellfish": "none",
+    "sesame": "none"
+  },
+  "notes": "Wheat comes only from inside the soy sauce sub-ingredients. Anchovies are fish."
+}
