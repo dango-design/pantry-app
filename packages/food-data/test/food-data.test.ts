@@ -4,10 +4,10 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 import { expandDictionary, type CompactDictionary, type Profile } from '@allergy/verdict-engine';
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { buildChefCard, chefCardHash } from '../src/chef-card.ts';
-import { offCode, usdaQueries } from '../src/fetchers.ts';
+import { fetchOffProduct, offCode, usdaQueries } from '../src/fetchers.ts';
 import { ingredientsHash, normalizeOffResponse, normalizeOffSearch, normalizeUsdaSearch } from '../src/products.ts';
 import { extractUpcs, isoDate, matchRecall, parseFsisRecalls, parseOpenFdaEnforcement, recallAllergens } from '../src/recalls.ts';
 
@@ -53,6 +53,37 @@ describe('Open Food Facts', () => {
     expect(offCode('00044000037451')).toBe('0044000037451');
     expect(offCode('00000096385074')).toBe('96385074');
     expect(offCode('04006381333931')).toBe('4006381333931');
+  });
+});
+
+describe('Open Food Facts requests', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  // Records the headers of each request and answers with a recorded product.
+  function stubFetch() {
+    const sent: Record<string, string>[] = [];
+    vi.stubGlobal('fetch', async (_url: string, init: { headers: Record<string, string> }) => {
+      sent.push(init.headers);
+      return new Response(JSON.stringify(json('off/product-0044000037451.json')), { status: 200 });
+    });
+    return sent;
+  }
+
+  it('sends the app name as User-Agent by default', async () => {
+    const sent = stubFetch();
+    const p = await fetchOffProduct('00044000037451', { userAgent: 'TestApp/1.0 (test@example.com)' });
+    expect(p?.gtin).toBe('00044000037451');
+    expect(sent[0]!['User-Agent']).toBe('TestApp/1.0 (test@example.com)');
+    expect(sent[0]!['X-User-Agent']).toBeUndefined();
+  });
+
+  it('sends it as X-User-Agent when asked, for browsers', async () => {
+    const sent = stubFetch();
+    await fetchOffProduct('00044000037451', { userAgent: 'TestApp/1.0 (test@example.com)', userAgentHeader: 'X-User-Agent' });
+    expect(sent[0]!['X-User-Agent']).toBe('TestApp/1.0 (test@example.com)');
+    expect(sent[0]!['User-Agent']).toBeUndefined();
   });
 });
 

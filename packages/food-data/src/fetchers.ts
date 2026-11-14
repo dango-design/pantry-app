@@ -65,12 +65,26 @@ export function offCode(gtin14: string): string {
   return gtin14.startsWith('0') ? gtin14.slice(1) : gtin14;
 }
 
-export async function fetchOffProduct(
-  gtin14: string,
-  opts: { userAgent: string; timeoutMs?: number },
-): Promise<NormalizedProduct | null> {
+/**
+ * How to send the app's name and contact to Open Food Facts. Browsers refuse to let a web page set
+ * User-Agent, so web pages send it as X-User-Agent, which OFF also accepts.
+ */
+export type OffUserAgentHeader = 'User-Agent' | 'X-User-Agent';
+
+export interface OffRequestOptions {
+  userAgent: string;
+  /** Defaults to "User-Agent". Use "X-User-Agent" in a browser. */
+  userAgentHeader?: OffUserAgentHeader;
+  timeoutMs?: number;
+}
+
+function offHeaders(opts: OffRequestOptions): Record<string, string> {
+  return { [opts.userAgentHeader ?? 'User-Agent']: opts.userAgent };
+}
+
+export async function fetchOffProduct(gtin14: string, opts: OffRequestOptions): Promise<NormalizedProduct | null> {
   const url = `https://world.openfoodfacts.org/api/v2/product/${offCode(gtin14)}?fields=${OFF_FIELDS}`;
-  const { status, body } = await getJson('Open Food Facts', url, { timeoutMs: opts.timeoutMs ?? 4000, headers: { 'User-Agent': opts.userAgent } });
+  const { status, body } = await getJson('Open Food Facts', url, { timeoutMs: opts.timeoutMs ?? 4000, headers: offHeaders(opts) });
   if (status === 404) return null;
   if (status >= 400) throw new SourceError('Open Food Facts', `HTTP ${status}`, status);
   const product = normalizeOffResponse(body as Record<string, unknown>);
@@ -80,7 +94,7 @@ export async function fetchOffProduct(
 
 export async function searchOff(
   query: string,
-  opts: { userAgent: string; page?: number; pageSize?: number; timeoutMs?: number },
+  opts: OffRequestOptions & { page?: number; pageSize?: number },
 ): Promise<{ products: NormalizedProduct[]; count: number }> {
   const params = new URLSearchParams({
     search_terms: query,
@@ -94,7 +108,7 @@ export async function searchOff(
   });
   const { status, body } = await getJson('Open Food Facts', `https://world.openfoodfacts.org/cgi/search.pl?${params}`, {
     timeoutMs: opts.timeoutMs ?? 8000,
-    headers: { 'User-Agent': opts.userAgent },
+    headers: offHeaders(opts),
   });
   if (status >= 400) throw new SourceError('Open Food Facts', `HTTP ${status}`, status);
   const b = body as Record<string, unknown>;
