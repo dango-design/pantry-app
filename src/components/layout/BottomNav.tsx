@@ -51,7 +51,7 @@ export function BottomNav({ addOpen, onAddClick }: BottomNavProps) {
     <nav
       aria-label="Main"
       className={cn(
-        'md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 safe-area-bottom',
+        'md:hidden print:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 safe-area-bottom',
         addOpen ? 'z-[52]' : 'z-40'
       )}
     >

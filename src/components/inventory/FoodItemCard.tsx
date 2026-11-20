@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from 'react'
+import { useRef, useState, useEffect, Suspense } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ShoppingCart, Trash2 } from 'lucide-react'
 import Inventory2Outlined from '@mui/icons-material/Inventory2Outlined'
@@ -9,6 +9,7 @@ import { formatExpirationText, getFreshnessLevel, FRESHNESS_COLORS } from '@/uti
 import { QUANTITY_UNITS } from '@/utils/constants'
 import { getFoodIcon, getLocationIcon, FoodThumbnail } from '@/components/icons'
 import { useFlyToCart } from '@/components/common'
+import { LazyPantryAllergyBadge } from '@/components/allergy/lazy'
 import type { FoodItem } from '@/types'
 
 // Card color tokens (M3 roles, neutral values: white card, zinc-gray outline)
@@ -256,6 +257,13 @@ export function FoodItemCard({
                 <span className="truncate">{expirationText}</span>
               </span>
             </div>
+
+            {/* Allergy badge: only for items added by barcode, which have real ingredient data */}
+            {item.gtin && (
+              <Suspense fallback={null}>
+                <LazyPantryAllergyBadge gtin={item.gtin} className="self-start" />
+              </Suspense>
+            )}
           </div>
         </div>
 

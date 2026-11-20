@@ -7,6 +7,7 @@ import {
   HelpCircle,
   LogOut,
   ChevronRight,
+  ShieldCheck,
 } from 'lucide-react'
 import { Card, CardContent } from '@/components/common'
 import { PageHeader, pageContainer } from '@/components/layout'
@@ -95,6 +96,12 @@ export function SettingsPage() {
               label="Household"
               description="Manage household members"
               onClick={() => navigate('/settings/household')}
+            />
+            <SettingItem
+              icon={ShieldCheck}
+              label="Allergies"
+              description="People and their food allergies"
+              onClick={() => navigate('/settings/allergies')}
             />
             <SettingItem
               icon={Bell}

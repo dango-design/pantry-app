@@ -39,7 +39,7 @@ export function ItemAllergySection({ gtin, itemName, onScanBarcode }: { gtin?: s
               : 'Scan the barcode to check it for allergens.'}
           </p>
           {!gtin && onScanBarcode && (
-            <button type="button" onClick={onScanBarcode} className="font-medium text-purple-700 underline">
+            <button type="button" onClick={onScanBarcode} className="font-medium text-primary underline">
               Scan barcode
             </button>
           )}
@@ -60,7 +60,7 @@ export function ItemAllergySection({ gtin, itemName, onScanBarcode }: { gtin?: s
       emptyPeopleMessage={
         <>
           Nobody to check for yet.{' '}
-          <Link to="/settings/allergies" className="font-medium text-purple-700 underline">
+          <Link to="/settings/allergies" className="font-medium text-primary underline">
             Add people and their allergies
           </Link>
           .

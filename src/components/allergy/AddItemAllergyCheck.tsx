@@ -40,7 +40,7 @@ export function AddItemAllergyCheck({
     return (
       <div className="rounded-xl border border-gray-200 bg-white p-3 text-sm text-gray-700">
         Allergy check: nobody to check for yet.{' '}
-        <Link to="/settings/allergies" className="font-medium text-purple-700 underline">
+        <Link to="/settings/allergies" className="font-medium text-primary underline">
           Add people
         </Link>
       </div>

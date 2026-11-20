@@ -1,6 +1,6 @@
-import { useState, useEffect, useMemo } from 'react'
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
-import { ChevronDown, Camera, Barcode, Receipt, Loader2 } from 'lucide-react'
+import { useState, useEffect, useMemo, useRef, useCallback, Suspense } from 'react'
+import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { ChevronDown, Camera, Barcode, Receipt, Loader2, ShieldX } from 'lucide-react'
 import { Button } from '@/components/common'
 import { PhotoCapture, BarcodeScanner, ItemReviewList, type ReviewItem } from '@/components/smart-input'
 import { useDemoStore, DEMO_HOUSEHOLD, DEMO_USER } from '@/stores/demoStore'
@@ -19,6 +19,11 @@ import {
   type BarcodeProduct,
 } from '@/services'
 import type { FoodCategory, StorageLocation, QuantityUnit } from '@/types'
+import type { LookupResult } from '@/allergy/lookup'
+import { productName } from '@/allergy/products'
+import { recordsForGtin, useAllergyStore } from '@/allergy/store'
+import { LazyAddItemAllergyCheck } from '@/components/allergy/lazy'
+import { mapCategory } from '@/utils/productCategory'
 
 // Quick add items - commonly added items
 const QUICK_ADD_ITEMS = [
@@ -53,6 +58,7 @@ function mapToReviewItem(item: DetectedItem | ReceiptItem, index: number): Revie
 
 export function AddItemPage() {
   const navigate = useNavigate()
+  const location = useLocation()
   // On /item/:id/edit this page edits an existing item instead of adding one
   const { id } = useParams<{ id: string }>()
   const isEditing = id !== undefined
@@ -84,6 +90,14 @@ export function AddItemPage() {
   )
   const [isEstimated, setIsEstimated] = useState(editingItem ? editingItem.expirationSource === 'calculated' : true)
 
+  // Barcode and allergy state. scannedGtin is set when a new item comes from a barcode.
+  const [scannedGtin, setScannedGtin] = useState<string | null>(null)
+  const [redPeople, setRedPeople] = useState<{ name: string; reason: string }[]>([])
+  const [confirmedRed, setConfirmedRed] = useState(false)
+  // The name a barcode filled in. The name autofill must not re-guess its category from words in it
+  // ("Peanut Butter Sandwich Cookie" matches "butter" and would become dairy in the fridge).
+  const barcodeName = useRef<string | null>(null)
+
   const quantityValue = Number(quantity)
   const isValid = name.trim() !== '' && quantityValue > 0 && purchaseDate !== '' && expirationDate !== ''
 
@@ -91,6 +105,7 @@ export function AddItemPage() {
   // shouldn't reset the item's quantity and dates)
   useEffect(() => {
     if (isEditing || !name.trim()) return
+    if (name === barcodeName.current) return
 
     const match = lookupFood(name)
     if (match) {
@@ -121,6 +136,36 @@ export function AddItemPage() {
     ))
   }
 
+  // Fill the form from a barcode lookup. The category comes from Open Food Facts, and storage and
+  // expiry use that category's defaults rather than a guess from the product name.
+  const fillFromBarcode = useCallback((gtin: string, records: LookupResult['records']) => {
+    setScannedGtin(gtin)
+    setConfirmedRed(false)
+    if (records.length === 0) return
+    const { name: productTitle, brand: productBrand } = productName(records)
+    const productCategory = mapCategory(records[0]?.categories ?? [])
+    const productStorage = getDefaultStorageLocation('', productCategory)
+    barcodeName.current = productTitle
+    setName(productTitle)
+    if (productBrand) setBrand(productBrand)
+    setCategory(productCategory)
+    setStorageLocation(productStorage)
+    setIsEstimated(true)
+    setExpirationDate(estimateExpirationDate('', productCategory, productStorage, todayDateString()))
+  }, [])
+
+  // Arriving from the Check page with "Add to pantry": fill in what the barcode lookup found.
+  const fromCheck = isEditing ? undefined : (location.state as { gtin?: string } | null)?.gtin
+  useEffect(() => {
+    if (!fromCheck) return
+    fillFromBarcode(fromCheck, recordsForGtin(useAllergyStore.getState().products, fromCheck))
+  }, [fromCheck, fillFromBarcode])
+
+  const handleRedPeople = useCallback((people: { name: string; reason: string }[]) => {
+    setRedPeople(people)
+    setConfirmedRed(false)
+  }, [])
+
   // Personalized quick adds based on frequently added items
   const personalizedQuickAdds = useMemo(() => {
     const itemCounts: Record<string, number> = {}
@@ -144,6 +189,12 @@ export function AddItemPage() {
 
   const handleSubmit = async () => {
     if (!isValid) return
+
+    // Not safe for someone: say who and why, and ask for a second tap. Don't block it.
+    if (!isEditing && scannedGtin && redPeople.length > 0 && !confirmedRed) {
+      setConfirmedRed(true)
+      return
+    }
 
     setLoading(true)
 
@@ -191,7 +242,8 @@ export function AddItemPage() {
       freshnessScore,
       tags: [],
       addedBy: DEMO_USER.id,
-      addedVia: 'manual',
+      addedVia: scannedGtin ? 'barcode' : 'manual',
+      ...(scannedGtin ? { gtin: scannedGtin, barcode: scannedGtin } : {}),
       status: 'active',
     })
 
@@ -241,16 +293,10 @@ export function AddItemPage() {
     }
   }
 
-  // Handle barcode scan
-  const handleBarcodeScan = (product: BarcodeProduct) => {
+  // Handle barcode scan. The lookup has already cached the product for the allergy check.
+  const handleBarcodeScan = (_product: BarcodeProduct, lookup: LookupResult) => {
     setSmartInputMode(null)
-    setName(product.name)
-    if (product.brand) setBrand(product.brand)
-    const productCategory = (product.category as FoodCategory) || 'other'
-    const productStorage = getDefaultStorageLocation(product.name, productCategory)
-    setCategory(productCategory)
-    setStorageLocation(productStorage)
-    updateEstimate({ name: product.name, category: productCategory, storageLocation: productStorage })
+    fillFromBarcode(lookup.gtin, lookup.records)
   }
 
   // Handle adding reviewed items
@@ -398,6 +444,13 @@ export function AddItemPage() {
         {/* Form */}
         <div className="bg-white rounded-t-3xl -mt-2 px-4 pt-6 pb-32 flex-1 md:rounded-none md:mt-0 md:px-6 md:pb-6">
           <div className="space-y-4">
+            {/* Allergy check for a scanned product, before saving */}
+            {!isEditing && scannedGtin && (
+              <Suspense fallback={null}>
+                <LazyAddItemAllergyCheck gtin={scannedGtin} onRedPeople={handleRedPeople} />
+              </Suspense>
+            )}
+
             {/* Quick Add Chips */}
             {!isEditing && (
               <div>
@@ -573,6 +626,19 @@ export function AddItemPage() {
           className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 md:static md:px-6"
           style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}
         >
+          {confirmedRed && redPeople.length > 0 && (
+            <div role="alert" className="max-w-lg mx-auto mb-3 flex items-start gap-2 rounded-xl border border-red-300 bg-red-50 p-3 text-sm text-red-900 md:max-w-none">
+              <ShieldX aria-hidden className="mt-0.5 h-4 w-4 shrink-0" />
+              <div>
+                {redPeople.map((p) => (
+                  <p key={p.name}>
+                    <span className="font-semibold">Not safe for {p.name}:</span> {p.reason}
+                  </p>
+                ))}
+                <p className="mt-1">Tap "Add anyway" to add it to the pantry.</p>
+              </div>
+            </div>
+          )}
           <div className="flex gap-3 max-w-lg mx-auto md:max-w-none md:justify-end">
             <Button
               variant="secondary"
@@ -585,9 +651,12 @@ export function AddItemPage() {
               onClick={handleSubmit}
               loading={loading}
               disabled={!isValid}
-              className="flex-1 md:flex-none md:min-w-28 bg-primary hover:bg-primary-hover"
+              className={cn(
+                'flex-1 md:flex-none md:min-w-28',
+                confirmedRed ? 'bg-red-600 hover:bg-red-700 focus:ring-red-500' : 'bg-primary hover:bg-primary-hover'
+              )}
             >
-              Save
+              {confirmedRed ? 'Add anyway' : 'Save'}
             </Button>
           </div>
         </div>

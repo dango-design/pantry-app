@@ -29,7 +29,7 @@ export function PersonChips({ profiles, selectedIds, onChange, label = 'Checking
               onClick={() => toggle(p.id)}
               className={cn(
                 'inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors',
-                on ? 'border-purple-600 bg-purple-50 text-purple-800' : 'border-gray-300 bg-white text-gray-600 hover:bg-gray-50',
+                on ? 'border-transparent bg-primary text-white' : 'border-gray-300 bg-white text-gray-600 hover:bg-gray-50',
               )}
             >
               <span aria-hidden className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: p.color }} />

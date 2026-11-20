@@ -65,7 +65,7 @@ export function AllergyProfileEditor({ initial, existingCount = 0, onSave, onCan
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g. Sam"
-              className="w-full rounded-lg border border-gray-300 px-4 py-3 text-base focus:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="w-full rounded-lg border border-gray-300 px-4 py-3 text-base focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary"
             />
           </div>
           <fieldset>
@@ -102,7 +102,7 @@ export function AllergyProfileEditor({ initial, existingCount = 0, onSave, onCan
                 onClick={() => toggle(a.id)}
                 className={cn(
                   'inline-flex items-center gap-1 rounded-full border px-3 py-1.5 text-sm font-medium',
-                  on ? 'border-purple-600 bg-purple-600 text-white' : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50',
+                  on ? 'border-transparent bg-primary text-white' : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50',
                 )}
               >
                 {on && <Check aria-hidden className="h-3.5 w-3.5" />}
@@ -148,7 +148,7 @@ export function AllergyProfileEditor({ initial, existingCount = 0, onSave, onCan
                   type="checkbox"
                   checked={avoidMayContain}
                   onChange={(e) => patch(a.allergenId, { avoidMayContain: e.target.checked })}
-                  className="h-5 w-5 shrink-0 accent-purple-600"
+                  className="h-5 w-5 shrink-0 accent-primary"
                 />
               </label>
             </CardContent>
@@ -187,7 +187,7 @@ export function AllergyProfileEditor({ initial, existingCount = 0, onSave, onCan
               }
             }}
             placeholder="Add a word"
-            className="min-w-0 flex-1 rounded-lg border border-gray-300 px-4 py-2 text-base focus:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-500"
+            className="min-w-0 flex-1 rounded-lg border border-gray-300 px-4 py-2 text-base focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary"
           />
           <Button type="button" variant="secondary" onClick={addAvoid} disabled={newAvoid.trim().length < 2}>
             Add
@@ -199,7 +199,7 @@ export function AllergyProfileEditor({ initial, existingCount = 0, onSave, onCan
         <Button type="button" variant="secondary" className="flex-1" onClick={onCancel}>
           Cancel
         </Button>
-        <Button type="submit" className="flex-1 bg-purple-600 hover:bg-purple-700" disabled={!name.trim()}>
+        <Button type="submit" className="flex-1" disabled={!name.trim()}>
           Save
         </Button>
       </div>

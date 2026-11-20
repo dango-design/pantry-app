@@ -31,7 +31,7 @@ export function AppLayout({ bottomNav = false }: AppLayoutProps) {
 
       <main
         className={cn(
-          'pl-[var(--side-nav-width)] pr-[env(safe-area-inset-right)]',
+          'pl-[var(--side-nav-width)] pr-[env(safe-area-inset-right)] print:p-0',
           bottomNav && 'pb-bottom-nav md:pb-0'
         )}
       >

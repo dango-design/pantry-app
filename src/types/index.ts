@@ -99,6 +99,8 @@ export interface FoodItem {
   freshnessScore: number
 
   barcode?: string
+  /** The barcode as a 14-digit GTIN. Set only when the item was added by barcode; the allergy check uses it. */
+  gtin?: string
   brand?: string
   productId?: string
 
