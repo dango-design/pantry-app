@@ -2,7 +2,7 @@
 // Writes the allergen dictionary (packages/verdict-engine/data/dictionary.json) as a SQL migration
 // that upserts allergens, allergen_terms and dictionary_meta. The JSON file is the source of truth:
 // edit it (for example to mark terms reviewed), then run `npm run gen:dictionary`. In pantry-app
-// the npm script passes --out supabase/migrations/005_allergy_dictionary.sql, so it rewrites that file.
+// the npm script passes --out supabase/migrations/007_allergy_dictionary.sql, so it rewrites that file.
 //
 // Usage: node scripts/gen-dictionary-sql.mjs [--out <file>]
 

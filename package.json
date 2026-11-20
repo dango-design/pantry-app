@@ -18,7 +18,7 @@
     "typecheck:packages": "tsc --noEmit -p packages/verdict-engine && tsc --noEmit -p packages/food-data",
     "sync:shared": "node scripts/sync-shared.mjs",
     "check:shared": "node scripts/sync-shared.mjs --check",
-    "gen:dictionary": "node scripts/gen-dictionary-sql.mjs --out supabase/migrations/005_allergy_dictionary.sql"
+    "gen:dictionary": "node scripts/gen-dictionary-sql.mjs --out supabase/migrations/007_allergy_dictionary.sql"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
