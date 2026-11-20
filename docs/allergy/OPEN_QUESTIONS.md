@@ -27,3 +27,12 @@ the build plan; the rest came up while building.
 | FSIS recall API blocks automated requests (HTTP 403) | The daily job skips FSIS and says so in its result. Check from the deployed Edge Function; if it is still blocked, ask FSIS for API access or use their RSS feed. |
 | Android build | Kotlin for the OCR module was only checked against stubs; there is no Android SDK on this Mac. Build with EAS or Android Studio and test a portrait photo (EXIF rotation). |
 | Push notifications need an EAS project id | Without `eas init`, alerts still appear in the Alerts tab but no push is sent. |
+
+## From the pantry-app integration
+
+| Question | Current state |
+| --- | --- |
+| Which Supabase project for step 3? | Brian chose to decide at step 3 (2026-11-13), and again to decide later (2026-11-19). Ask before creating, linking, deploying or setting secrets. |
+| Should Check be a phone tab? | It is a shield button in the phone tab headers, because `main`'s phone nav is full. Ask Brian. |
+| Is "From your photo" enough wording for a confirmed photo transcription? | Not asked yet; it matters in step 3. Changing it is an engine change and needs a test. |
+| Should `.claude/launch.json` have a Storybook entry? | `main` tracks this file with one `pantry-dev` entry. Storybook was started from a temporary entry that was not committed. |

@@ -111,7 +111,48 @@ food-allergy-app on 2026-11-13.
 - **`test:deno` and the `deno` package wait for step 3.** The Deno tests import `_shared/claude.ts`
   and `_shared/dictionary.ts`, which come with the Edge Functions in step 3. Until then there is
   nothing for Deno to run.
-- **`gen:dictionary` writes `supabase/migrations/005_allergy_dictionary.sql`.** It is not run yet: the
-  seed needs the tables from `004_allergy_schema.sql` (step 3).
+- **`gen:dictionary` writes `supabase/migrations/007_allergy_dictionary.sql`.** It is not run yet: the
+  seed needs the tables from `006_allergy_schema.sql` (step 3). The numbers start at 006 because
+  GitHub's `main` already has migrations 003 to 005.
 - **`supabase/functions/_shared/verdict-engine` and `_shared/food-data` are generated now** by
   `npm run sync:shared`, so `npm run check:shared` passes from the start. ESLint ignores them.
+- **Open Food Facts gets the app's name as `X-User-Agent` from the browser.** Browsers refuse to let a
+  page set `User-Agent`. `fetchOffProduct` and `searchOff` take `userAgentHeader`; the default is still
+  `User-Agent`, so the Edge Functions are unaffected. The contact address comes from
+  `VITE_OFF_CONTACT_EMAIL`. Without it the header says "no contact set", as the phone app did.
+- **Until step 3, barcodes are looked up from the browser in both modes.** The add page and the Check page
+  ask Open Food Facts directly, through `src/allergy/lookup.ts`, with or without Supabase. pantry's
+  `barcode-lookup` function and `lookupBarcode()` are no longer called. Step 3 moves both pages to
+  `lookup-product` and deletes `barcode-lookup`.
+- **The 15-reads-a-minute limit is counted in the page.** Each browser tab keeps its own count. Past the
+  limit, the lookup answers from the cache and says to wait a minute.
+- **A barcode with a wrong check digit is refused.** The phone app passed it on. On the web a typing slip
+  is more likely, and looking it up could show some other product's verdict.
+- **The pantry badge and the item page check everyone in the household. The Check page and the chef card
+  check the people selected there.** The pantry is shared, so its badges are for everyone.
+- **Badge words:** "Not safe for Sam", "Check first for Sam", "No listed allergens", "No ingredient list"
+  and "Store-made: ask staff". Each has a shield icon (`ShieldX`, `ShieldAlert`, `ShieldCheck`,
+  `ShieldQuestion`), so it never looks like a freshness label.
+- **The allergy data has its own store** (`pantry-allergy-store`, version 1), apart from
+  `pantry-demo-store`. `FoodItem.gtin` is optional, so `pantry-demo-store` keeps its version and nobody
+  loses demo data.
+- **The barcode polyfill is `barcode-detector` 3.2.3 (MIT, released 2026-10-19), with `zxing-wasm`
+  3.1.6 pinned to the same version it uses.** The `.wasm` (about 950 KB) is served by this app instead of
+  the package's default jsDelivr URL. Both load only when the browser has no `BarcodeDetector`.
+- **A name filled in by a barcode is not re-guessed.** The add page's name lookup matches whole words, so
+  "Peanut Butter Sandwich Cookie" matched "butter" and became dairy in the fridge. For a barcode product,
+  the category comes from Open Food Facts, and storage and expiry use that category's defaults.
+- **The item page offers "Scan barcode" for items typed by hand.** It saves the GTIN on the item, so the
+  item gets a badge. The handoff's wording also said "or photograph the label"; label photos arrive in
+  step 3, so the page does not offer them yet.
+- **The allergy work is built on GitHub's `main` (2026-11-19).** The first build used a local `main` a
+  month behind GitHub and conflicted in 19 files. Branch `allergy-on-main` replays it on `5cfe9cf` and
+  drops the fixes `main` already had.
+- **Check is not a phone tab.** `main`'s phone nav has four tabs and a centered +. Check is in the side
+  nav (tablet and desktop) and a shield button beside the settings gear in each phone tab header. The
+  item is `CHECK_NAV_ITEM` in `src/components/layout/navItems.ts`. Moving it into the phone nav means
+  adding it to `BottomNav`.
+- **The page header, side nav and bottom nav hide when printing**, and the side nav's padding goes, so
+  the chef card prints alone.
+- **ESLint ignores `.claude/`.** Claude Code keeps other sessions' worktrees there, and linting them
+  doubled the count.

@@ -17,7 +17,54 @@ This copy lives in pantry-app and is kept up to date as decisions change. The or
    - In step 3, don't bring `push_tokens` or the Expo push code into pantry's schema and Edge
      Functions. Web push stays a step 4 item.
 
-The defaults in the "Defaults to state" table below were stated to Brian and stand.
+The defaults in the "Defaults to state" table below were stated to Brian and stand, except where Check
+goes (see the status below). On 2026-11-19 Brian chose again to pick the Supabase project later.
+
+## Status (2026-11-19, branch `allergy-on-main`)
+
+**Steps 0, 1 and 2 are done, on top of GitHub's `main` (`5cfe9cf`).** Nothing is pushed. No Supabase
+project exists.
+
+**Why this branch, and not `allergy-integration`.** The handoff (2026-11-11) checked a local `main` at
+`c49abb8`. GitHub's `main` was already 34 commits ahead (PRs #2 to #8, 2026-10-18 to 10-21), and nobody
+fetched it. The first build, on branches `allergy-integration` and `pantry-small-fixes`, conflicted with
+`main` in 19 files. This branch replays that work on `main` and replaces both. Don't merge either of them.
+
+GitHub's `main` had already done several things this plan asks for:
+
+- Step 0's 19 story type errors (PR #2). Lint has no errors.
+- Problems 1 to 3 below: the RLS recursion, the self-insert hole and `search_path` (migrations 003 to
+  005). So the allergy migrations in step 3 start at 006.
+- Dates read and written as local calendar days, and the freshness bar worked out from the dates.
+- A new design: a charcoal `primary` color token, sentence case, a + button that opens an Add sheet, a
+  side nav from tablet width up, and the same header on every tab.
+
+**What the allergy work looks like on `main`:**
+
+- The allergy screens use `main`'s `PageHeader`, page widths and `primary` color.
+- **Where Check goes (changed from the default below).** The phone bottom nav already has four tabs and
+  the +, so a fifth tab would push the + off center and undo PR #3's simpler nav. Check is in the side
+  nav on tablet and desktop, and on phones it is a shield button beside the settings gear in each tab's
+  header. Ask Brian whether he wants a phone tab instead.
+- The page header and the navs hide when printing, so the chef card prints on its own.
+
+| Check | Result |
+| --- | --- |
+| `npm run build` | Passes. Main bundle 832 KB (241 KB gzipped); `main` alone is 821 KB (237 KB). The engine, dictionary, polyfill and `.wasm` are separate chunks that load on demand. |
+| `npm test` | 186 pass: engine 156, food-data 21, web allergy helpers 9. |
+| `npm run lint` | 0 errors and 4 warnings, all 4 already on `main`. ESLint now ignores `.claude/`, where other sessions' worktrees live. |
+| `npm run check:shared` | Up to date. |
+| Storybook | All 144 stories render with no errors, the 16 allergy stories included. |
+| The five milestone-1 checks | All passed in the dev server at 375 px phone width, and the Check page at desktop width, against live Open Food Facts. Nutter Butter (`044000037451`) gave "Contains peanuts (peanut butter, peanuts)"; Nutella (`009800895250`) gave "Contains milk (milk, whey)". |
+
+Not checked on this branch: a real camera scan, Safari and Firefox themselves, and printing on paper.
+The barcode polyfill, store barcodes and wrong check digits were checked on the first build and the
+code is unchanged.
+
+**The engine is unchanged.** food-data gained one option (`userAgentHeader`) with tests.
+
+**Next:** step 3. Ask Brian which Supabase project to use first. Decisions so far are in
+`docs/allergy/DECISIONS.md` under "pantry-app integration".
 
 ## How to use this file
 
@@ -108,6 +155,9 @@ The original plan is the Claude Doc "Food Allergy App: Claude Code Build Plan"
 if you need more detail than DECISIONS.md gives.
 
 ### pantry-app (the target)
+
+> **Out of date.** This section describes the local checkout at `c49abb8`, which was a month behind
+> GitHub. See "Status" at the top for what GitHub's `main` already fixed.
 
 `/Users/brian/Projects/pantry-app`: GitHub `byebrianwong/pantry-app`, `main` at `c49abb8`, with
 `.claude/` untracked.
@@ -255,7 +305,7 @@ Defaults to state, not ask, unless Brian objects:
 | Sign-in | Keep pantry's email and password. (The allergy app used email codes.) |
 | pantry's OpenAI functions | Leave them alone. Both keys are needed. Moving them to Claude would be its own task. |
 | Allergy table names | `allergy_profiles`, `allergy_profile_allergens`, `allergy_profile_avoids`. pantry already has `user_profiles`, so a table named `profiles` would confuse people. |
-| Where Check goes | A fourth bottom-nav tab, "Check", next to Pantry, Recipes and Shopping. |
+| Where Check goes | A fourth bottom-nav tab, "Check", next to Pantry, Recipes and Shopping. **Changed 2026-11-19:** `main`'s phone nav is full, so Check is in the side nav and a shield button in the phone tab headers. |
 | Recipe and shopping list checks | Later (step 4), under the "never green" rule below. |
 
 ## The plan
@@ -264,6 +314,8 @@ Work on a branch, for example `allergy-integration`. Commit after each logical c
 open a pull request unless Brian asks.
 
 ### Step 0: baseline
+
+**Already done on GitHub's `main`** (PR #2). Only the first step, copying this file, was left.
 
 1. Copy this file to `docs/ALLERGY_INTEGRATION.md`.
 2. Fix the 19 type errors in `src/stories/` so `npm run build` passes, in a commit of its own.
@@ -399,11 +451,11 @@ existing ones:
 
 | Migration | What it does |
 | --- | --- |
-| `003_fix_household_rls.sql` | Adds `is_household_member()` and `is_household_owner()`. Decide whether `admin` counts as owner. Rewrites every pantry policy to use them. Drops the self-insert clause. Sets `search_path` on pantry's security definer functions. |
-| `004_allergy_schema.sql` | The allergy tables, adapted (see "Schema merge"). Adds `food_items.gtin text` (normalized, 14 digits) with an index. |
-| `005_allergy_dictionary.sql` | Generated by `gen:dictionary`. Use the script's `--out` option to write it under this name. |
-| `006_allergy_storage_and_cron.sql` | The `label-photos` private bucket and the cron jobs, in guarded blocks as in the allergy repo's `20261108000400`. |
-| `007_allergy_discover.sql` | The `discover_products()` function |
+| ~~`003_fix_household_rls.sql`~~ | **Already done on GitHub's `main`** (2026-10-19, PRs #4 to #7), as `003_tighten_household_members_insert.sql`, `004_household_membership_rules.sql` and `005_harden_security_definer_functions.sql`. They add `private.is_household_member()`, `private.is_household_admin()` and `private.owns_household()`, end the recursion, drop the self-insert clause, and pin `search_path`. The allergy policies should use those functions instead of bringing the allergy repo's own. |
+| `006_allergy_schema.sql` | The allergy tables, adapted (see "Schema merge"). Adds `food_items.gtin text` (normalized, 14 digits) with an index. |
+| `007_allergy_dictionary.sql` | Generated by `npm run gen:dictionary`, which already writes to this name. |
+| `008_allergy_storage_and_cron.sql` | The `label-photos` private bucket and the cron jobs, in guarded blocks as in the allergy repo's `20261108000400`. |
+| `009_allergy_discover.sql` | The `discover_products()` function |
 
 **RLS tests.** Port `supabase-stub.sql`, and add `raw_user_meta_data jsonb` to its `auth.users`,
 because pantry's signup trigger reads it. Write tests for the merged schema:
