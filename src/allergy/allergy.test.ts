@@ -5,7 +5,7 @@ import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { normalizeOffResponse } from '@allergy/food-data'
 import { describe, expect, it } from 'vitest'
-import { badgeSummary, condenseReasons, highlightWords, redPeople } from './display'
+import { badgeSummary, combinedBadge, condenseReasons, highlightWords, redPeople } from './display'
 import { NotABarcodeError, parseBarcode } from './lookup'
 import { verdictFor } from './verdict'
 import type { AllergyProfile, StoredRecord } from './types'
@@ -88,3 +88,37 @@ describe('barcodes', () => {
     expect(() => parseBarcode('abc')).toThrow(NotABarcodeError)
   })
 })
+
+describe('one badge for a card with several batches', () => {
+  const rice: StoredRecord = {
+    ...nutterRecord,
+    key: 'off:rice',
+    sourceId: 'rice',
+    gtin: '00012345678905',
+    name: 'Rice',
+    ingredientsText: 'Long grain rice.',
+    allergenTags: [],
+    traceTags: [],
+  }
+  const red = () => verdictFor('00044000037451', [nutterRecord], [sam])
+  const green = () => verdictFor('00012345678905', [rice], [sam])
+
+  it('shows nothing when no batch was checked', () => {
+    expect(combinedBadge([], 2)).toBeNull()
+  })
+
+  it('shows green only when every batch was checked', () => {
+    expect(green().overall).toBe('green')
+    expect(combinedBadge([green()], 0)).toMatchObject({ verdict: 'green', text: 'No listed allergens' })
+  })
+
+  it('does not vouch for batches nobody checked', () => {
+    expect(combinedBadge([green()], 1)).toMatchObject({ verdict: 'unknown', text: 'Not all checked' })
+  })
+
+  it('a red batch always shows, whatever the other batches are', () => {
+    expect(combinedBadge([green(), red()], 0)).toMatchObject({ verdict: 'red', text: 'Not safe for Sam' })
+    expect(combinedBadge([red()], 3)).toMatchObject({ verdict: 'red', text: 'Not safe for Sam' })
+  })
+})
+

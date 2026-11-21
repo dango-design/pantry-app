@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect, Suspense } from 'react'
+import { useRef, useState, useEffect, useMemo, Suspense } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Minus, Plus, ShoppingCart, Trash2 } from 'lucide-react'
 import Inventory2Outlined from '@mui/icons-material/Inventory2Outlined'
@@ -116,6 +116,8 @@ export function FoodItemCard({
   const name = stock?.name ?? item.name
   const quantityDisplay = stock ? formatStockCount(stock) : formatQuantity(item.quantity, item.quantityUnit)
   const batchCount = stock?.items.length ?? 1
+  // One entry per batch on this card, for the allergy badge
+  const allergyGtins = useMemo(() => (stock?.items ?? [item]).map((row) => row.gtin), [stock, item])
   const showStepper = onAdjust !== undefined && isDiscreteUnit(stock?.unit ?? item.quantityUnit)
 
   // Get the appropriate icons
@@ -290,10 +292,11 @@ export function FoodItemCard({
               </span>
             </div>
 
-            {/* Allergy badge: only for items added by barcode, which have real ingredient data */}
-            {item.gtin && (
+            {/* Allergy badge: only when a batch was added by barcode and so has real ingredient data.
+                It looks at every batch on the card, not just the first. */}
+            {allergyGtins.some(Boolean) && (
               <Suspense fallback={null}>
-                <LazyPantryAllergyBadge gtin={item.gtin} className="self-start" />
+                <LazyPantryAllergyBadge gtins={allergyGtins} className="self-start" />
               </Suspense>
             )}
           </div>

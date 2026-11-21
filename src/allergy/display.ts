@@ -64,11 +64,17 @@ function joinNames(names: string[]): string {
   return `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}`
 }
 
+export interface BadgeSummary {
+  verdict: Verdict
+  text: string
+  detail: string
+}
+
 /**
  * Short words for a badge on a pantry card or the add page, such as "Not safe for Sam". detail is the
  * first reason of the worst person, for a tooltip or screen reader.
  */
-export function badgeSummary(result: EvaluationResult): { verdict: Verdict; text: string; detail: string } {
+export function badgeSummary(result: EvaluationResult): BadgeSummary {
   const worst = result.profiles.filter((p) => p.verdict === result.overall)
   const names = joinNames(worst.map((p) => p.profileName))
   const detail = worst[0]?.summary ?? VERDICT_LABEL[result.overall]
@@ -94,4 +100,24 @@ export function redPeople(result: EvaluationResult): { name: string; reason: str
   return result.profiles
     .filter((p) => p.verdict === 'red')
     .map((p) => ({ name: p.profileName, reason: condenseReasons(p.reasons).find((r) => r.verdict === 'red')?.message ?? p.summary }))
+}
+
+/**
+ * One badge for a pantry card that stands for several batches of a product. results holds one engine
+ * result per checked batch (one with product data); uncheckedBatches counts the rest (typed by hand, or
+ * a barcode Open Food Facts did not know).
+ *
+ * The worst checked result wins, in the engine's order: red, unknown, yellow, green. A warning always
+ * shows. "No listed allergens" shows only when every batch was checked; otherwise the card would vouch
+ * for batches nobody checked, so it says "Not all checked". With no checked batch there is no badge.
+ */
+export function combinedBadge(results: EvaluationResult[], uncheckedBatches: number): BadgeSummary | null {
+  if (results.length === 0) return null
+  const worst = results.reduce((a, b) => (VERDICT_RANK[b.overall] > VERDICT_RANK[a.overall] ? b : a))
+  const summary = badgeSummary(worst)
+  if (summary.verdict === 'green' && uncheckedBatches > 0) {
+    const batches = uncheckedBatches === 1 ? '1 batch has' : `${uncheckedBatches} batches have`
+    return { verdict: 'unknown', text: 'Not all checked', detail: `${batches} no ingredient list` }
+  }
+  return summary
 }
