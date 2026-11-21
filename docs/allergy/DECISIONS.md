@@ -156,3 +156,8 @@ food-allergy-app on 2026-11-13.
   the chef card prints alone.
 - **ESLint ignores `.claude/`.** Claude Code keeps other sessions' worktrees there, and linting them
   doubled the count.
+- **A pantry card checks every batch on it** (2026-11-21). `main` now shows one card per product for all
+  its batches. The badge takes the worst checked result, so a warning always shows. It says "No listed
+  allergens" only when every batch was checked, and "Not all checked" when a green product shares its
+  card with batches typed by hand. Each batch's own item page shows that batch's result. The rule is
+  `combinedBadge()` in `src/allergy/display.ts`, with tests.

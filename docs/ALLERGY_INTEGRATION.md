@@ -20,10 +20,10 @@ This copy lives in pantry-app and is kept up to date as decisions change. The or
 The defaults in the "Defaults to state" table below were stated to Brian and stand, except where Check
 goes (see the status below). On 2026-11-19 Brian chose again to pick the Supabase project later.
 
-## Status (2026-11-19, branch `allergy-on-main`)
+## Status (2026-11-21, branch `allergy-on-main`, PR dango-design/pantry-app#9)
 
-**Steps 0, 1 and 2 are done, on top of GitHub's `main` (`5cfe9cf`).** Nothing is pushed. No Supabase
-project exists.
+**Steps 0, 1 and 2 are done, on top of GitHub's `main`** (merged up to `0e28930`, PR #10). The branch is
+pushed and open as PR #9. No Supabase project exists.
 
 **Why this branch, and not `allergy-integration`.** The handoff (2026-11-11) checked a local `main` at
 `c49abb8`. GitHub's `main` was already 34 commits ahead (PRs #2 to #8, 2026-10-18 to 10-21), and nobody
@@ -50,8 +50,8 @@ GitHub's `main` had already done several things this plan asks for:
 
 | Check | Result |
 | --- | --- |
-| `npm run build` | Passes. Main bundle 832 KB (241 KB gzipped); `main` alone is 821 KB (237 KB). The engine, dictionary, polyfill and `.wasm` are separate chunks that load on demand. |
-| `npm test` | 186 pass: engine 156, food-data 21, web allergy helpers 9. |
+| `npm run build` | Passes. Main bundle 872 KB (253 KB gzipped); `main` alone is 860 KB (249 KB). The engine, dictionary, polyfill and `.wasm` are separate chunks that load on demand. |
+| `npm test` | 315 pass: engine 156, food-data 21, web allergy helpers 13, and `main`'s own 125, which `npm test` now runs too. |
 | `npm run lint` | 0 errors and 4 warnings, all 4 already on `main`. ESLint now ignores `.claude/`, where other sessions' worktrees live. |
 | `npm run check:shared` | Up to date. |
 | Storybook | All 144 stories render with no errors, the 16 allergy stories included. |
