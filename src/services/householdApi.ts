@@ -1,4 +1,4 @@
-import { supabase } from './supabase'
+import { supabase, DB_SCHEMA } from './supabase'
 import type { Tables, UpdateTables } from '@/types/database'
 
 export type HouseholdRow = Tables<'households'>
@@ -223,7 +223,7 @@ export function subscribeToHouseholdMembers(
       'postgres_changes',
       {
         event: '*',
-        schema: 'public',
+        schema: DB_SCHEMA,
         table: 'household_members',
         filter: `household_id=eq.${householdId}`,
       },

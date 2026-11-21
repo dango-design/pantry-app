@@ -14,10 +14,16 @@ if (isDemoMode) {
   )
 }
 
-export const supabase = createClient<Database>(
+// The other app in this Supabase project owns the public schema, so all pantry
+// tables and functions are in this one. Use this constant wherever a schema name
+// is needed, including realtime subscriptions.
+export const DB_SCHEMA = 'pantry'
+
+export const supabase = createClient<Database, typeof DB_SCHEMA>(
   supabaseUrl || 'https://placeholder.supabase.co',
   supabaseAnonKey || 'placeholder-key',
   {
+    db: { schema: DB_SCHEMA },
     auth: {
       persistSession: true,
       autoRefreshToken: true,

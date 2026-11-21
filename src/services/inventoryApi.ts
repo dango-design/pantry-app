@@ -1,4 +1,4 @@
-import { supabase } from './supabase'
+import { supabase, DB_SCHEMA } from './supabase'
 import type { Tables, InsertTables, UpdateTables } from '@/types/database'
 import { dateStringFromToday } from '@/utils/dates'
 
@@ -192,7 +192,7 @@ export function subscribeToInventory(
       'postgres_changes',
       {
         event: '*',
-        schema: 'public',
+        schema: DB_SCHEMA,
         table: 'food_items',
         filter: `household_id=eq.${householdId}`,
       },

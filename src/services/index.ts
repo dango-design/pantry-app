@@ -1,5 +1,5 @@
 // Supabase client
-export { supabase, isDemoMode } from './supabase'
+export { supabase, isDemoMode, DB_SCHEMA } from './supabase'
 export type { Database, Tables, InsertTables, UpdateTables } from './supabase'
 
 // Inventory API

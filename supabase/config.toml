@@ -4,7 +4,8 @@
 [api]
 enabled = true
 port = 54321
-schemas = ["public"]
+# The other app in this project uses public. The pantry app uses pantry.
+schemas = ["public", "pantry"]
 
 [db]
 port = 54322
@@ -17,11 +18,18 @@ port = 54323
 enabled = true
 site_url = "http://localhost:5173"
 
-[functions.process-image]
+# Function names are shared by every app in the project, so each one has a pantry- prefix.
+[functions.pantry-process-image]
 verify_jwt = true
 
-[functions.process-receipt]
+[functions.pantry-process-receipt]
 verify_jwt = true
 
-[functions.barcode-lookup]
+[functions.pantry-barcode-lookup]
+verify_jwt = true
+
+[functions.pantry-import-recipe]
+verify_jwt = true
+
+[functions.pantry-suggest-recipes]
 verify_jwt = true
