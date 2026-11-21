@@ -11,7 +11,7 @@ import {
   parseQuickAdd,
   resolveQuickAdd,
 } from './quickAdd'
-import { getProductMemory } from './stock'
+import { getProductMemory, productKey } from './stock'
 
 // Local dates in November 2026, at noon unless an hour is given
 const nov = (day: number, hour = 12) => new Date(2026, 10, day, hour)
@@ -267,7 +267,12 @@ describe('getSuggestions', () => {
   it('puts products bought before above generic names, and name starts above later words', () => {
     // Bought: "Milk Chocolate" starts with it, "Almond Milk" has it as a later word.
     // Generic: "Milk" starts with it. Generic "Almond milk" is the bought product, so it is left out.
-    expect(names('milk')).toEqual(['Milk Chocolate', 'Almond Milk', 'Milk'])
+    const found = names('milk')
+    expect(found.slice(0, 3)).toEqual(['Milk Chocolate', 'Almond Milk', 'Milk'])
+    // Then generic names with it as a later word, such as "Oat milk"
+    expect(found.length).toBeGreaterThan(3)
+    expect(found.slice(3).every((name) => matchRank(name, 'milk') === 1)).toBe(true)
+    expect(found.filter((name) => productKey(name) === 'almond milk')).toEqual(['Almond Milk'])
   })
 
   it('carries the usual quantity for products bought before and none for generic names', () => {
@@ -285,8 +290,9 @@ describe('getSuggestions', () => {
   })
 
   it('offers one generic name per product, and none for a product bought before', () => {
-    expect(names('app')).toEqual(['Apples', 'Honeycrisp apple'])
-    expect(names('egg')).toEqual(['Eggs'])
+    // "Honeycrisp" is another name for apples, not a second product
+    expect(names('app')).toEqual(['Apples', 'Applesauce', 'Apple juice'])
+    expect(names('egg').filter((name) => productKey(name) === 'egg')).toEqual(['Eggs'])
     expect(getSuggestions('egg', memory, staples, [], nov(10))[0].source).toBe('bought')
   })
 
@@ -307,7 +313,7 @@ describe('getSuggestions', () => {
   it('marks products the list already covers', () => {
     const list = [listItem({ name: 'almond milk' })]
     const suggestions = getSuggestions('milk', memory, staples, list, nov(10))
-    expect(suggestions.map((s) => [s.name, s.onList])).toEqual([
+    expect(suggestions.slice(0, 3).map((s) => [s.name, s.onList])).toEqual([
       ['Milk Chocolate', false],
       ['Almond Milk', true],
       ['Milk', false],
