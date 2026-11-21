@@ -1,0 +1,37 @@
+name: CI
+
+# Runs on every push to every branch, and by hand from the Actions tab.
+on:
+  push:
+  workflow_dispatch:
+
+# A newer push to the same branch cancels the older run. On main every run
+# finishes, so each commit on main gets a result.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    name: Lint, test and build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck:packages
+      # Fails if supabase/functions/_shared is out of date with packages/.
+      - run: npm run check:shared
+      - run: npm test
+      - run: npm run build
+      # Catches stories that no longer compile.
+      - run: npm run build-storybook
