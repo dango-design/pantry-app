@@ -1,6 +1,15 @@
 import { useState, useMemo, useCallback } from 'react'
 import { SlidersHorizontal, ArrowUpDown, Check } from 'lucide-react'
-import { FoodItemCard, useAddToList } from '@/components/inventory'
+import {
+  FoodItemCard,
+  RunningLowSection,
+  StapleSheet,
+  emptyProduct,
+  restoreStaple,
+  shownCount,
+  snapshotStock,
+  useAddToList,
+} from '@/components/inventory'
 import { FilterSheet, type ExpirationFilter } from '@/components/inventory/FilterSheet'
 import { TonightBanner } from '@/components/plan'
 import { CARD_GRID, TabHeader, TabSearchField, pageContainer } from '@/components/layout'
@@ -8,6 +17,7 @@ import { Snackbar } from '@/components/common'
 import { useDemoStore } from '@/stores/demoStore'
 import { cn } from '@/utils/cn'
 import { getDaysUntilExpiration } from '@/utils/freshness'
+import { getStock, groupByProduct } from '@/utils/stock'
 import type { FoodCategory, StorageLocation, FoodItem } from '@/types'
 
 // Category chips configuration
@@ -38,6 +48,8 @@ interface SnackbarState {
   open: boolean
   message: string
   undoAction?: () => void
+  /** Goes up with each message, so a new message gets its own full time on screen */
+  id: number
 }
 
 export function InventoryPage() {
@@ -48,9 +60,18 @@ export function InventoryPage() {
   const [sortBy, setSortBy] = useState<SortOption>('expiration')
   const [showSortMenu, setShowSortMenu] = useState(false)
   const [showFilterSheet, setShowFilterSheet] = useState(false)
-  const [snackbar, setSnackbar] = useState<SnackbarState>({ open: false, message: '' })
+  const [snackbar, setSnackbar] = useState<SnackbarState>({ open: false, message: '', id: 0 })
+  // The product whose "Keep in stock" sheet is open
+  const [stapleName, setStapleName] = useState<string | null>(null)
 
-  const { inventory, consumeItem, updateItem } = useDemoStore()
+  const { inventory, staples, adjustStock } = useDemoStore()
+
+  const showSnackbar = useCallback((message: string, undoAction?: () => void) => {
+    setSnackbar((prev) => ({ open: true, message, undoAction, id: prev.id + 1 }))
+  }, [])
+  const closeSnackbar = useCallback(() => {
+    setSnackbar((prev) => ({ open: false, message: '', id: prev.id }))
+  }, [])
 
   // Count active filters for badge
   const activeFilterCount =
@@ -64,29 +85,37 @@ export function InventoryPage() {
     setExpirationFilter('all')
   }
 
-  // Handle marking an item as used
+  // "Mark used" on a card: the whole product goes to zero. The rows are
+  // remembered first, so undo puts back exactly what was there.
   const handleMarkUsed = useCallback((item: FoodItem) => {
-    const previousQuantity = item.quantity
-    consumeItem(item.id, item.quantity) // Sets quantity to 0
+    const restore = snapshotStock(item.name)
+    emptyProduct(item.name)
+    showSnackbar(`${item.name} removed from pantry`, restore)
+  }, [showSnackbar])
 
-    setSnackbar({
-      open: true,
-      message: `${item.name} removed from pantry`,
-      undoAction: () => {
-        updateItem(item.id, { quantity: previousQuantity, status: 'active', consumedAt: undefined })
-      },
-    })
-  }, [consumeItem, updateItem])
+  // -1 / +1 on a card. No message unless that was the last one: then offer undo.
+  const handleAdjust = useCallback((item: FoodItem, delta: 1 | -1) => {
+    const restore = snapshotStock(item.name)
+    adjustStock(item.name, delta)
+    const after = useDemoStore.getState()
+    if (shownCount(getStock(item.name, after.inventory, after.staples)) <= 0) {
+      showSnackbar(`You are out of ${item.name}`, restore)
+    }
+  }, [adjustStock, showSnackbar])
 
-  // Cart action on a card: asks first when the item is still in stock
+  // Cart action on a card: asks first when the product is still in stock
   const { requestAdd, sheet: addToListSheet } = useAddToList(({ message, undo }) => {
-    setSnackbar({ open: true, message, undoAction: undo })
+    showSnackbar(message, undo)
   })
 
-  // Filter active items
-  const activeItems = useMemo(() => {
-    return inventory.filter((item) => item.status === 'active')
-  }, [inventory])
+  // One entry per product that has something in the pantry. A staple that is
+  // out shows in "Out and running low" only. That includes one whose estimate
+  // has reached zero while its rows still hold the last count.
+  const products = useMemo(() => {
+    return groupByProduct(inventory, staples).filter(
+      (stock) => stock.items.length > 0 && !(stock.staple && stock.status === 'out')
+    )
+  }, [inventory, staples])
 
   const handleChipClick = (categoryKey: FoodCategory | 'all') => {
     setSelectedCategories((prev) => {
@@ -116,30 +145,34 @@ export function InventoryPage() {
     })
   }
 
-  // Filter and sort inventory
-  const filteredInventory = useMemo(() => {
-    let items = activeItems
+  // Filter and sort the products. `items[0]` is a product's soonest-expiring
+  // row, so expiry filters and sorting go by that one.
+  const filteredProducts = useMemo(() => {
+    let list = products
 
     // Search filter
     if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase()
-      items = items.filter((item) => item.name.toLowerCase().includes(query))
+      const query = searchQuery.trim().toLowerCase()
+      list = list.filter((stock) =>
+        stock.name.toLowerCase().includes(query) ||
+        stock.items.some((item) => item.name.toLowerCase().includes(query))
+      )
     }
 
     // Category filter (multi-select)
     if (!selectedCategories.has('all')) {
-      items = items.filter((item) => selectedCategories.has(item.category))
+      list = list.filter((stock) => selectedCategories.has(stock.items[0].category))
     }
 
-    // Location filter (multi-select)
+    // Location filter (multi-select): a product matches when any of its rows is there
     if (!selectedLocations.has('all')) {
-      items = items.filter((item) => selectedLocations.has(item.storageLocation))
+      list = list.filter((stock) => stock.items.some((item) => selectedLocations.has(item.storageLocation)))
     }
 
     // Expiration filter
     if (expirationFilter !== 'all') {
-      items = items.filter((item) => {
-        const days = getDaysUntilExpiration(item.expirationDate)
+      list = list.filter((stock) => {
+        const days = getDaysUntilExpiration(stock.items[0].expirationDate)
         switch (expirationFilter) {
           case 'expired':
             return days < 0
@@ -155,22 +188,27 @@ export function InventoryPage() {
       })
     }
 
-    // Sort
-    return items.sort((a, b) => {
+    // Sort a copy, so the list from groupByProduct keeps its order
+    return [...list].sort((a, b) => {
+      const rowA = a.items[0]
+      const rowB = b.items[0]
       switch (sortBy) {
         case 'expiration':
-          return getDaysUntilExpiration(a.expirationDate) - getDaysUntilExpiration(b.expirationDate)
+          return getDaysUntilExpiration(rowA.expirationDate) - getDaysUntilExpiration(rowB.expirationDate)
         case 'category':
-          return a.category.localeCompare(b.category)
+          return rowA.category.localeCompare(rowB.category)
         case 'location':
-          return a.storageLocation.localeCompare(b.storageLocation)
+          return rowA.storageLocation.localeCompare(rowB.storageLocation)
         case 'name':
           return a.name.localeCompare(b.name)
         default:
           return 0
       }
     })
-  }, [activeItems, selectedCategories, selectedLocations, expirationFilter, searchQuery, sortBy])
+  }, [products, selectedCategories, selectedLocations, expirationFilter, searchQuery, sortBy])
+
+  // The "Out and running low" section only shows on the plain, unfiltered pantry
+  const isBrowsing = searchQuery.trim() === '' && activeFilterCount === 0
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -264,7 +302,9 @@ export function InventoryPage() {
       <div className={cn(pageContainer('wide'), 'pt-2 pb-6 space-y-2 md:pt-6 md:pb-10 md:space-y-3')}>
         <TonightBanner />
 
-        {filteredInventory.length === 0 ? (
+        {isBrowsing && <RunningLowSection onOpenStaple={setStapleName} onNotify={showSnackbar} />}
+
+        {filteredProducts.length === 0 ? (
           <div className="text-center py-16 text-gray-500">
             <p className="text-lg font-medium mb-1">No items found</p>
             <p className="text-sm">
@@ -273,12 +313,14 @@ export function InventoryPage() {
           </div>
         ) : (
           <div className={CARD_GRID}>
-            {filteredInventory.map((item) => (
+            {filteredProducts.map((stock) => (
               <FoodItemCard
-                key={item.id}
-                item={item}
+                key={stock.key}
+                item={stock.items[0]}
+                stock={stock}
                 onMarkUsed={handleMarkUsed}
                 onAddToCart={requestAdd}
+                onAdjust={handleAdjust}
               />
             ))}
           </div>
@@ -301,11 +343,24 @@ export function InventoryPage() {
       {/* "You still have …" confirmation for the cart action */}
       {addToListSheet}
 
+      {/* "Keep in stock" sheet, opened from the "Out and running low" section */}
+      {stapleName && (
+        <StapleSheet
+          key={stapleName}
+          name={stapleName}
+          onClose={() => setStapleName(null)}
+          onRemoved={(staple) =>
+            showSnackbar(`Stopped keeping ${staple.name} in stock`, () => restoreStaple(staple))
+          }
+        />
+      )}
+
       {/* Snackbar */}
       <Snackbar
+        key={snackbar.id}
         open={snackbar.open}
         message={snackbar.message}
-        onClose={() => setSnackbar({ open: false, message: '' })}
+        onClose={closeSnackbar}
         onUndo={snackbar.undoAction}
       />
     </div>

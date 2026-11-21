@@ -1,42 +1,84 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { Minus, Plus, Clock, MapPin, Tag, ShoppingCart, CheckCircle2, Edit2, SlidersHorizontal, Trash2 } from 'lucide-react'
-import { Button, Card, CardContent, Dialog, DialogActions, Snackbar } from '@/components/common'
+import { Minus, Plus, Clock, MapPin, Tag, ShoppingCart, CheckCircle2, ChevronRight, Edit2, Repeat, SlidersHorizontal, Trash2 } from 'lucide-react'
+import { Badge, Button, Card, CardContent, Dialog, DialogActions, Snackbar } from '@/components/common'
 import { useDemoStore } from '@/stores/demoStore'
 import { CATEGORIES, CATEGORY_TONES, STORAGE_LOCATIONS, QUANTITY_UNITS } from '@/utils/constants'
 import { calculateFreshnessScore, formatExpirationText, getFreshnessLevel, FRESHNESS_COLORS } from '@/utils/freshness'
 import { formatDateString } from '@/utils/dates'
 import { FoodThumbnail } from '@/components/icons'
-import { useAddToList } from '@/components/inventory'
+import {
+  StapleSheet,
+  describeDailyUse,
+  emptyProduct,
+  restoreStaple,
+  shownCount,
+  snapshotStock,
+  useAddToList,
+} from '@/components/inventory'
 import { PageHeader, pageContainer } from '@/components/layout'
 import { cn } from '@/utils/cn'
+import { formatQuantity } from '@/utils/mealPlan'
+import { describeRunOut, formatStockCount, getStock } from '@/utils/stock'
 
 // Snackbar state type
 interface SnackbarState {
   open: boolean
   message: string
   undoAction?: () => void
+  /** Goes up with each message, so a new message gets its own full time on screen */
+  id: number
 }
+
+// Smallest amount, and step, in the "Use item" dialog
+const USE_STEP = 0.5
 
 export function ItemDetailPage() {
   const navigate = useNavigate()
   const { id } = useParams<{ id: string }>()
-  const { inventory, deleteItem, consumeItem, updateItem } = useDemoStore()
+  const { inventory, staples, deleteItem, adjustStock } = useDemoStore()
 
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const [showUseDialog, setShowUseDialog] = useState(false)
+  const [showStapleSheet, setShowStapleSheet] = useState(false)
   const [useQuantity, setUseQuantity] = useState(1)
-  const [snackbar, setSnackbar] = useState<SnackbarState>({ open: false, message: '' })
+  const [snackbar, setSnackbar] = useState<SnackbarState>({ open: false, message: '', id: 0 })
+
+  // True after the product was used up from this page. The page then goes
+  // back to the pantry when the message closes, unless Undo brought the
+  // product back. It waits until then so that Undo can still be tapped:
+  // leaving at once would remove the message.
+  const usedUpHere = useRef(false)
+
+  const showSnackbar = useCallback((message: string, undoAction?: () => void, usedUp = false) => {
+    if (usedUp) usedUpHere.current = true
+    setSnackbar((prev) => ({ open: true, message, undoAction, id: prev.id + 1 }))
+  }, [])
+
+  const closeSnackbar = useCallback(() => {
+    setSnackbar((prev) => ({ open: false, message: '', id: prev.id }))
+    if (!usedUpHere.current) return
+    usedUpHere.current = false
+
+    // Read the store now: Undo may have put the product back
+    const current = useDemoStore.getState()
+    const row = current.inventory.find((i) => i.id === id)
+    if (!row || shownCount(getStock(row.name, current.inventory, current.staples)) <= 0) navigate('/')
+  }, [id, navigate])
+
+  // The message can close just after the page is left by other means. Do not send the user anywhere then.
+  useEffect(() => () => {
+    usedUpHere.current = false
+  }, [])
 
   const item = useMemo(() => {
     return inventory.find((i) => i.id === id)
   }, [inventory, id])
 
-  // "Buy more" asks first when the item is still in stock. Only the
-  // "Used it up" choice empties the item, so only then go back.
+  // "Buy more" asks first when the product is still in stock. Only the
+  // "I'm out of it" choice empties the pantry, so only then go back.
   const { requestAdd, sheet: addToListSheet } = useAddToList(({ message, undo, usedUp }) => {
-    setSnackbar({ open: true, message, undoAction: undo })
-    if (usedUp) setTimeout(() => navigate('/'), 300)
+    showSnackbar(message, undo, usedUp)
   })
 
   if (!item) {
@@ -54,34 +96,39 @@ export function ItemDetailPage() {
   const location = STORAGE_LOCATIONS[item.storageLocation] || { label: item.storageLocation, color: '#6B7280' }
   const freshnessLevel = getFreshnessLevel(item.expirationDate)
   const freshnessScore = calculateFreshnessScore(item.purchaseDate, item.expirationDate)
-  const unitLabel = QUANTITY_UNITS[item.quantityUnit]?.shortLabel || ''
   const tone = CATEGORY_TONES[item.category] || CATEGORY_TONES.other
 
+  // The product this row belongs to: the count across all of its rows. For a
+  // staple the count is the estimate, not the quantity stored on the rows.
+  const stock = getStock(item.name, inventory, staples)
+  const staple = stock.staple
+  const available = shownCount(stock)
+  const unitLabel = QUANTITY_UNITS[stock.unit]?.shortLabel || ''
+  const otherRows = stock.items.filter((row) => row.id !== item.id)
+  const runOut = describeRunOut(stock)
 
+  const openUseDialog = () => {
+    setUseQuantity(Math.min(1, available))
+    setShowUseDialog(true)
+  }
+
+  // Takes the amount from the product. Rows that expire soonest are used first.
   const handleUse = () => {
-    consumeItem(item.id, useQuantity)
+    adjustStock(item.name, -useQuantity)
     setShowUseDialog(false)
 
     // If fully consumed, go back
-    if (item.quantity - useQuantity <= 0) {
+    if (available - useQuantity <= 0) {
       navigate('/')
     }
   }
 
+  // The whole product goes to zero. The rows are remembered first, so undo
+  // puts back exactly what was there.
   const handleMarkUsed = () => {
-    const previousQuantity = item.quantity
-    consumeItem(item.id, item.quantity) // Sets quantity to 0
-
-    setSnackbar({
-      open: true,
-      message: `${item.name} removed from pantry`,
-      undoAction: () => {
-        updateItem(item.id, { quantity: previousQuantity, status: 'active', consumedAt: undefined })
-      },
-    })
-
-    // Navigate back after a short delay
-    setTimeout(() => navigate('/'), 300)
+    const restore = snapshotStock(item.name)
+    emptyProduct(item.name)
+    showSnackbar(`${item.name} removed from pantry`, restore, true)
   }
 
   const handleRemove = () => {
@@ -120,7 +167,8 @@ export function ItemDetailPage() {
 
                 <div className="flex items-center gap-4 mt-2 text-sm">
                   <span className="text-gray-600">
-                    Qty: {item.quantity} {unitLabel}
+                    {formatStockCount(stock)} left
+                    {stock.items.length > 1 && ` in ${stock.items.length} batches`}
                   </span>
                   <span
                     className="flex items-center gap-1"
@@ -215,16 +263,87 @@ export function ItemDetailPage() {
           </CardContent>
         </Card>
 
+        {/* Other rows of the same product */}
+        {otherRows.length > 0 && (
+          <Card>
+            <CardContent className="p-4">
+              <p className="text-sm text-gray-500">Other batches</p>
+              <ul className="mt-1 divide-y divide-gray-100">
+                {otherRows.map((row) => (
+                  <li key={row.id}>
+                    <button
+                      type="button"
+                      onClick={() => navigate(`/item/${row.id}`)}
+                      className="w-full flex items-center gap-3 py-2.5 text-left text-sm"
+                    >
+                      <span className="flex-1 min-w-0 truncate">
+                        {/* An estimate covers the whole product, so the amount on one row would not add up */}
+                        {!stock.isEstimate && `${formatQuantity(row.quantity, row.quantityUnit)} · `}
+                        Bought {formatDateString(row.purchaseDate)}
+                      </span>
+                      <span
+                        className="flex-shrink-0"
+                        style={{ color: FRESHNESS_COLORS[getFreshnessLevel(row.expirationDate)] }}
+                      >
+                        Expires {formatDateString(row.expirationDate)}
+                      </span>
+                      <ChevronRight className="h-4 w-4 flex-shrink-0 text-gray-400" />
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Keep in stock: shows the settings for a staple, or offers to make the product one */}
+        <Card>
+          <button
+            type="button"
+            onClick={() => setShowStapleSheet(true)}
+            className="w-full flex items-center gap-3 p-4 text-left rounded-xl hover:bg-gray-50 transition-colors"
+          >
+            <div className="w-10 h-10 rounded-lg bg-primary-soft flex items-center justify-center flex-shrink-0">
+              <Repeat className="h-5 w-5 text-primary" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="font-medium flex items-center gap-2">
+                Keep in stock
+                {staple && stock.status === 'low' && <Badge variant="warning" size="sm">Running low</Badge>}
+                {staple && stock.status === 'out' && <Badge variant="danger" size="sm">Out</Badge>}
+              </p>
+              {staple ? (
+                <>
+                  <p className="text-sm text-gray-500">
+                    Keep at least {formatQuantity(staple.minQuantity, staple.unit)} · Buy {formatQuantity(staple.buyQuantity, staple.unit)} at a time
+                  </p>
+                  {stock.dailyUse !== undefined && (
+                    <p className="text-sm text-gray-500">
+                      {describeDailyUse(stock.dailyUse, stock.unit)}
+                      {runOut && ` · ${runOut}`}
+                    </p>
+                  )}
+                </>
+              ) : (
+                <p className="text-sm text-gray-500">Get a warning before you run out</p>
+              )}
+            </div>
+            <ChevronRight className="h-5 w-5 flex-shrink-0 text-gray-400" />
+          </button>
+        </Card>
+
         {/* Actions: one filled primary, soft secondaries, and Remove as a quiet text link */}
         <div className="space-y-3">
-          <Button onClick={handleMarkUsed} className="w-full" size="lg">
+          {/* Still works at "About 0 left": that is an estimate, and this confirms it */}
+          <Button onClick={handleMarkUsed} disabled={stock.items.length === 0} className="w-full" size="lg">
             <CheckCircle2 className="h-5 w-5 mr-2" />
             Used it all
           </Button>
 
           <div className="flex gap-3">
             <Button
-              onClick={() => setShowUseDialog(true)}
+              onClick={openUseDialog}
+              disabled={available <= 0}
               variant="secondary"
               className="flex-1"
               size="lg"
@@ -279,7 +398,8 @@ export function ItemDetailPage() {
       >
         <div className="flex items-center justify-center gap-4 py-4">
           <button
-            onClick={() => setUseQuantity(Math.max(0.5, useQuantity - 0.5))}
+            onClick={() => setUseQuantity(Math.max(Math.min(USE_STEP, available), useQuantity - USE_STEP))}
+            aria-label="Less"
             className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors"
           >
             <Minus className="h-5 w-5" />
@@ -291,7 +411,8 @@ export function ItemDetailPage() {
           </div>
 
           <button
-            onClick={() => setUseQuantity(Math.min(item.quantity, useQuantity + 0.5))}
+            onClick={() => setUseQuantity(Math.min(available, useQuantity + USE_STEP))}
+            aria-label="More"
             className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors"
           >
             <Plus className="h-5 w-5" />
@@ -299,7 +420,7 @@ export function ItemDetailPage() {
         </div>
 
         <p className="text-center text-sm text-gray-500 mb-4">
-          {item.quantity - useQuantity} {unitLabel} will remain
+          {formatQuantity(Math.max(0, available - useQuantity), stock.unit)} will remain
         </p>
 
         <DialogActions>
@@ -315,11 +436,23 @@ export function ItemDetailPage() {
       {/* "You still have …" confirmation for Buy more */}
       {addToListSheet}
 
+      {/* "Keep in stock" sheet. Opened fresh each time, so its fields start from the saved settings. */}
+      {showStapleSheet && (
+        <StapleSheet
+          name={item.name}
+          onClose={() => setShowStapleSheet(false)}
+          onRemoved={(removed) =>
+            showSnackbar(`Stopped keeping ${removed.name} in stock`, () => restoreStaple(removed))
+          }
+        />
+      )}
+
       {/* Snackbar */}
       <Snackbar
+        key={snackbar.id}
         open={snackbar.open}
         message={snackbar.message}
-        onClose={() => setSnackbar({ open: false, message: '' })}
+        onClose={closeSnackbar}
         onUndo={snackbar.undoAction}
       />
     </div>
