@@ -173,8 +173,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       password,
       options: {
         // The project's default Site URL belongs to the other app. Without this,
-        // the confirmation link would send people there.
-        emailRedirectTo: window.location.origin,
+        // the confirmation link would send people there. Keep the trailing
+        // slash: the allow-list entry is "<origin>/**", which does not match
+        // the origin without a slash, and Supabase then falls back to the
+        // Site URL without an error.
+        emailRedirectTo: `${window.location.origin}/`,
         data: {
           display_name: displayName,
           // The shared email template uses this to pick the pantry wording

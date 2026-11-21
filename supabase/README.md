@@ -70,6 +70,11 @@ Do these in order. Steps 3 to 5 are in the Supabase dashboard.
    URLs: add the pantry app's production URL and `http://localhost:5173/**`.
    Leave the Site URL as it is. It belongs to DoDone.
 
+   An entry `https://example.com/**` matches `https://example.com/` but not
+   `https://example.com` with no trailing slash. A redirect that does not
+   match is silently replaced by the Site URL, so the person lands on
+   DoDone. The app always sends a path that starts with `/`.
+
 5. **Email templates.** There is one set of templates for the whole project,
    and it currently says "Welcome to DoDone". The pantry app sends
    `app: 'pantry'` in the sign-up data, so the confirmation template can pick
@@ -83,10 +88,14 @@ Do these in order. Steps 3 to 5 are in the Supabase dashboard.
    {{ end }}
    ```
 
-   `.Data.app` is set once, by the app the person signed up in. For the
-   password reset email, compare `{{ .RedirectTo }}` with the pantry app's
-   reset URL instead. This has not been tested yet. Send yourself each email
-   from both apps after changing a template.
+   Compare with `printf "%v"` as in the live template, not with a plain
+   `eq .Data.app "pantry"`. Sign-up data is whatever the client sends. A plain
+   `eq` fails when `app` is a number, and a template that fails makes that
+   sign-up fail with HTTP 500.
+
+   `.Data.app` is set once, by the app the person signed up in. The password
+   reset email still uses Supabase's default wording, which names neither
+   app.
 
 6. Deploy the edge functions and set their secret:
 
@@ -131,6 +140,11 @@ schema locally.
 
 ## Known gaps
 
+- **`pantry-barcode-lookup` accepts the public anon key.** It only calls the
+  free Open Food Facts API, so it has no sign-in check. The four AI functions
+  do have one: they call `requireUser()` from
+  `supabase/functions/_shared/requireUser.ts`, which refuses the anon key and
+  anonymous users. A new function that costs money must call it too.
 - **An account that owns a pantry household cannot be deleted.** Several
   pantry columns point at the person (`households.owner_id`,
   `food_items.added_by` and others) with no delete rule, so deleting the row in
