@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ShoppingCart, Trash2 } from 'lucide-react'
+import { Minus, Plus, ShoppingCart, Trash2 } from 'lucide-react'
 import Inventory2Outlined from '@mui/icons-material/Inventory2Outlined'
 import AutoDeleteOutlined from '@mui/icons-material/AutoDeleteOutlined'
 import { cn } from '@/utils/cn'
@@ -9,6 +9,8 @@ import { formatExpirationText, getFreshnessLevel, FRESHNESS_COLORS } from '@/uti
 import { QUANTITY_UNITS } from '@/utils/constants'
 import { getFoodIcon, getLocationIcon, FoodThumbnail } from '@/components/icons'
 import { useFlyToCart } from '@/components/common'
+import { formatStockCount, type StockInfo } from '@/utils/stock'
+import { isDiscreteUnit } from '@/utils/units'
 import type { FoodItem } from '@/types'
 
 // Card color tokens (M3 roles, neutral values: white card, zinc-gray outline)
@@ -19,10 +21,15 @@ const M3 = {
 }
 
 interface FoodItemCardProps {
+  /** The row the card opens. For a product, pass its soonest-expiring row */
   item: FoodItem
+  /** The product's totals. With this the card shows the count across all of the product's rows */
+  stock?: StockInfo
   onMarkUsed?: (item: FoodItem) => void
   /** Return false when the item wasn't added right away (e.g. the page asks first) */
   onAddToCart?: (item: FoodItem) => boolean | void
+  /** One tap down or up. The buttons only show for units you count */
+  onAdjust?: (item: FoodItem, delta: 1 | -1) => void
   className?: string
 }
 
@@ -68,10 +75,21 @@ const ACTION_WIDTH = 72
 // Icon size matching Figma's 16.667px
 const META_ICON_SIZE = 17
 
+// Width of the picture on the right of the card (w-20)
+const MEDIA_WIDTH = 80
+
+// Stops a tap or touch on the -1 / +1 buttons from opening the card or starting a swipe
+const stopEvent = (e: React.SyntheticEvent) => e.stopPropagation()
+
+const STEP_BUTTON =
+  'w-10 h-10 flex items-center justify-center text-gray-700 hover:bg-gray-50 active:bg-gray-100 transition-colors touch-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary'
+
 export function FoodItemCard({
   item,
+  stock,
   onMarkUsed,
   onAddToCart,
+  onAdjust,
   className,
 }: FoodItemCardProps) {
   const navigate = useNavigate()
@@ -89,9 +107,15 @@ export function FoodItemCard({
 
   const freshnessLevel = getFreshnessLevel(item.expirationDate)
   const expirationText = formatExpirationText(item.expirationDate)
-  const quantityDisplay = formatQuantity(item.quantity, item.quantityUnit)
   const locationLabel = getLocationLabel(item.storageLocation)
   const tone = CATEGORY_TONES[item.category] || CATEGORY_TONES.other
+
+  // For a product, show the total across its rows. A staple's total is an
+  // estimate ("About 3"), not the quantity stored on the row.
+  const name = stock?.name ?? item.name
+  const quantityDisplay = stock ? formatStockCount(stock) : formatQuantity(item.quantity, item.quantityUnit)
+  const batchCount = stock?.items.length ?? 1
+  const showStepper = onAdjust !== undefined && isDiscreteUnit(stock?.unit ?? item.quantityUnit)
 
   // Get the appropriate icons
   const FoodIcon = getFoodIcon(item.name, item.category)
@@ -212,8 +236,11 @@ export function FoodItemCard({
           transition: isDragging ? 'none' : 'transform 0.2s ease-out',
         }}
       >
-        {/* Left content section */}
-        <div className="flex flex-1 items-center self-stretch gap-4 min-w-0">
+        {/* Left content section. Its right border is the line between the text and the picture. */}
+        <div
+          className="flex flex-1 items-center self-stretch gap-4 min-w-0"
+          style={{ borderRight: `1px solid ${M3.outlineVariant}` }}
+        >
           {/* Color strip - 8px wide, full height, straight right edge */}
           <div
             className="w-2 self-stretch shrink-0"
@@ -223,20 +250,25 @@ export function FoodItemCard({
           {/* Text content */}
           <div className="flex-1 flex flex-col gap-1 py-4 min-w-0">
             {/* Title - M3 Title Medium */}
-            <h3
-              className="font-medium text-base leading-6 truncate"
-              style={{ color: M3.onSurface, letterSpacing: '0.15px' }}
-            >
-              {item.name}
-            </h3>
+            <div className="flex items-baseline gap-2 pr-2 min-w-0">
+              <h3
+                className="font-medium text-base leading-6 truncate"
+                style={{ color: M3.onSurface, letterSpacing: '0.15px' }}
+              >
+                {name}
+              </h3>
+              {batchCount > 1 && (
+                <span className="shrink-0 text-xs leading-6 text-gray-500">{batchCount} batches</span>
+              )}
+            </div>
 
             {/* Metadata row - M3 Body Medium */}
             <div
               className="flex items-center gap-2.5 text-sm leading-5"
               style={{ color: M3.onSurface, letterSpacing: '0.25px' }}
             >
-              {/* Quantity */}
-              <span className="flex-1 flex items-center gap-1 min-w-0">
+              {/* Quantity. An estimate is longer ("About 3"), so it takes the room it needs and is never cut off. */}
+              <span className={cn('flex items-center gap-1', stock?.isEstimate ? 'shrink-0' : 'flex-1 min-w-0')}>
                 <Inventory2Outlined className="shrink-0" style={{ fontSize: META_ICON_SIZE }} />
                 <span className="truncate">{quantityDisplay}</span>
               </span>
@@ -259,40 +291,87 @@ export function FoodItemCard({
           </div>
         </div>
 
-        {/* Media section - 80px, bordered: item photo, or food icon on the category tint */}
-        <FoodThumbnail
-          ref={iconRef}
-          name={item.name}
-          category={item.category}
-          imageUrl={item.imageUrl}
-          iconSize={32}
-          className="w-20 self-stretch shrink-0"
-          style={{ borderLeft: `1px solid ${M3.outlineVariant}` }}
-        />
+        {/* Media section - 80px: item photo, or food icon on the category tint. With -1 / +1 buttons below it for units you count. */}
+        <div className="self-stretch shrink-0 flex flex-col" style={{ width: MEDIA_WIDTH }}>
+          {/* The picture fills the room left over. It is positioned so a tall photo cannot make the card taller. */}
+          <div className="relative flex-1 min-h-0">
+            <FoodThumbnail
+              ref={iconRef}
+              name={item.name}
+              category={item.category}
+              imageUrl={item.imageUrl}
+              iconSize={showStepper ? 24 : 32}
+              className="absolute inset-0"
+            />
+          </div>
+
+          {/* Two 40px buttons. The lines between them are inset shadows, so they take no room. */}
+          {showStepper && (
+            <div
+              className="flex shrink-0 bg-white"
+              onClick={stopEvent}
+              onTouchStart={stopEvent}
+              onTouchMove={stopEvent}
+              onTouchEnd={stopEvent}
+            >
+              <button
+                type="button"
+                onClick={() => onAdjust?.(item, -1)}
+                aria-label={`Use one ${name}`}
+                title="Use one"
+                className={STEP_BUTTON}
+                style={{ boxShadow: `inset 0 1px 0 ${M3.outlineVariant}` }}
+              >
+                <Minus className="h-4 w-4" />
+              </button>
+              <button
+                type="button"
+                onClick={() => onAdjust?.(item, 1)}
+                aria-label={`Add one ${name}`}
+                title="Add one"
+                className={STEP_BUTTON}
+                style={{ boxShadow: `inset 0 1px 0 ${M3.outlineVariant}, inset 1px 0 0 ${M3.outlineVariant}` }}
+              >
+                <Plus className="h-4 w-4" />
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* Desktop: Action buttons - slide ON TOP from right on hover */}
+      {/* Desktop: action buttons slide in on hover. They cover the end of the
+          text and stop at the picture, so the -1 / +1 buttons stay in reach.
+          The wrapper hides them while they are slid out. */}
       {!isTouch && (
         <div
-          className={cn(
-            'absolute right-0 top-0 bottom-0 flex transition-transform duration-200',
-            isHovered ? 'translate-x-0' : 'translate-x-full'
-          )}
+          className="absolute top-0 bottom-0 w-28 overflow-hidden pointer-events-none"
+          style={{ right: MEDIA_WIDTH }}
         >
-          <button
-            onClick={handleAddToCart}
-            className="w-14 flex items-center justify-center bg-primary text-white hover:bg-primary-hover transition-colors"
-            title="Add to shopping list"
+          <div
+            className={cn(
+              'flex h-full transition-transform duration-200',
+              isHovered ? 'translate-x-0 pointer-events-auto' : 'translate-x-full'
+            )}
           >
-            <ShoppingCart className="h-5 w-5" />
-          </button>
-          <button
-            onClick={handleMarkUsed}
-            className="w-14 flex items-center justify-center bg-red-500 text-white hover:bg-red-600 transition-colors"
-            title="Remove from pantry"
-          >
-            <Trash2 className="h-5 w-5" />
-          </button>
+            <button
+              onClick={handleAddToCart}
+              className="w-14 flex items-center justify-center bg-primary text-white hover:bg-primary-hover transition-colors"
+              title="Add to shopping list"
+              aria-label={`Add ${name} to shopping list`}
+              tabIndex={isHovered ? 0 : -1}
+            >
+              <ShoppingCart className="h-5 w-5" />
+            </button>
+            <button
+              onClick={handleMarkUsed}
+              className="w-14 flex items-center justify-center bg-red-500 text-white hover:bg-red-600 transition-colors"
+              title="Remove from pantry"
+              aria-label={`Remove ${name} from pantry`}
+              tabIndex={isHovered ? 0 : -1}
+            >
+              <Trash2 className="h-5 w-5" />
+            </button>
+          </div>
         </div>
       )}
     </div>

@@ -1,8 +1,10 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { FoodItem, ShoppingListItem, Household, Recipe, FoodCategory, StorageLocation, QuantityUnit, MealPlanEntry } from '@/types'
+import type { FoodItem, ShoppingListItem, Household, Recipe, FoodCategory, StorageLocation, QuantityUnit, MealPlanEntry, Staple } from '@/types'
 import { dateStringFromToday, toLocalDateString } from '@/utils/dates'
+import { estimateExpirationDate, getDefaultStorageLocation, lookupFood } from '@/utils/foodDatabase'
 import { calculateFreshnessScore } from '@/utils/freshness'
+import { findStaple, getStock, isOnShoppingList, productKey, roundStockCount, withStockCount } from '@/utils/stock'
 import { roundQuantity } from '@/utils/units'
 
 // Store version - increment this when schema changes to clear old data
@@ -97,6 +99,70 @@ const createDemoInventory = (): FoodItem[] => {
       updatedAt: purchaseDate.toISOString(),
     }
   })
+}
+
+// The demo staple: a drink the household has about one of a day
+const DEMO_STAPLE_NAME = 'BODYARMOR Lite'
+
+// Three purchases of 12, bought 12 days apart. The first two are used up.
+// That history gives a learned use of 1 a day, so 9 days after the last
+// purchase about 3 are left: below "keep at least 6".
+const createDemoStapleHistory = (): FoodItem[] => {
+  const purchases = [
+    { daysAgo: 33, usedUpDaysAgo: 21 },
+    { daysAgo: 21, usedUpDaysAgo: 9 },
+    { daysAgo: 9 },
+  ]
+
+  return purchases.map(({ daysAgo, usedUpDaysAgo }, index) => {
+    const purchaseDate = dateStringFromToday(-daysAgo)
+    const expirationDate = dateStringFromToday(270 - daysAgo)
+    const usedUp = usedUpDaysAgo !== undefined
+    const purchasedAt = new Date(Date.now() - daysAgo * 24 * 60 * 60 * 1000).toISOString()
+
+    return {
+      id: `demo-staple-item-${index + 1}`,
+      householdId: DEMO_HOUSEHOLD.id,
+      name: DEMO_STAPLE_NAME,
+      brand: 'BODYARMOR',
+      category: 'beverages' as const,
+      quantity: usedUp ? 0 : 12,
+      quantityUnit: 'count' as const,
+      originalQuantity: 12,
+      storageLocation: 'pantry',
+      purchaseDate,
+      expirationDate,
+      expirationSource: 'calculated' as const,
+      freshnessScore: calculateFreshnessScore(purchaseDate, expirationDate),
+      tags: [],
+      addedBy: DEMO_USER.id,
+      addedVia: 'manual' as const,
+      status: usedUp ? 'consumed' as const : 'active' as const,
+      consumedAt: usedUp ? new Date(Date.now() - usedUpDaysAgo * 24 * 60 * 60 * 1000).toISOString() : undefined,
+      createdAt: purchasedAt,
+      updatedAt: purchasedAt,
+    }
+  })
+}
+
+const createDemoStaples = (): Staple[] => {
+  const now = new Date().toISOString()
+  return [
+    {
+      id: 'demo-staple-1',
+      name: DEMO_STAPLE_NAME,
+      category: 'beverages',
+      unit: 'count',
+      minQuantity: 6,
+      buyQuantity: 12,
+      dailyUse: 1,
+      autoAdd: true,
+      // The pantry count was last right when the latest 12 were bought
+      countedAt: new Date(Date.now() - 9 * 24 * 60 * 60 * 1000).toISOString(),
+      createdAt: now,
+      updatedAt: now,
+    },
+  ]
 }
 
 // Demo recipes that use items from the demo inventory
@@ -362,6 +428,7 @@ interface DemoState {
   shoppingList: ShoppingListItem[]
   recipes: Recipe[]
   mealPlan: MealPlanEntry[]
+  staples: Staple[]
 
   // Actions
   enableDemoMode: () => void
@@ -373,8 +440,24 @@ interface DemoState {
   deleteItem: (id: string) => void
   consumeItem: (id: string, quantityUsed: number) => FoodItem | null
 
+  // Staple actions
+  /** Adds a staple. If one with the same name exists, it is updated and returned instead. */
+  addStaple: (data: Pick<Staple, 'name' | 'category' | 'unit' | 'minQuantity' | 'buyQuantity' | 'dailyUse' | 'autoAdd'>) => Staple
+  updateStaple: (id: string, updates: Partial<Omit<Staple, 'id' | 'createdAt'>>) => void
+  removeStaple: (id: string) => void
+  /** Make the pantry rows for this product add up to exactly `count` */
+  setStock: (name: string, count: number) => void
+  /** Add to or take from the current estimate, e.g. -1 for "used one" */
+  adjustStock: (name: string, delta: number) => void
+  /** Put low staples on the shopping list. Safe to call often: it changes state only when needed. */
+  syncStapleList: () => void
+
   // Shopping list actions
   addShoppingItem: (item: Omit<ShoppingListItem, 'id' | 'createdAt' | 'updatedAt'>) => ShoppingListItem
+  updateShoppingItem: (
+    id: string,
+    updates: Partial<Pick<ShoppingListItem, 'name' | 'quantity' | 'quantityUnit' | 'notes' | 'category' | 'store' | 'priority'>>
+  ) => void
   toggleShoppingItem: (id: string) => void
   removeShoppingItem: (id: string) => void
   clearCheckedItems: () => ShoppingListItem[]
@@ -415,6 +498,88 @@ function validateInventory(items: FoodItem[]): FoodItem[] {
   })
 }
 
+// ---------------------------------------------------------------------------
+// Stock counts
+//
+// For a staple, the app estimates what is left: the amount in the pantry rows
+// when they were last known to be right (`countedAt`), minus daily use since
+// then. So the rows and `countedAt` always have to change together.
+// ---------------------------------------------------------------------------
+
+type StockState = Pick<DemoState, 'inventory' | 'staples'>
+
+// The staples with one of them marked as counted now
+function markCounted(staples: Staple[], stapleId: string, nowIso: string): Staple[] {
+  return staples.map((staple) =>
+    staple.id === stapleId ? { ...staple, countedAt: nowIso, updatedAt: nowIso } : staple
+  )
+}
+
+// A pantry row for a product that has never had one
+function createStockRow(name: string, count: number, unit: QuantityUnit, staple: Staple | undefined, now: Date): FoodItem {
+  const nowIso = now.toISOString()
+  const category = staple?.category ?? lookupFood(name)?.category ?? 'other'
+  const storageLocation = getDefaultStorageLocation(name, category)
+  const purchaseDate = toLocalDateString(now)
+  const expirationDate = estimateExpirationDate(name, category, storageLocation, purchaseDate)
+
+  return {
+    id: createId('demo-item'),
+    householdId: DEMO_HOUSEHOLD.id,
+    name: staple?.name ?? name.trim(),
+    category,
+    quantity: count,
+    quantityUnit: unit,
+    originalQuantity: count,
+    storageLocation,
+    purchaseDate,
+    expirationDate,
+    expirationSource: 'calculated',
+    freshnessScore: calculateFreshnessScore(purchaseDate, expirationDate),
+    tags: [],
+    addedBy: DEMO_USER.id,
+    addedVia: 'manual',
+    status: 'active',
+    createdAt: nowIso,
+    updatedAt: nowIso,
+  }
+}
+
+// Make a product's pantry rows add up to `count`. A matching staple is marked as counted now.
+function writeStockCount(state: StockState, name: string, count: number, now: Date): StockState {
+  const staple = findStaple(name, state.staples)
+  const key = productKey(name)
+  const hasRows = state.inventory.some((item) => productKey(item.name) === key)
+  const unit = staple || hasRows
+    ? getStock(name, state.inventory, state.staples, now).unit
+    : lookupFood(name)?.unit ?? 'count'
+
+  let inventory = withStockCount(state.inventory, name, count, unit, now)
+  // No row can hold the count, so this is the first one for the product
+  if (inventory === null) {
+    inventory = [...state.inventory, createStockRow(name, count, unit, staple, now)]
+  }
+
+  return {
+    inventory,
+    staples: staple ? markCounted(state.staples, staple.id, now.toISOString()) : state.staples,
+  }
+}
+
+// For a staple, write the current estimate into the pantry rows and mark it as
+// counted now. Every action that changes a staple's quantities does this first.
+// Otherwise the old count, the time since it, and the new amount get mixed:
+// 12 bought two weeks ago at 1 a day, plus 12 bought today, must give about
+// 12 and not 24.
+function settleStaple(state: StockState, name: string, now: Date): StockState {
+  const stock = getStock(name, state.inventory, state.staples, now)
+  if (!stock.staple) return state
+  if (!stock.isEstimate) {
+    return { inventory: state.inventory, staples: markCounted(state.staples, stock.staple.id, now.toISOString()) }
+  }
+  return writeStockCount(state, name, roundStockCount(stock.estimated, stock.unit), now)
+}
+
 export const useDemoStore = create<DemoState>()(
   persist(
     (set, get) => ({
@@ -423,15 +588,19 @@ export const useDemoStore = create<DemoState>()(
       shoppingList: [],
       recipes: [],
       mealPlan: [],
+      staples: [],
 
       enableDemoMode: () => {
         set({
           isDemoMode: true,
-          inventory: createDemoInventory(),
+          inventory: [...createDemoInventory(), ...createDemoStapleHistory()],
           shoppingList: createDemoShoppingList(),
           recipes: createDemoRecipes(),
           mealPlan: createDemoMealPlan(),
+          staples: createDemoStaples(),
         })
+        // The demo staple is low, so it goes on the list right away
+        get().syncStapleList()
       },
 
       disableDemoMode: () => {
@@ -441,34 +610,66 @@ export const useDemoStore = create<DemoState>()(
           shoppingList: [],
           recipes: [],
           mealPlan: [],
+          staples: [],
         })
       },
 
       addItem: (itemData) => {
-        const now = new Date().toISOString()
+        const now = new Date()
+        const nowIso = now.toISOString()
         const newItem: FoodItem = {
           ...itemData,
           id: createId('demo-item'),
-          createdAt: now,
-          updatedAt: now,
+          createdAt: nowIso,
+          updatedAt: nowIso,
         }
-        set((state) => ({
-          inventory: [...state.inventory, newItem],
-        }))
+        set((state) => {
+          const staple = findStaple(newItem.name, state.staples)
+          if (!staple) return { inventory: [...state.inventory, newItem] }
+
+          // Settle what was left before adding the new purchase. Buying more
+          // also ends any hold on putting the staple back on the list.
+          const settled = settleStaple(state, newItem.name, now)
+          return {
+            inventory: [...settled.inventory, newItem],
+            staples: settled.staples.map((s) =>
+              s.id === staple.id ? { ...s, countedAt: nowIso, skippedAt: undefined, updatedAt: nowIso } : s
+            ),
+          }
+        })
         return newItem
       },
 
       updateItem: (id, updates) => {
+        const now = new Date()
+        const nowIso = now.toISOString()
         let updatedItem: FoodItem | null = null
-        set((state) => ({
-          inventory: state.inventory.map((item) => {
-            if (item.id === id) {
-              updatedItem = { ...item, ...updates, updatedAt: new Date().toISOString() }
-              return updatedItem
+        set((state) => {
+          const target = state.inventory.find((item) => item.id === id)
+          if (!target) return state
+
+          // A new quantity on a staple's row is a new count, so settle first.
+          // Forms send the quantity even when it did not change; that is not a count.
+          const changesQuantity = updates.quantity !== undefined && updates.quantity !== target.quantity
+          const staple = changesQuantity ? findStaple(target.name, state.staples) : undefined
+          const settled = staple ? settleStaple(state, target.name, now) : state
+
+          const inventory = settled.inventory.map((item) => {
+            if (item.id !== id) return item
+            const next: FoodItem = { ...item, ...updates, updatedAt: nowIso }
+            // Settling can mark this row used up. A quantity above 0 puts it back in stock.
+            if (staple && target.status === 'active' && updates.status === undefined && next.quantity > 0) {
+              next.status = 'active'
+              next.consumedAt = undefined
             }
-            return item
-          }),
-        }))
+            updatedItem = next
+            return next
+          })
+
+          return staple
+            ? { inventory, staples: markCounted(settled.staples, staple.id, nowIso) }
+            : { inventory }
+        })
         return updatedItem
       },
 
@@ -479,24 +680,136 @@ export const useDemoStore = create<DemoState>()(
       },
 
       consumeItem: (id, quantityUsed) => {
+        const now = new Date()
+        const nowIso = now.toISOString()
         let updatedItem: FoodItem | null = null
-        set((state) => ({
-          inventory: state.inventory.map((item) => {
-            if (item.id === id) {
-              const newQuantity = Math.max(0, roundQuantity(item.quantity - quantityUsed))
-              updatedItem = {
-                ...item,
-                quantity: newQuantity,
-                status: newQuantity === 0 ? 'consumed' : 'active',
-                consumedAt: newQuantity === 0 ? new Date().toISOString() : undefined,
-                updatedAt: new Date().toISOString(),
-              }
-              return updatedItem
+        set((state) => {
+          const target = state.inventory.find((item) => item.id === id)
+          if (!target) return state
+
+          // For a staple, settle the estimate first, then take the amount used from what is left
+          const staple = findStaple(target.name, state.staples)
+          const settled = staple ? settleStaple(state, target.name, now) : state
+
+          const inventory = settled.inventory.map((item) => {
+            if (item.id !== id) return item
+            const newQuantity = Math.max(0, roundQuantity(item.quantity - quantityUsed))
+            const next: FoodItem = {
+              ...item,
+              quantity: newQuantity,
+              status: newQuantity === 0 ? 'consumed' : 'active',
+              consumedAt: newQuantity === 0 ? nowIso : undefined,
+              updatedAt: nowIso,
             }
-            return item
-          }),
-        }))
+            updatedItem = next
+            return next
+          })
+
+          return staple
+            ? { inventory, staples: markCounted(settled.staples, staple.id, nowIso) }
+            : { inventory }
+        })
         return updatedItem
+      },
+
+      addStaple: (data) => {
+        const nowIso = new Date().toISOString()
+        const existing = findStaple(data.name, get().staples)
+        // Two staples with one name would both try to track the same pantry rows
+        const staple: Staple = existing
+          ? { ...existing, ...data, updatedAt: nowIso }
+          : { ...data, id: createId('staple'), countedAt: nowIso, createdAt: nowIso, updatedAt: nowIso }
+        set((state) => ({
+          staples: existing
+            ? state.staples.map((s) => (s.id === existing.id ? staple : s))
+            : [...state.staples, staple],
+        }))
+        return staple
+      },
+
+      updateStaple: (id, updates) => {
+        set((state) => ({
+          staples: state.staples.map((staple) =>
+            staple.id === id
+              ? { ...staple, ...updates, updatedAt: new Date().toISOString() }
+              : staple
+          ),
+        }))
+      },
+
+      removeStaple: (id) => {
+        set((state) => {
+          const staple = state.staples.find((s) => s.id === id)
+          if (!staple) return state
+          // Write the estimate into the pantry rows first. Once the staple is
+          // gone the rows are the only count left, and without this they would
+          // show the last count again (12, when the estimate said about 3).
+          const settled = settleStaple(state, staple.name, new Date())
+          return {
+            inventory: settled.inventory,
+            staples: settled.staples.filter((s) => s.id !== id),
+          }
+        })
+      },
+
+      setStock: (name, count) => {
+        set((state) => writeStockCount(state, name, Math.max(0, count), new Date()))
+      },
+
+      adjustStock: (name, delta) => {
+        const { inventory, staples } = get()
+        const stock = getStock(name, inventory, staples)
+        const base = roundStockCount(stock.estimated, stock.unit)
+        get().setStock(name, Math.max(0, base + delta))
+      },
+
+      syncStapleList: () => {
+        const { inventory, staples, shoppingList } = get()
+        if (staples.length === 0) return
+
+        const now = new Date()
+        const nowIso = now.toISOString()
+        const toAdd: ShoppingListItem[] = []
+        const restocked = new Set<string>()
+
+        for (const staple of staples) {
+          const stock = getStock(staple.name, inventory, staples, now)
+          // With two staples of one name only the first is tracked
+          if (stock.staple?.id !== staple.id) continue
+
+          if (stock.status === 'ok') {
+            // Back in stock: the next time it runs low it can go on the list again
+            if (staple.skippedAt) restocked.add(staple.id)
+            continue
+          }
+          if (!staple.autoAdd || staple.skippedAt) continue
+          if (isOnShoppingList(staple.name, [...shoppingList, ...toAdd], now)) continue
+
+          toAdd.push({
+            id: createId('shop'),
+            shoppingListId: 'demo-list',
+            name: staple.name,
+            category: staple.category,
+            quantity: staple.buyQuantity,
+            quantityUnit: staple.unit,
+            source: 'low_stock',
+            isChecked: false,
+            priority: 'normal',
+            createdAt: nowIso,
+            updatedAt: nowIso,
+          })
+        }
+
+        // This runs from an effect that depends on this state, so only set when something changes
+        if (toAdd.length === 0 && restocked.size === 0) return
+        set((state) => ({
+          shoppingList: toAdd.length > 0 ? [...state.shoppingList, ...toAdd] : state.shoppingList,
+          staples: restocked.size > 0
+            ? state.staples.map((staple) =>
+                restocked.has(staple.id) ? { ...staple, skippedAt: undefined, updatedAt: nowIso } : staple
+              )
+            : state.staples,
+        }))
       },
 
       addShoppingItem: (itemData) => {
@@ -513,20 +826,47 @@ export const useDemoStore = create<DemoState>()(
         return newItem
       },
 
-      toggleShoppingItem: (id) => {
+      updateShoppingItem: (id, updates) => {
         set((state) => ({
           shoppingList: state.shoppingList.map((item) =>
             item.id === id
-              ? { ...item, isChecked: !item.isChecked, updatedAt: new Date().toISOString() }
+              ? { ...item, ...updates, updatedAt: new Date().toISOString() }
+              : item
+          ),
+        }))
+      },
+
+      toggleShoppingItem: (id) => {
+        const nowIso = new Date().toISOString()
+        set((state) => ({
+          shoppingList: state.shoppingList.map((item) =>
+            item.id === id
+              ? { ...item, isChecked: !item.isChecked, checkedAt: item.isChecked ? undefined : nowIso, updatedAt: nowIso }
               : item
           ),
         }))
       },
 
       removeShoppingItem: (id) => {
-        set((state) => ({
-          shoppingList: state.shoppingList.filter((item) => item.id !== id),
-        }))
+        const now = new Date()
+        const nowIso = now.toISOString()
+        set((state) => {
+          const removed = state.shoppingList.find((item) => item.id === id)
+          const shoppingList = state.shoppingList.filter((item) => item.id !== id)
+          if (!removed || removed.source !== 'low_stock' || removed.isChecked) return { shoppingList }
+
+          // Taking a low staple off the list means "not now". Without this
+          // note syncStapleList would put it straight back.
+          const stock = getStock(removed.name, state.inventory, state.staples, now)
+          const stapleId = stock.staple?.id
+          if (!stapleId || stock.status === 'ok') return { shoppingList }
+          return {
+            shoppingList,
+            staples: state.staples.map((staple) =>
+              staple.id === stapleId ? { ...staple, skippedAt: nowIso, updatedAt: nowIso } : staple
+            ),
+          }
+        })
       },
 
       clearCheckedItems: () => {
@@ -641,6 +981,7 @@ export const useDemoStore = create<DemoState>()(
             inventory: [],
             shoppingList: [],
             recipes: [],
+            staples: [],
           } as Partial<DemoState> as DemoState
         }
 
@@ -661,6 +1002,8 @@ export const useDemoStore = create<DemoState>()(
           ...currentState,
           ...state,
           inventory: validateInventory(state.inventory || []),
+          // Data saved before staples existed has no list of them
+          staples: Array.isArray(state.staples) ? state.staples : [],
         }
       },
     }
