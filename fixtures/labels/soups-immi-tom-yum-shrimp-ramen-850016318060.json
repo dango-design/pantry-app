@@ -1,0 +1,28 @@
+{
+  "id": "off-0850016318060",
+  "name": "Tom Yum Ramen (Shrimp)",
+  "brand": "Immi",
+  "gtin": "0850016318060",
+  "source": "off",
+  "sourceUrl": "https://world.openfoodfacts.org/product/0850016318060",
+  "labelRegion": "us",
+  "ingredientsText": "Pea Protein, Wheat Gluten, Food Starch Modified, Sustainable Palm Oil, Wheat Flour, Sunflower Seed Protein, Salt, Yeast Extract, Contains Less Than 2% Of The Following: Natural Flavor, Gum Acacia, Onion Powder, Garlic Powder, Shiitake Mushroom Powder, Shallot Powder, Tomato Powder, Coconut Milk, Spices, Medium Chain Triglycerides, Potassium Chloride, Citric Acid, Turmeric (For Color), Paprika Extract (For Color), Calcium Carbonate, Maltodextrin.",
+  "containsStatement": "Contains: Wheat Tree Nuts (Coconut).",
+  "mayContainStatement": null,
+  "offAllergenTags": [
+    "en:gluten"
+  ],
+  "offTraceTags": [],
+  "expected": {
+    "milk": "none",
+    "egg": "none",
+    "peanut": "none",
+    "tree_nut": "contains",
+    "wheat": "contains",
+    "soy": "none",
+    "fish": "none",
+    "shellfish": "none",
+    "sesame": "none"
+  },
+  "notes": "Coconut rule: the printed Contains line says 'Tree Nuts (Coconut)', so tree_nut is contains. No shrimp despite the name. Garbled address tail 'Manufa Francisco CA 94107' dropped."
+}

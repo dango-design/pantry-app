@@ -1,0 +1,26 @@
+{
+  "id": "off-0011110719287",
+  "name": "worcestershire sauce",
+  "brand": "Kroger",
+  "gtin": "0011110719287",
+  "source": "off",
+  "sourceUrl": "https://world.openfoodfacts.org/product/0011110719287",
+  "labelRegion": "us",
+  "ingredientsText": "WATER, DISTILLED VINEGAR, MOLASSES, SALT, CITRIC ACID, DEXTROSE, CARAMEL COLOR, NATURAL FLAVORS, MALIC ACID, HYDROLYZED SOY AND CORN PROTEIN, ONION*, GARLIC*.",
+  "containsStatement": null,
+  "mayContainStatement": null,
+  "offAllergenTags": [],
+  "offTraceTags": [],
+  "expected": {
+    "milk": "none",
+    "egg": "none",
+    "peanut": "none",
+    "tree_nut": "none",
+    "wheat": "none",
+    "soy": "contains",
+    "fish": "none",
+    "shellfish": "none",
+    "sesame": "none"
+  },
+  "notes": "'HYDROLYZED SOY AND CORN PROTEIN' names soy, so soy is contains. No anchovies in this one."
+}

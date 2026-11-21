@@ -1,0 +1,28 @@
+{
+  "id": "off-0853883006047",
+  "name": "hummus lemon dill",
+  "brand": "ithaca",
+  "gtin": "0853883006047",
+  "source": "off",
+  "sourceUrl": "https://world.openfoodfacts.org/product/0853883006047",
+  "labelRegion": "us",
+  "ingredientsText": "chickpeas, water, organic sunflower oil, cold pressed lemon juice, tahini, fresh garlic, vinegar, salt, dill, crushed red pepper.",
+  "containsStatement": null,
+  "mayContainStatement": null,
+  "offAllergenTags": [
+    "en:sesame-seeds"
+  ],
+  "offTraceTags": [],
+  "expected": {
+    "milk": "none",
+    "egg": "none",
+    "peanut": "none",
+    "tree_nut": "none",
+    "wheat": "none",
+    "soy": "none",
+    "fish": "none",
+    "shellfish": "none",
+    "sesame": "contains"
+  },
+  "notes": "Plain 'tahini' (no word sesame) makes sesame contains. No Contains line."
+}

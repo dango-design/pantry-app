@@ -1,0 +1,34 @@
+{
+  "id": "off-0602652170560",
+  "name": "Peanut Butter Dark Chocolate",
+  "brand": "KIND",
+  "gtin": "0602652170560",
+  "source": "off",
+  "sourceUrl": "https://world.openfoodfacts.org/product/0602652170560",
+  "labelRegion": "us",
+  "ingredientsText": "Peanuts, glucose syrup, almonds, honey, sugar, soy protein isolate, palm kernel oil, peanut butter (peanuts, sea salt), unsweetened chocolate, alkalized cocoa, tapioca starch, chicory root fiber, soy lecithin, sea salt, natural flavor, cocoa butter.",
+  "containsStatement": "Allergen Information: Contains peanuts, almonds and soy.",
+  "mayContainStatement": "May contain tree nuts and sesame seeds. May contain nut shell fragments.",
+  "offAllergenTags": [
+    "en:nuts",
+    "en:peanuts",
+    "en:soybeans"
+  ],
+  "offTraceTags": [
+    "en:nuts",
+    "en:sesame-seeds",
+    "en:Nut Shell Fragments"
+  ],
+  "expected": {
+    "milk": "none",
+    "egg": "none",
+    "peanut": "contains",
+    "tree_nut": "contains",
+    "wheat": "none",
+    "soy": "contains",
+    "fish": "none",
+    "shellfish": "none",
+    "sesame": "may_contain"
+  },
+  "notes": "'May contain tree nuts' does not lower tree_nut, which is already contains from almonds. Nut shell fragments are not an allergen."
+}

@@ -1,0 +1,29 @@
+{
+  "id": "off-0052500050054",
+  "name": "Real Mayonnaise",
+  "brand": "Duke's",
+  "gtin": "0052500050054",
+  "source": "off",
+  "sourceUrl": "https://world.openfoodfacts.org/product/0052500050054",
+  "labelRegion": "us",
+  "ingredientsText": "Soybean oil, egg yolks, water, distilled and cider vinegar, salt, oleoresin paprika, natural flavors, calcium disodium edta",
+  "containsStatement": null,
+  "mayContainStatement": null,
+  "offAllergenTags": [
+    "en:eggs",
+    "en:soybeans"
+  ],
+  "offTraceTags": [],
+  "expected": {
+    "milk": "none",
+    "egg": "contains",
+    "peanut": "none",
+    "tree_nut": "none",
+    "wheat": "none",
+    "soy": "possible",
+    "fish": "none",
+    "shellfish": "none",
+    "sesame": "none"
+  },
+  "notes": "Soybean oil is the only soy source, so soy is possible."
+}

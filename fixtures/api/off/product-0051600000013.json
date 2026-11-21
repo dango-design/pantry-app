@@ -1,0 +1,31 @@
+{
+  "code": "0051600000013",
+  "product": {
+    "allergens_tags": [
+      "en:fish"
+    ],
+    "brands": "Lea & Perrins",
+    "categories_tags": [
+      "en:condiments",
+      "en:sauces",
+      "en:worcestershire-sauces",
+      "en:Anchovy sauce",
+      "en:Meat sauces",
+      "en:Steak sauces"
+    ],
+    "code": "0051600000013",
+    "countries_tags": [
+      "en:united-states"
+    ],
+    "image_front_small_url": "https://images.openfoodfacts.org/images/products/005/160/000/0013/front_en.31.200.jpg",
+    "ingredients_text": "Distilled white vinegar, molasses, sugar, water, salt, onions, anchovies, garlic, cloves, tamarind extract, natural flavorings, chili pepper extract.",
+    "ingredients_text_en": "Distilled white vinegar, molasses, sugar, water, salt, onions, anchovies, garlic, cloves, tamarind extract, natural flavorings, chili pepper extract.",
+    "last_modified_t": 1790001590,
+    "product_name": "Worcestershire Sauce",
+    "product_name_en": "Worcestershire Sauce",
+    "quantity": "10 fl oz",
+    "traces_tags": []
+  },
+  "status": 1,
+  "status_verbose": "product found"
+}

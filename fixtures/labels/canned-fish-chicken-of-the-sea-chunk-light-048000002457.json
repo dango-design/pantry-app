@@ -1,0 +1,29 @@
+{
+  "id": "off-0048000002457",
+  "name": "Chunk Light Tuna",
+  "brand": "Chicken of the Sea",
+  "gtin": "0048000002457",
+  "source": "off",
+  "sourceUrl": "https://world.openfoodfacts.org/product/0048000002457",
+  "labelRegion": "us",
+  "ingredientsText": "CHUNK LIGHT TUNA, WATER, VEGETABLE BROTH (CONTAINS SOY), SALT.",
+  "containsStatement": null,
+  "mayContainStatement": null,
+  "offAllergenTags": [
+    "en:fish",
+    "en:soybeans"
+  ],
+  "offTraceTags": [],
+  "expected": {
+    "milk": "none",
+    "egg": "none",
+    "peanut": "none",
+    "tree_nut": "none",
+    "wheat": "none",
+    "soy": "contains",
+    "fish": "contains",
+    "shellfish": "none",
+    "sesame": "none"
+  },
+  "notes": "'(CONTAINS SOY)' sits inside the ingredient list, not in a separate Contains line."
+}

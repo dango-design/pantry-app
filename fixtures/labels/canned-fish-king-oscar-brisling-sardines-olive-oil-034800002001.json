@@ -1,0 +1,26 @@
+{
+  "id": "off-0034800002001",
+  "name": "Wild Caught Sardines in Extra Virgin Olive Oil",
+  "brand": "King Oscar",
+  "gtin": "0034800002001",
+  "source": "off",
+  "sourceUrl": "https://world.openfoodfacts.org/product/0034800002001",
+  "labelRegion": "us",
+  "ingredientsText": "LIGHTLY SMOKED BRISLING SARDINES, EXTRA VIRGIN OLIVE OIL, SALT.",
+  "containsStatement": null,
+  "mayContainStatement": null,
+  "offAllergenTags": [],
+  "offTraceTags": [],
+  "expected": {
+    "milk": "none",
+    "egg": "none",
+    "peanut": "none",
+    "tree_nut": "none",
+    "wheat": "none",
+    "soy": "none",
+    "fish": "contains",
+    "shellfish": "none",
+    "sesame": "none"
+  },
+  "notes": "OFF allergen tags are empty, but brisling sardines are fish. No Contains line."
+}

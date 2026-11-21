@@ -1,0 +1,28 @@
+{
+  "id": "off-0080000514202",
+  "name": "Tuna Creations Ranch",
+  "brand": "StarKist",
+  "gtin": "0080000514202",
+  "source": "off",
+  "sourceUrl": "https://world.openfoodfacts.org/product/0080000514202",
+  "labelRegion": "us",
+  "ingredientsText": "light tuna, water, sunflower oil, buttermilk solids, contains 2% or less of the following: vinegar, sugar, onion powder, garlic powder, spices, salt, xanthan gum, natural flavors, monosodium glutamate, titanium dioxide, acetic acid",
+  "containsStatement": null,
+  "mayContainStatement": null,
+  "offAllergenTags": [
+    "en:milk"
+  ],
+  "offTraceTags": [],
+  "expected": {
+    "milk": "contains",
+    "egg": "none",
+    "peanut": "none",
+    "tree_nut": "none",
+    "wheat": "none",
+    "soy": "none",
+    "fish": "contains",
+    "shellfish": "none",
+    "sesame": "none"
+  },
+  "notes": "OFF tags miss fish; light tuna is fish. Buttermilk solids are milk."
+}

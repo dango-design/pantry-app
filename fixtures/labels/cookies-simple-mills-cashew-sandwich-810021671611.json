@@ -1,0 +1,28 @@
+{
+  "id": "off-0810021671611",
+  "name": "Nut Butter Stuffed Sandwich Cookies Cocoa & Cashew Butter",
+  "brand": "Simple Mills",
+  "gtin": "0810021671611",
+  "source": "off",
+  "sourceUrl": "https://world.openfoodfacts.org/product/0810021671611",
+  "labelRegion": "us",
+  "ingredientsText": "Cashews, Organic Coconut Sugar, Organic Palm Shortening, Tapioca Starch, Organic Buckwheat Flour, Dutch Cocoa Powder, Carrot Fiber, Arrowroot, Organic Apple Cider Vinegar, Sea Salt, Baking Soda, Vanilla Extract, Rosemary Extract",
+  "containsStatement": null,
+  "mayContainStatement": null,
+  "offAllergenTags": [
+    "en:nuts"
+  ],
+  "offTraceTags": [],
+  "expected": {
+    "milk": "none",
+    "egg": "none",
+    "peanut": "none",
+    "tree_nut": "contains",
+    "wheat": "none",
+    "soy": "none",
+    "fish": "none",
+    "shellfish": "none",
+    "sesame": "none"
+  },
+  "notes": "Cashews make tree_nut contains. Buckwheat flour and coconut sugar are not allergens. No Contains line."
+}

@@ -1,0 +1,29 @@
+{
+  "id": "off-0051500240946",
+  "name": "CREAMY PEANUT BUTTER",
+  "brand": "Jif",
+  "gtin": "0051500240946",
+  "source": "off",
+  "sourceUrl": "https://world.openfoodfacts.org/product/0051500240946",
+  "labelRegion": "us",
+  "ingredientsText": "roasted peanuts, sugar, molasses, fully hydrogenated vegetable oils (rapeseed and soybean), mono and diglycerides, salt",
+  "containsStatement": null,
+  "mayContainStatement": null,
+  "offAllergenTags": [
+    "en:peanuts",
+    "en:soybeans"
+  ],
+  "offTraceTags": [],
+  "expected": {
+    "milk": "none",
+    "egg": "none",
+    "peanut": "contains",
+    "tree_nut": "none",
+    "wheat": "none",
+    "soy": "possible",
+    "fish": "none",
+    "shellfish": "none",
+    "sesame": "none"
+  },
+  "notes": "Fully hydrogenated soybean oil is a highly refined oil, so soy is possible. Rapeseed is not one of the 9."
+}

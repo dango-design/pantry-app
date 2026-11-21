@@ -1,0 +1,296 @@
+{
+  "totalHits": 1,
+  "currentPage": 1,
+  "totalPages": 1,
+  "pageList": [
+    1
+  ],
+  "foodSearchCriteria": {
+    "dataType": [
+      "Branded"
+    ],
+    "query": "00044000037451",
+    "generalSearchInput": "00044000037451",
+    "pageNumber": 1,
+    "numberOfResultsPerPage": 50,
+    "pageSize": 5,
+    "requireAllWords": false,
+    "foodTypes": [
+      "Branded"
+    ]
+  },
+  "foods": [
+    {
+      "fdcId": 1459132,
+      "description": "NABISCO NUTTER BUTTER LUNCHBOX COOKIES 1X1.9 OZ",
+      "dataType": "Branded",
+      "gtinUpc": "00044000037451",
+      "publishedDate": "2021-03-19",
+      "brandOwner": "Mondelez USA",
+      "brandName": "NABISCO NUTTER BUTTER",
+      "ingredients": "INGREDIENTS: UNBLEACHED ENRICHED FLOUR (WHEAT FLOUR, NIACIN, REDUCED IRON, THIAMINE MONONITRATE {VITAMIN B1}, RIBOFLAVIN {VITAMIN B2}, FOLIC ACID), SUGAR, PEANUT BUTTER (PEANUTS, CORN SYRUP SOLIDS, HYDROGENATED RAPESEED AND/OR COTTONSEED AND/OR SOYBEAN OILS, SALT, PEANUT OIL), CANOLA OIL, WHOLE GRAIN WHEAT FLOUR, PALM OIL, HIGH FRUCTOSE CORN SYRUP, SALT, LEAVENING (BAKING SODA AND/OR CALCIUM PHOSPHATE), CORNSTARCH, SOY LECITHIN, ARTIFICIAL FLAVOR.",
+      "marketCountry": "United States",
+      "foodCategory": "Biscuits/Cookies",
+      "modifiedDate": "2018-05-07",
+      "dataSource": "GDSN",
+      "servingSizeUnit": "g",
+      "servingSize": 56.0,
+      "householdServingFullText": "1 pack (56g)",
+      "tradeChannels": [
+        "NO_TRADE_CHANNEL"
+      ],
+      "allHighlightFields": "<b>GTIN/UPC</b>: <em>00044000037451</em>",
+      "score": -648.5318,
+      "microbes": [],
+      "foodNutrients": [
+        {
+          "nutrientId": 1003,
+          "nutrientName": "Protein",
+          "nutrientNumber": "203",
+          "unitName": "G",
+          "derivationCode": "LCSA",
+          "derivationDescription": "Calculated from an approximate value per serving size measure",
+          "derivationId": 71,
+          "value": 7.14,
+          "foodNutrientSourceId": 9,
+          "foodNutrientSourceCode": "12",
+          "foodNutrientSourceDescription": "Manufacturer's analytical; partial documentation",
+          "rank": 600,
+          "indentLevel": 1,
+          "foodNutrientId": 18156476
+        },
+        {
+          "nutrientId": 1004,
+          "nutrientName": "Total lipid (fat)",
+          "nutrientNumber": "204",
+          "unitName": "G",
+          "derivationCode": "LCSA",
+          "derivationDescription": "Calculated from an approximate value per serving size measure",
+          "derivationId": 71,
+          "value": 19.6,
+          "foodNutrientSourceId": 9,
+          "foodNutrientSourceCode": "12",
+          "foodNutrientSourceDescription": "Manufacturer's analytical; partial documentation",
+          "rank": 800,
+          "indentLevel": 1,
+          "foodNutrientId": 18156477,
+          "percentDailyValue": 17
+        },
+        {
+          "nutrientId": 1005,
+          "nutrientName": "Carbohydrate, by difference",
+          "nutrientNumber": "205",
+          "unitName": "G",
+          "derivationCode": "LCSA",
+          "derivationDescription": "Calculated from an approximate value per serving size measure",
+          "derivationId": 71,
+          "value": 69.6,
+          "foodNutrientSourceId": 9,
+          "foodNutrientSourceCode": "12",
+          "foodNutrientSourceDescription": "Manufacturer's analytical; partial documentation",
+          "rank": 1110,
+          "indentLevel": 2,
+          "foodNutrientId": 18156478,
+          "percentDailyValue": 13
+        },
+        {
+          "nutrientId": 1008,
+          "nutrientName": "Energy",
+          "nutrientNumber": "208",
+          "unitName": "KCAL",
+          "derivationCode": "LCSA",
+          "derivationDescription": "Calculated from an approximate value per serving size measure",
+          "derivationId": 71,
+          "value": 482,
+          "foodNutrientSourceId": 9,
+          "foodNutrientSourceCode": "12",
+          "foodNutrientSourceDescription": "Manufacturer's analytical; partial documentation",
+          "rank": 300,
+          "indentLevel": 1,
+          "foodNutrientId": 18156479
+        },
+        {
+          "nutrientId": 2000,
+          "nutrientName": "Total Sugars",
+          "nutrientNumber": "269",
+          "unitName": "G",
+          "derivationCode": "LCSA",
+          "derivationDescription": "Calculated from an approximate value per serving size measure",
+          "derivationId": 71,
+          "value": 30.4,
+          "foodNutrientSourceId": 9,
+          "foodNutrientSourceCode": "12",
+          "foodNutrientSourceDescription": "Manufacturer's analytical; partial documentation",
+          "rank": 1510,
+          "indentLevel": 3,
+          "foodNutrientId": 18156480
+        },
+        {
+          "nutrientId": 1079,
+          "nutrientName": "Fiber, total dietary",
+          "nutrientNumber": "291",
+          "unitName": "G",
+          "derivationCode": "LCSA",
+          "derivationDescription": "Calculated from an approximate value per serving size measure",
+          "derivationId": 71,
+          "value": 1.8,
+          "foodNutrientSourceId": 9,
+          "foodNutrientSourceCode": "12",
+          "foodNutrientSourceDescription": "Manufacturer's analytical; partial documentation",
+          "rank": 1200,
+          "indentLevel": 3,
+          "foodNutrientId": 18156481,
+          "percentDailyValue": 4
+        },
+        {
+          "nutrientId": 1087,
+          "nutrientName": "Calcium, Ca",
+          "nutrientNumber": "301",
+          "unitName": "MG",
+          "derivationCode": "LCSA",
+          "derivationDescription": "Calculated from an approximate value per serving size measure",
+          "derivationId": 71,
+          "value": 30.0,
+          "foodNutrientSourceId": 9,
+          "foodNutrientSourceCode": "12",
+          "foodNutrientSourceDescription": "Manufacturer's analytical; partial documentation",
+          "rank": 5300,
+          "indentLevel": 1,
+          "foodNutrientId": 18156482,
+          "percentDailyValue": 0
+        },
+        {
+          "nutrientId": 1089,
+          "nutrientName": "Iron, Fe",
+          "nutrientNumber": "303",
+          "unitName": "MG",
+          "derivationCode": "LCSA",
+          "derivationDescription": "Calculated from an approximate value per serving size measure",
+          "derivationId": 71,
+          "value": 2.48,
+          "foodNutrientSourceId": 9,
+          "foodNutrientSourceCode": "12",
+          "foodNutrientSourceDescription": "Manufacturer's analytical; partial documentation",
+          "rank": 5400,
+          "indentLevel": 1,
+          "foodNutrientId": 18156483,
+          "percentDailyValue": 8
+        },
+        {
+          "nutrientId": 1092,
+          "nutrientName": "Potassium, K",
+          "nutrientNumber": "306",
+          "unitName": "MG",
+          "derivationCode": "LCSA",
+          "derivationDescription": "Calculated from an approximate value per serving size measure",
+          "derivationId": 71,
+          "value": 152,
+          "foodNutrientSourceId": 9,
+          "foodNutrientSourceCode": "12",
+          "foodNutrientSourceDescription": "Manufacturer's analytical; partial documentation",
+          "rank": 5700,
+          "indentLevel": 1,
+          "foodNutrientId": 18156484,
+          "percentDailyValue": 2
+        },
+        {
+          "nutrientId": 1093,
+          "nutrientName": "Sodium, Na",
+          "nutrientNumber": "307",
+          "unitName": "MG",
+          "derivationCode": "LCSA",
+          "derivationDescription": "Calculated from an approximate value per serving size measure",
+          "derivationId": 71,
+          "value": 357,
+          "foodNutrientSourceId": 9,
+          "foodNutrientSourceCode": "12",
+          "foodNutrientSourceDescription": "Manufacturer's analytical; partial documentation",
+          "rank": 5800,
+          "indentLevel": 1,
+          "foodNutrientId": 18156485,
+          "percentDailyValue": 200
+        },
+        {
+          "nutrientId": 1162,
+          "nutrientName": "Vitamin C, total ascorbic acid",
+          "nutrientNumber": "401",
+          "unitName": "MG",
+          "derivationCode": "LCCD",
+          "derivationDescription": "Calculated from a daily value percentage per serving size measure",
+          "derivationId": 75,
+          "value": 0.0,
+          "foodNutrientSourceId": 9,
+          "foodNutrientSourceCode": "12",
+          "foodNutrientSourceDescription": "Manufacturer's analytical; partial documentation",
+          "rank": 6300,
+          "indentLevel": 1,
+          "foodNutrientId": 18156486,
+          "percentDailyValue": 0
+        },
+        {
+          "nutrientId": 1257,
+          "nutrientName": "Fatty acids, total trans",
+          "nutrientNumber": "605",
+          "unitName": "G",
+          "derivationCode": "LCSA",
+          "derivationDescription": "Calculated from an approximate value per serving size measure",
+          "derivationId": 71,
+          "value": 0.0,
+          "foodNutrientSourceId": 9,
+          "foodNutrientSourceCode": "12",
+          "foodNutrientSourceDescription": "Manufacturer's analytical; partial documentation",
+          "rank": 15400,
+          "indentLevel": 1,
+          "foodNutrientId": 18156487
+        },
+        {
+          "nutrientId": 1258,
+          "nutrientName": "Fatty acids, total saturated",
+          "nutrientNumber": "606",
+          "unitName": "G",
+          "derivationCode": "LCSA",
+          "derivationDescription": "Calculated from an approximate value per serving size measure",
+          "derivationId": 71,
+          "value": 4.46,
+          "foodNutrientSourceId": 9,
+          "foodNutrientSourceCode": "12",
+          "foodNutrientSourceDescription": "Manufacturer's analytical; partial documentation",
+          "rank": 9700,
+          "indentLevel": 1,
+          "foodNutrientId": 18156488,
+          "percentDailyValue": 13
+        }
+      ],
+      "finalFoodInputFoods": [],
+      "foodMeasures": [],
+      "foodAttributes": [
+        {
+          "value": "10",
+          "name": "Added Brand/Sub Brand Information",
+          "id": 1715962
+        }
+      ],
+      "foodAttributeTypes": [
+        {
+          "name": "Update Log",
+          "description": "Changes that were made to this food",
+          "id": 998,
+          "foodAttributes": [
+            {
+              "value": "10",
+              "name": "Added Brand/Sub Brand Information",
+              "id": 1715962
+            }
+          ]
+        }
+      ],
+      "foodVersionIds": []
+    }
+  ],
+  "aggregations": {
+    "dataType": {
+      "Branded": 1
+    },
+    "nutrients": {}
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "id": "off-0008005959101",
+  "name": "Crab & Lobster Ravioli",
+  "brand": "Nuovo Pasta Production Ltd",
+  "gtin": "0008005959101",
+  "source": "off",
+  "sourceUrl": "https://world.openfoodfacts.org/product/0008005959101",
+  "labelRegion": "us",
+  "ingredientsText": "FILLING: Ricotta cheese (pasteurized milk, whey, vinegar, salt, stabilizers [guar gum, xanthan gum, locust bean gum]), crab & lobster blend (crab meat, lobster meat), glycerin, white wine, breadcrumbs (wheat flour, sugar, yeast, salt), butter (cream, natural flavoring), wheat flour, heavy cream, sea salt, paprika oil, eggs, parsley, sugar, black pepper. PASTA: Wheat flour, water, eggs, tomato paste, paprika oil, annatto oil, beta-carotene (color).",
+  "containsStatement": null,
+  "mayContainStatement": null,
+  "offAllergenTags": [
+    "en:crustaceans",
+    "en:eggs",
+    "en:gluten",
+    "en:milk",
+    "en:Shellfish"
+  ],
+  "offTraceTags": [],
+  "expected": {
+    "milk": "contains",
+    "egg": "contains",
+    "peanut": "none",
+    "tree_nut": "none",
+    "wheat": "contains",
+    "soy": "none",
+    "fish": "none",
+    "shellfish": "contains",
+    "sesame": "none"
+  },
+  "notes": "Filling and pasta are listed as two groups. No Contains line."
+}

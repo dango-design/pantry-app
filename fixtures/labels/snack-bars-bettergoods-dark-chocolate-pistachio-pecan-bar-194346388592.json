@@ -1,0 +1,31 @@
+{
+  "id": "off-0194346388592",
+  "name": "Dark chocolate pistachio pecan nut bar",
+  "brand": "Bettergoods",
+  "gtin": "0194346388592",
+  "source": "off",
+  "sourceUrl": "https://world.openfoodfacts.org/product/0194346388592",
+  "labelRegion": "us",
+  "ingredientsText": "Pistachios, peanuts, pecans, tapioca fiber, chicory root fiber, sugar, unsweetened chocolate, brown rice flour, honey, brown rice syrup, cocoa butter, milkfat, salt, sunflower lecithin, soy lecithin, natural flavors.",
+  "containsStatement": null,
+  "mayContainStatement": null,
+  "offAllergenTags": [
+    "en:milk",
+    "en:nuts",
+    "en:peanuts",
+    "en:soybeans"
+  ],
+  "offTraceTags": [],
+  "expected": {
+    "milk": "contains",
+    "egg": "none",
+    "peanut": "contains",
+    "tree_nut": "contains",
+    "wheat": "none",
+    "soy": "contains",
+    "fish": "none",
+    "shellfish": "none",
+    "sesame": "none"
+  },
+  "notes": "Milkfat is milk. Both sunflower and soy lecithin are listed; the soy one makes soy contains. No Contains line."
+}

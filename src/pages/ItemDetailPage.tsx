@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback, useEffect, useRef } from 'react'
+import { useState, useMemo, useCallback, useEffect, useRef, Suspense } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { Minus, Plus, Clock, MapPin, Tag, ShoppingCart, CheckCircle2, ChevronRight, Edit2, Repeat, SlidersHorizontal, Trash2 } from 'lucide-react'
 import { Badge, Button, Card, CardContent, Dialog, DialogActions, Snackbar } from '@/components/common'
@@ -17,6 +17,8 @@ import {
   useAddToList,
 } from '@/components/inventory'
 import { PageHeader, pageContainer } from '@/components/layout'
+import { LazyItemAllergySection } from '@/components/allergy/lazy'
+import { BarcodeScanner } from '@/components/smart-input'
 import { cn } from '@/utils/cn'
 import { formatQuantity } from '@/utils/mealPlan'
 import { describeRunOut, formatStockCount, getStock } from '@/utils/stock'
@@ -36,13 +38,14 @@ const USE_STEP = 0.5
 export function ItemDetailPage() {
   const navigate = useNavigate()
   const { id } = useParams<{ id: string }>()
-  const { inventory, staples, deleteItem, adjustStock } = useDemoStore()
+  const { inventory, staples, deleteItem, adjustStock, updateItem } = useDemoStore()
 
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const [showUseDialog, setShowUseDialog] = useState(false)
   const [showStapleSheet, setShowStapleSheet] = useState(false)
   const [useQuantity, setUseQuantity] = useState(1)
   const [snackbar, setSnackbar] = useState<SnackbarState>({ open: false, message: '', id: 0 })
+  const [scanningBarcode, setScanningBarcode] = useState(false)
 
   // True after the product was used up from this page. The page then goes
   // back to the pantry when the message closes, unless Undo brought the
@@ -134,6 +137,20 @@ export function ItemDetailPage() {
   const handleRemove = () => {
     deleteItem(item.id)
     navigate('/')
+  }
+
+  // Attach a barcode to an item typed by hand, so it can be checked for allergens.
+  if (scanningBarcode) {
+    return (
+      <BarcodeScanner
+        title="Scan this item's barcode"
+        onScan={(product, lookup) => {
+          updateItem(item.id, { gtin: lookup.gtin, barcode: lookup.gtin, brand: item.brand ?? product.brand ?? undefined })
+          setScanningBarcode(false)
+        }}
+        onCancel={() => setScanningBarcode(false)}
+      />
+    )
   }
 
   return (
@@ -262,6 +279,14 @@ export function ItemDetailPage() {
             )}
           </CardContent>
         </Card>
+
+        {/* Allergies: the full result for items with product data */}
+        <section aria-label="Allergies" className="space-y-2">
+          <h2 className="text-sm font-semibold text-gray-700">Allergies</h2>
+          <Suspense fallback={null}>
+            <LazyItemAllergySection gtin={item.gtin} itemName={item.name} onScanBarcode={() => setScanningBarcode(true)} />
+          </Suspense>
+        </section>
 
         {/* Other rows of the same product */}
         {otherRows.length > 0 && (

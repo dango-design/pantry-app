@@ -1,0 +1,30 @@
+{
+  "id": "off-0070718000944",
+  "name": "New England Style Clam Corn Chowder",
+  "brand": "Bar Harbor",
+  "gtin": "0070718000944",
+  "source": "off",
+  "sourceUrl": "https://world.openfoodfacts.org/product/0070718000944",
+  "labelRegion": "us",
+  "ingredientsText": "Water, potatoes, clams, non-gmo corn, wheat flour, butter (milk, salt), native tapioca starch, onions, sea salt, seasoned salt (salt, sugar, paprika, turmeric, onion, garlic) and pepper.",
+  "containsStatement": null,
+  "mayContainStatement": null,
+  "offAllergenTags": [
+    "en:gluten",
+    "en:milk",
+    "en:molluscs"
+  ],
+  "offTraceTags": [],
+  "expected": {
+    "milk": "contains",
+    "egg": "none",
+    "peanut": "none",
+    "tree_nut": "none",
+    "wheat": "contains",
+    "soy": "none",
+    "fish": "none",
+    "shellfish": "none",
+    "sesame": "none"
+  },
+  "notes": "Clams are molluscs, not shellfish under the crustacean-only rule."
+}

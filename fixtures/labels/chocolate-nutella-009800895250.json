@@ -1,0 +1,30 @@
+{
+  "id": "off-0009800895250",
+  "name": "Hazelnut Spread With Cocoa",
+  "brand": "Nutella",
+  "gtin": "0009800895250",
+  "source": "off",
+  "sourceUrl": "https://world.openfoodfacts.org/product/0009800895250",
+  "labelRegion": "us",
+  "ingredientsText": "sugar, palm oil, hazelnuts, cocoa, skim milk, whey (milk), lecithin as emulsifier (soy), vanillin: an artificial flavor",
+  "containsStatement": null,
+  "mayContainStatement": null,
+  "offAllergenTags": [
+    "en:milk",
+    "en:nuts",
+    "en:soybeans"
+  ],
+  "offTraceTags": [],
+  "expected": {
+    "milk": "contains",
+    "egg": "none",
+    "peanut": "none",
+    "tree_nut": "contains",
+    "wheat": "none",
+    "soy": "contains",
+    "fish": "none",
+    "shellfish": "none",
+    "sesame": "none"
+  },
+  "notes": "'lecithin as emulsifier (soy)' names soy, so soy is contains."
+}

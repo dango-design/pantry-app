@@ -1,0 +1,29 @@
+{
+  "id": "off-0028029439601",
+  "name": "THE ULTIMATE FISH STICK",
+  "brand": "Trident",
+  "gtin": "0028029439601",
+  "source": "off",
+  "sourceUrl": "https://world.openfoodfacts.org/product/0028029439601",
+  "labelRegion": "us",
+  "ingredientsText": "fish (Alaska pollock), brown rice flour, vegetable oil (soybean and/or canola), whole grain yellow corn flour, sorghum flour, water, modified corn starch, contains 2% or less of: sugar, salt, leavening (sodium acid pyrophosphate, sodium bicarbonate, monocalcium phosphate), yeast, onion powder, garlic powder, spice, extractives of paprika, extractives of turmeric",
+  "containsStatement": null,
+  "mayContainStatement": null,
+  "offAllergenTags": [
+    "en:fish",
+    "en:soybeans"
+  ],
+  "offTraceTags": [],
+  "expected": {
+    "milk": "none",
+    "egg": "none",
+    "peanut": "none",
+    "tree_nut": "none",
+    "wheat": "none",
+    "soy": "possible",
+    "fish": "contains",
+    "shellfish": "none",
+    "sesame": "none"
+  },
+  "notes": "'vegetable oil (soybean and/or canola)' makes soy possible. Brown rice and sorghum flour are not wheat."
+}

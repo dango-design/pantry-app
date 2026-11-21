@@ -1,0 +1,28 @@
+{
+  "id": "off-0096619905515",
+  "name": "Basil Pesto",
+  "brand": "Kirkland Signature",
+  "gtin": "0096619905515",
+  "source": "off",
+  "sourceUrl": "https://world.openfoodfacts.org/product/0096619905515",
+  "labelRegion": "us",
+  "ingredientsText": "basil blend (genovese basil d.0.p., sunfluwer oil, sea salt) sunflower oil, parmesan cheese, (pasteurized part-skim cow's milk, cheese cultures, sea salt, enzymes), pine nuts, extra virgin olive oil, pecorino romano d.o.p.cheese (sheep's milk, rennet, salt), fresh garlic, ascorbic acid, citric acid, black pepper.",
+  "containsStatement": "contains: milk, pine nuts.",
+  "mayContainStatement": null,
+  "offAllergenTags": [
+    "en:milk"
+  ],
+  "offTraceTags": [],
+  "expected": {
+    "milk": "contains",
+    "egg": "none",
+    "peanut": "none",
+    "tree_nut": "contains",
+    "wheat": "none",
+    "soy": "none",
+    "fish": "none",
+    "shellfish": "none",
+    "sesame": "none"
+  },
+  "notes": "Sheep's milk and cow's milk both count as milk. Pine nuts are a tree nut."
+}

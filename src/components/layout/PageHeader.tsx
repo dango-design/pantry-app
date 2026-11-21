@@ -21,7 +21,7 @@ export function PageHeader({ title, onBack, hideBackOnDesktop, actions, width = 
   const navigate = useNavigate()
 
   return (
-    <header className="sticky top-0 z-40 bg-white border-b border-gray-200">
+    <header className="sticky top-0 z-40 bg-white border-b border-gray-200 print:hidden">
       <div className={cn(pageContainer(width), 'flex items-center gap-2 h-14 md:h-16')}>
         <button
           onClick={onBack ?? (() => navigate(-1))}

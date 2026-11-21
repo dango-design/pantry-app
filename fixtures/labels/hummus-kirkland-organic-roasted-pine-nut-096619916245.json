@@ -1,0 +1,28 @@
+{
+  "id": "off-0096619916245",
+  "name": "ROASTED PINE NUT HUMMUS",
+  "brand": "KIRKLAND ORGANIC",
+  "gtin": "0096619916245",
+  "source": "off",
+  "sourceUrl": "https://world.openfoodfacts.org/product/0096619916245",
+  "labelRegion": "us",
+  "ingredientsText": "ORGANIC CHICKPEAS, WATER, ORGANIC SESAME TAHINI, ORGANIC SUNFLOWER OIL, ORGANIC LEMON JUICE, ORGANIC GARLIC, SEA SALT, ORGANIC CUMIN. TOPPING: ORGANIC SUNFLOWER OIL, ORGANIC PINE NUTS, WATER, ORGANIC RED PEPPER, ORGANIC MINCED GARLIC, ORGANIC CUMIN, ORGANIC PARSLEY, SEA SALT, CITRIC ACID, ORGANIC ONION.",
+  "containsStatement": "CONTAINS: Pine Nuts, Sesame.",
+  "mayContainStatement": null,
+  "offAllergenTags": [
+    "en:sesame-seeds"
+  ],
+  "offTraceTags": [],
+  "expected": {
+    "milk": "none",
+    "egg": "none",
+    "peanut": "none",
+    "tree_nut": "contains",
+    "wheat": "none",
+    "soy": "none",
+    "fish": "none",
+    "shellfish": "none",
+    "sesame": "contains"
+  },
+  "notes": "OFF tags miss the pine nuts; pine nut is one of the 12 tree nuts."
+}

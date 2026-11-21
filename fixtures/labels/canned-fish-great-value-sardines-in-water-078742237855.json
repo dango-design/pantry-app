@@ -1,0 +1,31 @@
+{
+  "id": "off-0078742237855",
+  "name": "Sardines in Water",
+  "brand": "Great Value",
+  "gtin": "0078742237855",
+  "source": "off",
+  "sourceUrl": "https://world.openfoodfacts.org/product/0078742237855",
+  "labelRegion": "us",
+  "ingredientsText": "Sardines, water, salt.",
+  "containsStatement": null,
+  "mayContainStatement": "May contain wheat and soy.",
+  "offAllergenTags": [
+    "en:fish"
+  ],
+  "offTraceTags": [
+    "en:gluten",
+    "en:soybeans"
+  ],
+  "expected": {
+    "milk": "none",
+    "egg": "none",
+    "peanut": "none",
+    "tree_nut": "none",
+    "wheat": "may_contain",
+    "soy": "may_contain",
+    "fish": "contains",
+    "shellfish": "none",
+    "sesame": "none"
+  },
+  "notes": "No Contains line; fish comes from the ingredient list."
+}

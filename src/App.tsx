@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider, useAuth } from '@/contexts/AuthContext'
 import { ProtectedRoute } from '@/components/auth'
@@ -18,6 +19,16 @@ import {
   SettingsPage,
   HouseholdPage,
 } from '@/pages'
+
+// The allergy pages load on first visit, so the engine and dictionary stay out of the main bundle.
+const CheckPage = lazy(() => import('@/pages/allergy/CheckPage').then((m) => ({ default: m.CheckPage })))
+const AllergyProfilesPage = lazy(() => import('@/pages/allergy/AllergyProfilesPage').then((m) => ({ default: m.AllergyProfilesPage })))
+const AllergyProfilePage = lazy(() => import('@/pages/allergy/AllergyProfilePage').then((m) => ({ default: m.AllergyProfilePage })))
+const ChefCardPage = lazy(() => import('@/pages/allergy/ChefCardPage').then((m) => ({ default: m.ChefCardPage })))
+
+function Lazy({ children }: { children: React.ReactNode }) {
+  return <Suspense fallback={<div className="min-h-screen bg-gray-50" aria-busy="true" />}>{children}</Suspense>
+}
 
 // Redirect authenticated users away from auth pages
 function AuthRoute({ children }: { children: React.ReactNode }) {
@@ -80,6 +91,10 @@ function AppRoutes() {
         <Route path="/recipe/:id/edit" element={<RecipeFormPage />} />
         <Route path="/settings" element={<SettingsPage />} />
         <Route path="/settings/household" element={<HouseholdPage />} />
+        <Route path="/settings/allergies" element={<Lazy><AllergyProfilesPage /></Lazy>} />
+        <Route path="/settings/allergies/:id" element={<Lazy><AllergyProfilePage /></Lazy>} />
+        <Route path="/check" element={<Lazy><CheckPage /></Lazy>} />
+        <Route path="/chef-card" element={<Lazy><ChefCardPage /></Lazy>} />
       </Route>
 
       {/* Fallback */}

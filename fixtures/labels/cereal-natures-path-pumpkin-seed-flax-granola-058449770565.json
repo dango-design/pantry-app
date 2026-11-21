@@ -1,0 +1,35 @@
+{
+  "id": "off-0058449770565",
+  "name": "Pumpkin Seed + Flax Granola",
+  "brand": "Nature's Path Organic",
+  "gtin": "0058449770565",
+  "source": "off",
+  "sourceUrl": "https://world.openfoodfacts.org/product/0058449770565",
+  "labelRegion": "us",
+  "ingredientsText": "Whole grain rolled oats*, cane sugar, soy oil*, brown rice flour pumpkin seeds, flax seeds* oat syrup solids* [oat syrup solids*, tocopherols (added to enhance freshness)], sea salt, molasses*, cinnamon*. *Organic.",
+  "containsStatement": "Contains soy.",
+  "mayContainStatement": "Produced in a facility that uses wheat, peanuts and tree nuts",
+  "offAllergenTags": [
+    "en:gluten",
+    "en:nuts",
+    "en:peanuts",
+    "en:soybeans"
+  ],
+  "offTraceTags": [
+    "en:gluten",
+    "en:nuts",
+    "en:peanuts"
+  ],
+  "expected": {
+    "milk": "none",
+    "egg": "none",
+    "peanut": "may_contain",
+    "tree_nut": "may_contain",
+    "wheat": "may_contain",
+    "soy": "contains",
+    "fish": "none",
+    "shellfish": "none",
+    "sesame": "none"
+  },
+  "notes": "Soy oil alone would be possible, but the printed 'Contains soy.' makes soy contains. Brown rice flour is not wheat."
+}

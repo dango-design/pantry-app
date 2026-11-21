@@ -1,0 +1,37 @@
+{
+  "code": "0040000424314",
+  "product": {
+    "allergens_tags": [
+      "en:eggs",
+      "en:milk",
+      "en:peanuts",
+      "en:soybeans"
+    ],
+    "brands": "Snickers",
+    "categories_tags": [
+      "en:snacks",
+      "en:sweet-snacks",
+      "en:cocoa-and-its-products",
+      "en:confectioneries",
+      "en:chocolate-candies",
+      "en:bars",
+      "en:candy-chocolate-bars"
+    ],
+    "code": "0040000424314",
+    "countries_tags": [
+      "en:france",
+      "en:spain",
+      "en:united-states"
+    ],
+    "image_front_small_url": "https://images.openfoodfacts.org/images/products/004/000/042/4314/front_en.11.200.jpg",
+    "ingredients_text": "milk chocolate (sugar, cocoa butter, chocolate, skim milk, lactose, milkfat, soy lecithin, artificial flavor), peanuts, corn syrup, sugar, sugar, milkfat, skim milk, partially hydrogenated soybean oil, lactose, salt, egg whites, chocolate, artificially flavor,",
+    "ingredients_text_en": "milk chocolate (sugar, cocoa butter, chocolate, skim milk, lactose, milkfat, soy lecithin, artificial flavor), peanuts, corn syrup, sugar, sugar, milkfat, skim milk, partially hydrogenated soybean oil, lactose, salt, egg whites, chocolate, artificially flavor,",
+    "last_modified_t": 1789862003,
+    "product_name": "Snickers",
+    "product_name_en": "Snickers",
+    "quantity": "1.86oz",
+    "traces_tags": []
+  },
+  "status": 1,
+  "status_verbose": "product found"
+}

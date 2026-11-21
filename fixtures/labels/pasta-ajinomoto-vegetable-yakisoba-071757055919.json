@@ -1,0 +1,30 @@
+{
+  "id": "off-0071757055919",
+  "name": "Vegetable Yakisoba",
+  "brand": "Ajinomoto",
+  "gtin": "0071757055919",
+  "source": "off",
+  "sourceUrl": "https://world.openfoodfacts.org/product/0071757055919",
+  "labelRegion": "us",
+  "ingredientsText": "COOKED YAKISOBA NOODLES (WATER, WHEAT FLOUR, CORN STARCH, SALT), CABBAGE, SOY SAUCE (WATER, SOYBEANS, SALT, WHEAT, ALCOHOL), SOYBEAN OIL, CARROTS, BROCCOLI, CHINESE PEA PODS, SUGAR, WATER CHESTNUTS, CONTAINS 2% OR LESS OF: EDAMAME SOYBEANS, SHIITAKE MUSHROOMS, ASPARAGUS, RED BELL PEPPERS, WATER, CORN STARCH, SALT, SESAME OIL, GARLIC PUREE, BLACK PEPPER.",
+  "containsStatement": null,
+  "mayContainStatement": null,
+  "offAllergenTags": [
+    "en:gluten",
+    "en:sesame-seeds",
+    "en:soybeans"
+  ],
+  "offTraceTags": [],
+  "expected": {
+    "milk": "none",
+    "egg": "none",
+    "peanut": "none",
+    "tree_nut": "none",
+    "wheat": "contains",
+    "soy": "contains",
+    "fish": "none",
+    "shellfish": "none",
+    "sesame": "contains"
+  },
+  "notes": "Water chestnuts are not a tree nut. Edamame and soy sauce are soy; sesame oil is sesame."
+}

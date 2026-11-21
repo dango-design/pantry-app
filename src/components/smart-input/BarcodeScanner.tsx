@@ -1,20 +1,56 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { Barcode, X, Camera, Keyboard, Loader2 } from 'lucide-react'
 import { Button, Input } from '@/components/common'
-import { lookupBarcode, type BarcodeProduct } from '@/services'
-
-// BarcodeDetector is not in TypeScript's DOM lib yet
-interface BarcodeDetectorInstance {
-  detect(source: HTMLVideoElement): Promise<{ rawValue: string }[]>
-}
-type BarcodeDetectorConstructor = new (options: { formats: string[] }) => BarcodeDetectorInstance
+import type { BarcodeProduct } from '@/services'
+import type { LookupResult } from '@/allergy/lookup'
+import { createBarcodeDetector, type BarcodeDetectorLike } from '@/allergy/barcodeDetector'
+import { productName } from '@/allergy/products'
+import { mapCategory } from '@/utils/productCategory'
 
 interface BarcodeScannerProps {
-  onScan: (product: BarcodeProduct) => void
+  /**
+   * Called with the product after a successful lookup. lookup holds the full Open Food Facts records,
+   * already cached for the allergy check.
+   */
+  onScan?: (product: BarcodeProduct, lookup: LookupResult) => void
+  /** If given, the scanner only reads the code and hands it over without looking it up. */
+  onCode?: (code: string, format?: string) => void
   onCancel: () => void
+  title?: string
 }
 
-export function BarcodeScanner({ onScan, onCancel }: BarcodeScannerProps) {
+// Until step 3 brings the lookup-product Edge Function, barcodes are looked up from the browser
+// straight at Open Food Facts, in demo mode and with Supabase alike.
+async function lookupForPantry(code: string, format?: string): Promise<{ product: BarcodeProduct; lookup: LookupResult } | { error: string }> {
+  const { lookupProduct, NotABarcodeError } = await import('@/allergy/lookup')
+  try {
+    const lookup = await lookupProduct(code, { symbology: format })
+    if (lookup.storeMade) {
+      return { error: 'This barcode was printed in the store, so it does not name a product. Type the item name instead.' }
+    }
+    if (lookup.records.length === 0) {
+      return { error: lookup.sourceErrors[0] ?? 'Open Food Facts does not know this product. Type the item name instead.' }
+    }
+    const { name, brand } = productName(lookup.records)
+    const first = lookup.records[0]!
+    return {
+      lookup,
+      product: {
+        name,
+        brand,
+        category: mapCategory(first.categories ?? []),
+        quantity: first.quantity ?? null,
+        imageUrl: first.imageUrl ?? null,
+        barcode: lookup.gtin,
+      },
+    }
+  } catch (e) {
+    if (e instanceof NotABarcodeError) return { error: e.message }
+    return { error: 'Failed to look up the barcode' }
+  }
+}
+
+export function BarcodeScanner({ onScan, onCode, onCancel, title = 'Scan barcode' }: BarcodeScannerProps) {
   const [mode, setMode] = useState<'select' | 'camera' | 'manual'>('select')
   const [manualCode, setManualCode] = useState('')
   const [loading, setLoading] = useState(false)
@@ -22,11 +58,9 @@ export function BarcodeScanner({ onScan, onCancel }: BarcodeScannerProps) {
   const [stream, setStream] = useState<MediaStream | null>(null)
 
   const videoRef = useRef<HTMLVideoElement>(null)
-  const detectorRef = useRef<BarcodeDetectorInstance | null>(null)
-  const scanIntervalRef = useRef<NodeJS.Timeout | null>(null)
-
-  // Check if BarcodeDetector API is available
-  const hasBarcodeDetector = 'BarcodeDetector' in window
+  const detectorRef = useRef<BarcodeDetectorLike | null>(null)
+  const scanIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const detectingRef = useRef(false)
 
   const stopCamera = useCallback(() => {
     if (scanIntervalRef.current) {
@@ -39,24 +73,23 @@ export function BarcodeScanner({ onScan, onCancel }: BarcodeScannerProps) {
     }
   }, [stream])
 
-  const lookupAndReturn = useCallback(async (barcode: string) => {
+  const lookupAndReturn = useCallback(async (barcode: string, format?: string) => {
+    if (onCode) {
+      stopCamera()
+      onCode(barcode, format)
+      return
+    }
     setLoading(true)
     setError(null)
-
-    try {
-      const result = await lookupBarcode(barcode)
-      if (result.success && result.product) {
-        stopCamera()
-        onScan(result.product)
-      } else {
-        setError(result.error || 'Product not found')
-      }
-    } catch {
-      setError('Failed to lookup barcode')
-    } finally {
-      setLoading(false)
+    const result = await lookupForPantry(barcode, format)
+    setLoading(false)
+    if ('error' in result) {
+      setError(result.error)
+      return
     }
-  }, [onScan, stopCamera])
+    stopCamera()
+    onScan?.(result.product, result.lookup)
+  }, [onCode, onScan, stopCamera])
 
   const startCamera = useCallback(async () => {
     try {
@@ -74,38 +107,50 @@ export function BarcodeScanner({ onScan, onCancel }: BarcodeScannerProps) {
     }
   }, [])
 
-  // Apply stream to video element and start barcode detection when ready
+  // Apply stream to video element and start barcode detection when ready. Browsers without a
+  // built-in BarcodeDetector (Safari, Firefox) load a WebAssembly one first.
   useEffect(() => {
-    if (stream && videoRef.current && mode === 'camera') {
-      videoRef.current.srcObject = stream
+    if (!(stream && videoRef.current && mode === 'camera')) return
+    videoRef.current.srcObject = stream
+    let cancelled = false
 
-      // Try to use BarcodeDetector API if available
-      if (hasBarcodeDetector) {
-        const { BarcodeDetector } = window as unknown as { BarcodeDetector: BarcodeDetectorConstructor }
-        detectorRef.current = new BarcodeDetector({
-          formats: ['ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_128', 'code_39'],
-        })
-
-        // Start scanning
+    createBarcodeDetector()
+      .then((detector) => {
+        if (cancelled) return
+        detectorRef.current = detector
         scanIntervalRef.current = setInterval(async () => {
-          if (!videoRef.current || !detectorRef.current) return
-
+          if (!videoRef.current || !detectorRef.current || detectingRef.current) return
+          if (videoRef.current.readyState < 2) return
+          detectingRef.current = true
           try {
             const barcodes = await detectorRef.current.detect(videoRef.current)
-            if (barcodes.length > 0) {
-              const barcode = barcodes[0].rawValue
+            if (barcodes.length > 0 && !cancelled) {
               if (scanIntervalRef.current) {
                 clearInterval(scanIntervalRef.current)
+                scanIntervalRef.current = null
               }
-              await lookupAndReturn(barcode)
+              await lookupAndReturn(barcodes[0]!.rawValue, barcodes[0]!.format)
             }
           } catch {
-            // Detection failed, continue scanning
+            // Detection failed on this frame; try the next one.
+          } finally {
+            detectingRef.current = false
           }
-        }, 200)
+        }, 250)
+      })
+      .catch((err) => {
+        console.error('Barcode detector error:', err)
+        if (!cancelled) setError('This browser could not start the barcode reader. Type the number instead.')
+      })
+
+    return () => {
+      cancelled = true
+      if (scanIntervalRef.current) {
+        clearInterval(scanIntervalRef.current)
+        scanIntervalRef.current = null
       }
     }
-  }, [stream, mode, hasBarcodeDetector, lookupAndReturn])
+  }, [stream, mode, lookupAndReturn])
 
   useEffect(() => {
     return () => {
@@ -131,7 +176,7 @@ export function BarcodeScanner({ onScan, onCancel }: BarcodeScannerProps) {
         <button onClick={handleCancel} className="p-2 text-white">
           <X className="h-6 w-6" />
         </button>
-        <h2 className="text-white font-medium">Scan barcode</h2>
+        <h2 className="text-white font-medium">{title}</h2>
         <div className="w-10" />
       </div>
 
@@ -154,7 +199,7 @@ export function BarcodeScanner({ onScan, onCancel }: BarcodeScannerProps) {
             <div className="text-left">
               <p className="text-white font-medium">Scan with camera</p>
               <p className="text-white/60 text-sm">
-                {hasBarcodeDetector ? 'Auto-detect barcode' : 'Capture barcode image'}
+                Point the camera at the barcode
               </p>
             </div>
           </button>
@@ -206,9 +251,7 @@ export function BarcodeScanner({ onScan, onCancel }: BarcodeScannerProps) {
           {/* Instructions */}
           <div className="absolute bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-black/80 to-transparent">
             <p className="text-white text-center mb-4">
-              {hasBarcodeDetector
-                ? 'Position the barcode within the frame'
-                : 'Barcode scanning requires manual entry on this device'}
+              Position the barcode within the frame
             </p>
 
             {error && (
@@ -217,14 +260,15 @@ export function BarcodeScanner({ onScan, onCancel }: BarcodeScannerProps) {
               </div>
             )}
 
-            {!hasBarcodeDetector && (
-              <Button
-                onClick={() => setMode('manual')}
-                className="w-full bg-primary hover:bg-primary-hover"
-              >
-                Enter manually
-              </Button>
-            )}
+            <Button
+              onClick={() => {
+                stopCamera()
+                setMode('manual')
+              }}
+              className="w-full bg-primary hover:bg-primary-hover"
+            >
+              Enter manually
+            </Button>
           </div>
         </>
       )}
@@ -242,7 +286,9 @@ export function BarcodeScanner({ onScan, onCancel }: BarcodeScannerProps) {
               <Input
                 value={manualCode}
                 onChange={(e) => setManualCode(e.target.value)}
-                placeholder="e.g., 5901234123457"
+                placeholder="e.g., 044000037451"
+                inputMode="numeric"
+                aria-label="Barcode number"
                 className="text-center text-xl tracking-widest"
                 autoFocus
               />
