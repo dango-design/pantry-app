@@ -1,3 +1,6 @@
 export { FoodItemCard, FoodItemCheckboxCard } from './FoodItemCard'
 export { AlreadyInPantrySheet } from './AlreadyInPantrySheet'
+export { RunningLowSection } from './RunningLowSection'
+export { StapleSheet } from './StapleSheet'
 export { useAddToList, type AddToListResult } from './useAddToList'
+export { describeDailyUse, emptyProduct, restoreStaple, shownCount, snapshotStock } from './stockHelpers'

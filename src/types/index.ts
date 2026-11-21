@@ -121,6 +121,22 @@ export interface FoodItem {
 export type FoodItemInsert = Omit<FoodItem, 'id' | 'createdAt' | 'updatedAt' | 'freshnessScore'>
 export type FoodItemUpdate = Partial<Omit<FoodItem, 'id' | 'createdAt' | 'householdId'>>
 
+// A product the household wants to keep in stock, tracked across purchases
+export interface Staple {
+  id: string
+  name: string            // matched to pantry and list items by name (isSameName rules)
+  category: FoodCategory
+  unit: QuantityUnit
+  minQuantity: number     // "keep at least": at or below this it needs buying
+  buyQuantity: number     // how many go on the shopping list
+  dailyUse?: number       // the user's own guess, in `unit` per day
+  autoAdd: boolean        // put it on the shopping list automatically when low
+  countedAt: string       // ISO time the pantry quantities were last known to be right
+  skippedAt?: string      // the user removed the auto-added list item; hold off until restocked
+  createdAt: string
+  updatedAt: string
+}
+
 // Shopping List
 export interface ShoppingList {
   id: string

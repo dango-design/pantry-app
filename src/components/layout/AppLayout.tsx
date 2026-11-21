@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
+import { useStapleAutoAdd } from '@/hooks/useStapleAutoAdd'
 import { cn } from '@/utils/cn'
 import { AddSheet } from './AddSheet'
 import { BottomNav } from './BottomNav'
@@ -19,6 +20,9 @@ export function AppLayout({ bottomNav = false }: AppLayoutProps) {
   const [addOpen, setAddOpen] = useState(false)
   const toggleAdd = useCallback(() => setAddOpen((open) => !open), [])
   const closeAdd = useCallback(() => setAddOpen(false), [])
+
+  // Every signed-in page uses this layout, so low staples reach the shopping list from any page
+  useStapleAutoAdd()
 
   // Going to another page while the Add menu is open closes it
   useEffect(() => {

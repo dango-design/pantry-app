@@ -14,11 +14,18 @@ function nameWords(name: string): string[] {
     .map((word) => (word.length > 3 && word.endsWith('s') && !word.endsWith('ss') ? word.slice(0, -1) : word))
 }
 
+/**
+ * A name with case, punctuation, and plurals removed: "Eggs!" gives "egg".
+ * Empty when the name has no letters a to z or digits.
+ */
+export function normalizeName(name: string): string {
+  return nameWords(name).join(' ')
+}
+
 /** Same item name, ignoring case, punctuation, and plurals */
 export function isSameName(a: string, b: string): boolean {
-  const wa = nameWords(a)
-  const wb = nameWords(b)
-  return wa.length > 0 && wa.join(' ') === wb.join(' ')
+  const key = normalizeName(a)
+  return key.length > 0 && key === normalizeName(b)
 }
 
 // Every word of `query` appears in `name` ("milk" is in "Almond Milk"; "egg" is not in "Eggplant")
