@@ -68,9 +68,14 @@ const LOCATION_PHRASES: Record<string, string> = {
   spice_rack: 'on the spice rack',
 }
 
+/** Where something is, as a phrase: "in the fridge", "on the counter". "at home" for a place the app does not know */
+export function locationPhrase(location: string): string {
+  return LOCATION_PHRASES[location] ?? 'at home'
+}
+
 /** e.g. "2 in the fridge · expires in 1 week" */
 export function describeStock(item: FoodItem): string {
-  const where = LOCATION_PHRASES[item.storageLocation] ?? 'at home'
+  const where = locationPhrase(item.storageLocation)
   const days = getDaysUntilExpiration(item.expirationDate)
   const expiry = days < 0
     ? 'expired'

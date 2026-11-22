@@ -99,10 +99,11 @@ export function ShoppingListPage() {
     [removalId]
   )
 
+  // Products bought before go where they went last time
+  const memory = useMemo(() => getProductMemory(inventory, staples), [inventory, staples])
+
   // Let the user confirm location and expiry for each checked item before adding
   const handleReviewChecked = () => {
-    // Products bought before go where they went last time
-    const memory = getProductMemory(inventory, staples)
     setReviewItems(shoppingList.filter((item) => item.isChecked).map((item) => toReviewItem(item, memory)))
   }
 
@@ -340,6 +341,7 @@ export function ShoppingListPage() {
           onCancel={() => setReviewItems(null)}
           title="Add to pantry"
           description="Check where each item goes and when it expires. Tap the pencil to change details."
+          memory={memory}
         />
       )}
 

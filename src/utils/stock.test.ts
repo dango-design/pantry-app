@@ -353,12 +353,28 @@ describe('getProductMemory', () => {
       usualQuantity: 12,
       storageLocation: 'refrigerator',
       shelfLifeDays: 30,
+      shelfLifeFromUser: false,
       timesBought: 2,
       lastPurchased: novDate(13),
       brand: 'BODYARMOR',
       isStaple: true,
     })
     expect(findProductMemory('egg', memory)).toMatchObject({ name: 'eggs', timesBought: 3, isStaple: false })
+  })
+
+  it('remembers the latest shelf life someone typed for the same place', () => {
+    const rows = [
+      row({ name: 'Oat Milk', purchaseDate: novDate(1), expirationDate: novDate(11), storageLocation: 'refrigerator', expirationSource: 'manual' }),
+      // Kept somewhere else: not the same shelf life
+      row({ name: 'Oat Milk', purchaseDate: novDate(5), expirationDate: '2027-02-05', storageLocation: 'freezer', expirationSource: 'manual' }),
+      // The app's own estimate: a typed date beats it
+      row({ name: 'Oat Milk', purchaseDate: novDate(9), expirationDate: novDate(16), storageLocation: 'refrigerator' }),
+    ]
+    expect(findProductMemory('oat milk', getProductMemory(rows, []))).toMatchObject({
+      storageLocation: 'refrigerator',
+      shelfLifeDays: 10,
+      shelfLifeFromUser: true,
+    })
   })
 
   it('includes a staple that was never bought', () => {

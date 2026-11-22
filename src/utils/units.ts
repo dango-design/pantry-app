@@ -41,6 +41,36 @@ export function formatUnit(unit: QuantityUnit): string {
   return config.shortLabel || config.label.toLowerCase()
 }
 
+// Other spellings of the app's units, as photo and receipt scans write them
+const UNIT_SPELLINGS: Record<string, QuantityUnit> = {
+  each: 'count', ea: 'count', ct: 'count', pc: 'count', pcs: 'count', piece: 'count', pieces: 'count', item: 'count', items: 'count',
+  ounce: 'oz', ounces: 'oz',
+  pound: 'lb', pounds: 'lb', lbs: 'lb',
+  gram: 'g', grams: 'g',
+  kilogram: 'kg', kilograms: 'kg', kgs: 'kg',
+  milliliter: 'ml', milliliters: 'ml', millilitre: 'ml', millilitres: 'ml',
+  liter: 'l', liters: 'l', litre: 'l', litres: 'l',
+  gallon: 'gal', gallons: 'gal',
+  cups: 'cup',
+  tablespoon: 'tbsp', tablespoons: 'tbsp',
+  teaspoon: 'tsp', teaspoons: 'tsp',
+  units: 'unit',
+  pk: 'pack', pkg: 'pack', package: 'pack', packages: 'pack', packs: 'pack',
+  bunches: 'bunch',
+  dz: 'dozen', dozens: 'dozen',
+}
+
+/**
+ * The app's unit for a unit name, ignoring case and plurals: "Gallon" is
+ * 'gal', "mL" is 'ml', "lbs" is 'lb'. Units the app has no match for, such as
+ * "pint", become 'count'.
+ */
+export function parseUnit(text: string | null | undefined): QuantityUnit {
+  const unit = (text ?? '').trim().toLowerCase().replace(/\.$/, '')
+  if (unit in QUANTITY_UNITS) return unit as QuantityUnit
+  return UNIT_SPELLINGS[unit] ?? 'count'
+}
+
 // Units where "1 left" means you're down to the last one
 const DISCRETE_UNITS: QuantityUnit[] = ['count', 'unit', 'pack', 'bunch', 'dozen']
 
