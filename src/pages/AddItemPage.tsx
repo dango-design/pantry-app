@@ -9,7 +9,7 @@ import { dateStringFromToday, todayDateString } from '@/utils/dates'
 import { calculateFreshnessScore } from '@/utils/freshness'
 import { getDefaultStorageLocation } from '@/utils/foodDatabase'
 import { describeExpiry, estimateExpiry, guessItem, parseCategory, type ExpiryEstimate } from '@/utils/itemDefaults'
-import { getProductMemory, type ProductMemory } from '@/utils/stock'
+import { getProductMemory, productKey, type ProductMemory } from '@/utils/stock'
 import { parseUnit } from '@/utils/units'
 import { FoodThumbnail } from '@/components/icons'
 import { PAGE_WIDTHS, PageHeader } from '@/components/layout'
@@ -200,8 +200,8 @@ export function AddItemPage() {
     const productEstimate = estimateExpiry(productTitle, productCategory, productStorage, todayDateString(), history)
 
     barcodeName.current = productTitle
-    // These come from the product, so editing its name keeps them
-    touched.current = new Set(['category', 'storage', 'brand'])
+    // These come from the product, so editing its name keeps them. Fields set by hand before the scan stay set.
+    for (const field of ['category', 'storage', 'brand'] as const) touched.current.add(field)
     setName(productTitle)
     setBrand(productBrand ?? guess.brand ?? '')
     setCategory(productCategory)
@@ -236,7 +236,14 @@ export function AddItemPage() {
       .slice(0, 4)
       .map(([name]) => name.charAt(0).toUpperCase() + name.slice(1))
 
-    const combined = [...new Set([...frequent, ...QUICK_ADD_ITEMS])]
+    // One chip per product: "Almond milk" from the pantry and "Almond Milk" from the defaults are the same
+    const seen = new Set<string>()
+    const combined = [...frequent, ...QUICK_ADD_ITEMS].filter((item) => {
+      const key = productKey(item)
+      if (seen.has(key)) return false
+      seen.add(key)
+      return true
+    })
     return combined.slice(0, 8)
   }, [inventory])
 
