@@ -5,7 +5,8 @@ import { CATEGORIES, QUANTITY_UNITS, STORAGE_LOCATIONS } from '@/utils/constants
 import { FoodThumbnail } from '@/components/icons'
 import { cn } from '@/utils/cn'
 import { formatDateString } from '@/utils/dates'
-import { estimateExpirationDate } from '@/utils/foodDatabase'
+import { estimateExpiry } from '@/utils/itemDefaults'
+import type { ProductMemory } from '@/utils/stock'
 import type { FoodCategory, StorageLocation, QuantityUnit } from '@/types'
 
 interface ReviewItem {
@@ -16,6 +17,8 @@ interface ReviewItem {
   quantityUnit: QuantityUnit
   storageLocation: StorageLocation
   brand?: string
+  /** yyyy-MM-dd. Today when not set; a receipt can give an earlier day */
+  purchaseDate?: string
   expirationDate?: string
   expirationEdited?: boolean
   selected: boolean
@@ -29,6 +32,8 @@ interface ItemReviewListProps {
   title?: string
   description?: string
   loading?: boolean
+  /** What the household bought before, so a re-estimated date can use a shelf life they typed */
+  memory?: ProductMemory[]
 }
 
 export function ItemReviewList({
@@ -39,6 +44,7 @@ export function ItemReviewList({
   title = 'Review items',
   description = 'Review the detected items. Tap to select/deselect, or edit details as needed.',
   loading = false,
+  memory,
 }: ItemReviewListProps) {
   const [editingId, setEditingId] = useState<string | null>(null)
 
@@ -67,7 +73,7 @@ export function ItemReviewList({
   const updateDetails = (item: ReviewItem, updates: Partial<ReviewItem>) => {
     const next = { ...item, ...updates }
     if (next.expirationDate && !next.expirationEdited) {
-      next.expirationDate = estimateExpirationDate(next.name, next.category, next.storageLocation)
+      next.expirationDate = estimateExpiry(next.name, next.category, next.storageLocation, next.purchaseDate, memory).date
     }
     updateItem(item.id, next)
   }

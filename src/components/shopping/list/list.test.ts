@@ -66,7 +66,7 @@ function listItem(overrides: Partial<ShoppingListItem> = {}): ShoppingListItem {
 
 describe('toReviewItem', () => {
   it('uses what was saved the last time the product was bought', () => {
-    const memory = getProductMemory([row()], [])
+    const memory = getProductMemory([row({ expirationSource: 'manual' })], [])
     const review = toReviewItem(listItem({ name: 'bodyarmor lite', category: 'other' }), memory)
 
     expect(review).toMatchObject({
@@ -96,6 +96,13 @@ describe('toReviewItem', () => {
 
     expect(review.quantity).toBe(2)
     expect(review.quantityUnit).toBe('lb')
+  })
+
+  it('estimates the date again when the last one was an estimate', () => {
+    const memory = getProductMemory([row({ name: 'Spinach', category: 'produce', storageLocation: 'refrigerator', expirationDate: '2026-11-20' })], [])
+    const review = toReviewItem(listItem({ name: 'Spinach' }), memory)
+
+    expect(review).toMatchObject({ category: 'produce', storageLocation: 'refrigerator', expirationDate: dateStringFromToday(5) })
   })
 
   it('estimates the date when the last purchase has no shelf life', () => {

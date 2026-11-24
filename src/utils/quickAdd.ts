@@ -1,6 +1,6 @@
 import type { FoodCategory, FoodItem, QuantityUnit, ShoppingListItem, Staple } from '@/types'
 import { QUANTITY_UNITS } from './constants'
-import { FOOD_DATABASE, lookupFood } from './foodDatabase'
+import { GENERIC_FOOD_NAMES, isFoodName, lookupFood } from './foodDatabase'
 import { formatQuantity } from './mealPlan'
 import { findInPantry, isLowStock } from './pantryMatch'
 import {
@@ -173,8 +173,6 @@ function buildItem(
   return item
 }
 
-const FOOD_NAMES = new Set(Object.keys(FOOD_DATABASE))
-
 /**
  * The list item for what was typed, or null when nothing was typed.
  *
@@ -186,7 +184,7 @@ export function resolveQuickAdd(text: string, memory: ProductMemory[], staples: 
   if (!whole) return null
 
   const known = findProductMemory(whole, memory)
-  if (known || FOOD_NAMES.has(whole.toLowerCase())) return buildItem(whole, undefined, known, staples)
+  if (known || isFoodName(whole)) return buildItem(whole, undefined, known, staples)
 
   const parsed = parseQuickAdd(whole)
   return buildItem(parsed.name, parsed, findProductMemory(parsed.name, memory), staples)
@@ -220,23 +218,8 @@ export function matchRank(name: string, query: string): 0 | 1 | null {
   return productKey(name) === productKey(query) ? 0 : null
 }
 
-function sentenceCase(name: string): string {
-  return name.charAt(0).toUpperCase() + name.slice(1)
-}
-
-// One generic name per product. "apple" and "apples" are the same product, and
-// the longer spelling reads better on a shopping list.
-function genericNames(): { key: string; name: string }[] {
-  const byKey = new Map<string, string>()
-  for (const name of Object.keys(FOOD_DATABASE)) {
-    const key = productKey(name)
-    const current = byKey.get(key)
-    if (!current || name.length > current.length) byKey.set(key, name)
-  }
-  return [...byKey].map(([key, name]) => ({ key, name: sentenceCase(name) }))
-}
-
-const GENERIC_NAMES = genericNames()
+// One generic name per food in the food table, as it reads on a shopping list
+const GENERIC_NAMES = GENERIC_FOOD_NAMES.map((name) => ({ key: productKey(name), name }))
 
 /**
  * Up to `limit` products matching the typed text. Products bought before come
