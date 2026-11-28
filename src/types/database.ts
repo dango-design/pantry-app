@@ -39,6 +39,10 @@ export type Database = {
           added_via: string
           status: string
           consumed_at: string | null
+          role: string | null
+          role_source: string | null
+          servings: number | null
+          touched_at: string | null
           created_at: string
           updated_at: string
         }
@@ -66,6 +70,10 @@ export type Database = {
           added_via: string
           status?: string
           consumed_at?: string | null
+          role?: string | null
+          role_source?: string | null
+          servings?: number | null
+          touched_at?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -93,6 +101,10 @@ export type Database = {
           added_via?: string
           status?: string
           consumed_at?: string | null
+          role?: string | null
+          role_source?: string | null
+          servings?: number | null
+          touched_at?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -249,6 +261,7 @@ export type Database = {
           invite_code: string
           owner_id: string
           settings: Json
+          size: number | null
           created_at: string
           updated_at: string
         }
@@ -258,6 +271,7 @@ export type Database = {
           invite_code?: string
           owner_id: string
           settings?: Json
+          size?: number | null
           created_at?: string
           updated_at?: string
         }
@@ -267,6 +281,7 @@ export type Database = {
           invite_code?: string
           owner_id?: string
           settings?: Json
+          size?: number | null
           created_at?: string
           updated_at?: string
         }

@@ -1,8 +1,9 @@
 import { addDays, parseISO } from 'date-fns'
-import type { FoodCategory, QuantityUnit, StorageLocation } from '@/types'
+import type { FoodCategory, FoodRole, QuantityUnit, RoleSource, StorageLocation } from '@/types'
 import { CATEGORIES } from './constants'
 import { todayDateString, toLocalDateString } from './dates'
 import { estimateShelfLife, getDefaultStorageLocation, lookupFood } from './foodDatabase'
+import { guessRole } from './foodRoles'
 import { locationPhrase } from './pantryMatch'
 import { findProductMemory, type ProductMemory } from './stock'
 
@@ -22,6 +23,9 @@ export interface ItemGuess {
   quantity: number
   storageLocation: StorageLocation
   brand?: string
+  /** What the food does in a meal. See roleForNewItem */
+  role: FoodRole
+  roleSource: RoleSource
   /** 'history': the household bought it before. 'food': the food table knows it. 'none': neither */
   source: 'history' | 'food' | 'none'
 }
@@ -40,16 +44,48 @@ export function guessItem(name: string, memory: ProductMemory[]): ItemGuess {
       quantity: known.usualQuantity > 0 ? known.usualQuantity : 1,
       storageLocation: known.storageLocation,
       brand: known.brand,
+      ...roleForNewItem(name, known.category, memory),
       source: 'history',
     }
   }
 
   const food = lookupFood(name)
   if (food) {
-    return { category: food.category, unit: food.unit, quantity: food.defaultQty, storageLocation: food.storage, source: 'food' }
+    return {
+      category: food.category,
+      unit: food.unit,
+      quantity: food.defaultQty,
+      storageLocation: food.storage,
+      ...roleForNewItem(name, food.category, memory),
+      source: 'food',
+    }
   }
 
-  return { category: 'other', unit: 'count', quantity: 1, storageLocation: getDefaultStorageLocation(name, 'other'), source: 'none' }
+  return {
+    category: 'other',
+    unit: 'count',
+    quantity: 1,
+    storageLocation: getDefaultStorageLocation(name, 'other'),
+    ...roleForNewItem(name, 'other', memory),
+    source: 'none',
+  }
+}
+
+/**
+ * The role for a new item called `name` filed under `category`. A role a
+ * person chose for the same product before carries over and stays 'manual',
+ * so no later guess replaces it. Otherwise it is guessed from the name and
+ * category (guessRole). The store calls this for every item added without a
+ * role, so typed, scanned, photo, receipt and shopping-list items all get one.
+ */
+export function roleForNewItem(
+  name: string,
+  category: FoodCategory,
+  memory: ProductMemory[] = [],
+): { role: FoodRole; roleSource: RoleSource } {
+  const chosen = findProductMemory(name, memory)?.role
+  if (chosen) return { role: chosen, roleSource: 'manual' }
+  return { role: guessRole(name, category), roleSource: 'guessed' }
 }
 
 export interface ExpiryEstimate {

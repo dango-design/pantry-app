@@ -52,6 +52,22 @@ export type AddedVia = 'photo' | 'receipt' | 'barcode' | 'manual' | 'voice'
 // Expiration Source
 export type ExpirationSource = 'scanned' | 'calculated' | 'manual'
 
+/**
+ * What a food does in a meal, as opposed to what it is (the category).
+ * Labels and helpers are in src/utils/foodRoles.ts.
+ * - main: protein or a ready meal
+ * - base: rice, pasta, bread, tortillas, grains
+ * - produce: vegetables and fruit
+ * - breakfast: breakfast foods and dairy
+ * - snack
+ * - flavor: oils, spices, sauces, condiments, baking basics such as salt and sugar
+ * - drink
+ */
+export type FoodRole = 'main' | 'base' | 'produce' | 'breakfast' | 'snack' | 'flavor' | 'drink'
+
+/** 'guessed': the app chose the role and may choose again. 'manual': a person chose it, and no guess replaces it */
+export type RoleSource = 'guessed' | 'manual'
+
 // User
 export interface User {
   id: string
@@ -114,6 +130,22 @@ export interface FoodItem {
   status: ItemStatus
   consumedAt?: string
 
+  /** Not set on items saved before roles existed. Read it with getRole(), which guesses when it is missing */
+  role?: FoodRole
+  roleSource?: RoleSource
+  /**
+   * Servings left in this item, when a person typed it. Not set means "estimate
+   * it" (estimateServings). The store scales it when the quantity changes, so
+   * using half of an item with 6 servings leaves 3.
+   */
+  servings?: number
+  /**
+   * ISO time a person last used, counted, adjusted or edited this item. Not set
+   * on items saved before this field existed. Read it with getTouchedAt(),
+   * which falls back to the purchase date.
+   */
+  touchedAt?: string
+
   createdAt: string
   updatedAt: string
 }
@@ -133,6 +165,7 @@ export interface Staple {
   autoAdd: boolean        // put it on the shopping list automatically when low
   countedAt: string       // ISO time the pantry quantities were last known to be right
   skippedAt?: string      // the user removed the auto-added list item; hold off until restocked
+  role?: FoodRole         // set when a person picks a role for the product; getRole() guesses otherwise
   createdAt: string
   updatedAt: string
 }

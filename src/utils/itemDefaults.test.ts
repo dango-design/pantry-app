@@ -38,12 +38,14 @@ describe('guessItem', () => {
       quantity: 2,
       storageLocation: 'refrigerator',
       brand: 'Oatly',
+      role: 'breakfast',
+      roleSource: 'guessed',
       source: 'history',
     })
   })
 
   it('uses the food table for a name not bought before', () => {
-    expect(guessItem('Eggs', [])).toMatchObject({ category: 'dairy', quantity: 12, storageLocation: 'refrigerator', source: 'food' })
+    expect(guessItem('Eggs', [])).toMatchObject({ category: 'dairy', quantity: 12, storageLocation: 'refrigerator', role: 'main', source: 'food' })
   })
 
   it("files an unknown name as 'other' in the fridge", () => {
@@ -52,6 +54,8 @@ describe('guessItem', () => {
       unit: 'count',
       quantity: 1,
       storageLocation: 'refrigerator',
+      role: 'snack',
+      roleSource: 'guessed',
       source: 'none',
     })
   })
