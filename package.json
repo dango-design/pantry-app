@@ -13,12 +13,16 @@
     "preview": "vite preview",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "test": "vitest run",
-    "test:watch": "vitest",
+    "test": "vitest run --project unit",
+    "test:stories": "vitest run --project storybook",
+    "test:e2e": "playwright test",
+    "test:watch": "vitest --project unit",
     "typecheck:packages": "tsc --noEmit -p packages/verdict-engine && tsc --noEmit -p packages/food-data",
+    "typecheck": "tsc -b && tsc --noEmit -p tsconfig.node.json && npm run typecheck:packages",
     "sync:shared": "node scripts/sync-shared.mjs",
     "check:shared": "node scripts/sync-shared.mjs --check",
-    "gen:dictionary": "node scripts/gen-dictionary-sql.mjs --out supabase/migrations/007_allergy_dictionary.sql"
+    "gen:dictionary": "node scripts/gen-dictionary-sql.mjs --out supabase/migrations/007_allergy_dictionary.sql",
+    "verify": "npm run lint && npm run typecheck && npm run check:shared && npm test && npm run build && npm run test:stories && npm run test:e2e"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -44,6 +48,7 @@
   "devDependencies": {
     "@chromatic-com/storybook": "^5.0.0",
     "@eslint/js": "^9.17.0",
+    "@playwright/test": "^1.58.1",
     "@storybook/addon-a11y": "^10.2.3",
     "@storybook/addon-docs": "^10.2.3",
     "@storybook/addon-onboarding": "^10.2.3",

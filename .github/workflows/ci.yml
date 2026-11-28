@@ -1,6 +1,7 @@
 name: CI
 
 # Runs on every push to every branch, and by hand from the Actions tab.
+# `npm run verify` runs the same checks locally. See AGENTS.md.
 on:
   push:
   workflow_dispatch:
@@ -16,7 +17,7 @@ permissions:
 
 jobs:
   checks:
-    name: Lint, test and build
+    name: Lint, typecheck, unit tests and build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -28,10 +29,57 @@ jobs:
 
       - run: npm ci
       - run: npm run lint
-      - run: npm run typecheck:packages
+      - run: npm run typecheck
       # Fails if supabase/functions/_shared is out of date with packages/.
       - run: npm run check:shared
       - run: npm test
       - run: npm run build
       # Catches stories that no longer compile.
       - run: npm run build-storybook
+
+  stories:
+    name: Storybook story tests
+    # Playwright 1.58 cannot install Chromium on ubuntu-latest (26.04).
+    # Move to ubuntu-latest when Playwright is upgraded to a version that supports it.
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      # Renders every story in Chromium and runs its play function.
+      - run: npm run test:stories
+
+  e2e:
+    name: End-to-end tests
+    # Playwright 1.58 cannot install Chromium on ubuntu-latest (26.04).
+    # Move to ubuntu-latest when Playwright is upgraded to a version that supports it.
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      # Builds the app in demo mode and drives it at phone and desktop sizes.
+      - run: npm run test:e2e
+
+      # Screenshots, traces and the HTML report for failed tests.
+      # Download from the run's Summary page, then: npx playwright show-report <folder>
+      - uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: playwright-report
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 14
