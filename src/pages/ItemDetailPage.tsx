@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback, useEffect, useRef, Suspense } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { Minus, Plus, Clock, MapPin, Tag, ShoppingCart, CheckCircle2, ChevronRight, Edit2, Repeat, SlidersHorizontal, Trash2 } from 'lucide-react'
+import { Minus, Plus, Clock, MapPin, Tag, ShoppingCart, CheckCircle2, ChevronRight, Edit2, Repeat, SlidersHorizontal, Trash2, UtensilsCrossed, Users } from 'lucide-react'
 import { Badge, Button, Card, CardContent, Dialog, DialogActions, Snackbar } from '@/components/common'
 import { useDemoStore } from '@/stores/demoStore'
 import { CATEGORIES, CATEGORY_TONES, STORAGE_LOCATIONS, QUANTITY_UNITS } from '@/utils/constants'
@@ -22,6 +22,8 @@ import { BarcodeScanner } from '@/components/smart-input'
 import { cn } from '@/utils/cn'
 import { formatQuantity } from '@/utils/mealPlan'
 import { describeRunOut, formatStockCount, getStock } from '@/utils/stock'
+import { estimateServings, FOOD_ROLE_DESCRIPTIONS, FOOD_ROLE_LABELS, FOOD_ROLES, getRole } from '@/utils/foodRoles'
+import type { FoodItem, FoodRole } from '@/types'
 
 // Snackbar state type
 interface SnackbarState {
@@ -38,7 +40,7 @@ const USE_STEP = 0.5
 export function ItemDetailPage() {
   const navigate = useNavigate()
   const { id } = useParams<{ id: string }>()
-  const { inventory, staples, deleteItem, adjustStock, updateItem } = useDemoStore()
+  const { inventory, staples, deleteItem, adjustStock, updateItem, setProductRole } = useDemoStore()
 
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const [showUseDialog, setShowUseDialog] = useState(false)
@@ -255,6 +257,33 @@ export function ItemDetailPage() {
                 <p className="font-medium">{location.label}</p>
               </div>
             </div>
+
+            {/* Role: what the food does in a meal. Applies to every batch of the product. */}
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
+                <UtensilsCrossed className="h-5 w-5 text-gray-600" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <label htmlFor="item-role" className="text-sm text-gray-500">Role in meals</label>
+                <select
+                  id="item-role"
+                  value={getRole(item)}
+                  onChange={(e) => setProductRole(item.name, e.target.value as FoodRole)}
+                  className="block w-full font-medium bg-transparent py-0.5 -ml-0.5 rounded focus:outline-none focus:ring-2 focus:ring-primary"
+                >
+                  {FOOD_ROLES.map((role) => (
+                    <option key={role} value={role}>
+                      {FOOD_ROLE_LABELS[role]} – {FOOD_ROLE_DESCRIPTIONS[role]}
+                    </option>
+                  ))}
+                </select>
+                {item.roleSource !== 'manual' && (
+                  <p className="text-xs text-gray-500">Guessed from the name. Change it if it’s wrong.</p>
+                )}
+              </div>
+            </div>
+
+            <ServingsField item={item} onSave={(servings) => updateItem(item.id, { servings })} />
 
             <div className="pt-2 border-t border-gray-100">
               <div className="flex justify-between text-sm">
@@ -480,6 +509,79 @@ export function ItemDetailPage() {
         onClose={closeSnackbar}
         onUndo={snackbar.undoAction}
       />
+    </div>
+  )
+}
+
+/**
+ * Servings left in this batch. Empty means "use the estimate", which shows as
+ * the placeholder. A typed number is saved when the field loses focus.
+ */
+function ServingsField({ item, onSave }: { item: FoodItem; onSave: (servings: number | undefined) => void }) {
+  const estimate = estimateServings({ ...item, servings: undefined })
+  const typed = item.servings
+  const [draft, setDraft] = useState(typed === undefined ? '' : String(typed))
+
+  // The store scales a typed number when the amount changes, so follow it
+  useEffect(() => {
+    setDraft(typed === undefined ? '' : String(typed))
+  }, [typed])
+
+  const save = () => {
+    const text = draft.trim()
+    if (text === '') {
+      if (typed !== undefined) onSave(undefined)
+      return
+    }
+    const value = Number(text)
+    if (!Number.isFinite(value) || value < 0) {
+      setDraft(typed === undefined ? '' : String(typed))
+      return
+    }
+    const rounded = Math.round(value * 10) / 10
+    if (rounded !== typed) onSave(rounded)
+  }
+
+  return (
+    <div className="flex items-center gap-3">
+      <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
+        <Users className="h-5 w-5 text-gray-600" />
+      </div>
+      <div className="flex-1 min-w-0">
+        <label htmlFor="item-servings" className="text-sm text-gray-500">Servings left</label>
+        <div className="flex items-center gap-2">
+          <input
+            id="item-servings"
+            type="number"
+            inputMode="decimal"
+            min="0"
+            step="any"
+            value={draft}
+            placeholder={`About ${estimate}`}
+            onChange={(e) => setDraft(e.target.value)}
+            onBlur={save}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') e.currentTarget.blur()
+            }}
+            className="w-28 font-medium bg-transparent border-b border-gray-200 py-0.5 focus:outline-none focus:border-primary placeholder:text-gray-900 placeholder:font-medium"
+          />
+          {typed !== undefined && (
+            <button
+              type="button"
+              onClick={() => {
+                setDraft('')
+                onSave(undefined)
+              }}
+              className="text-xs font-medium text-gray-500 hover:text-gray-700 underline"
+            >
+              Use estimate ({estimate})
+            </button>
+          )}
+        </div>
+        <p className="text-xs text-gray-500">
+          {typed === undefined ? 'Estimated from the amount. Type a number to set it.' : 'Set by you.'}
+        </p>
+      </div>
     </div>
   )
 }

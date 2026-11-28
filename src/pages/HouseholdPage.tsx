@@ -10,6 +10,8 @@ import {
   Trash2,
   LogOut,
   Check,
+  Minus,
+  Plus,
 } from 'lucide-react'
 import { Card, CardContent, Button, Input } from '@/components/common'
 import { PageHeader, pageContainer } from '@/components/layout'
@@ -26,6 +28,8 @@ import {
   type HouseholdMemberWithProfile,
 } from '@/services'
 import { cn } from '@/utils/cn'
+import { useDemoStore } from '@/stores/demoStore'
+import { clampHouseholdSize, MAX_HOUSEHOLD_SIZE } from '@/utils/foodRoles'
 
 type View = 'main' | 'join'
 
@@ -48,6 +52,8 @@ export function HouseholdPage() {
   const [joining, setJoining] = useState(false)
   const [editing, setEditing] = useState(false)
   const [householdName, setHouseholdName] = useState('')
+  const householdSize = useDemoStore((state) => state.householdSize)
+  const setHouseholdSize = useDemoStore((state) => state.setHouseholdSize)
 
   useEffect(() => {
     loadHouseholdData()
@@ -60,6 +66,9 @@ export function HouseholdPage() {
       const h = await getCurrentHousehold()
       setHousehold(h)
       setHouseholdName(h?.name || '')
+      // The saved household size wins over the one in this browser.
+      // Before the size column exists, rows have no `size` and this is skipped.
+      if (typeof h?.size === 'number') setHouseholdSize(h.size)
       if (h) {
         const m = await getHouseholdMembers(h.id)
         setMembers(m)
@@ -97,6 +106,21 @@ export function HouseholdPage() {
       setEditing(false)
     } catch {
       setError('Failed to update household name')
+    }
+  }
+
+  // The size is always saved in this browser. The owner also saves it to the
+  // household, once the database has the column. Until then that save fails
+  // quietly and the browser copy is used.
+  async function handleChangeSize(next: number) {
+    const size = clampHouseholdSize(next)
+    setHouseholdSize(size)
+    if (!household || household.owner_id !== user?.id) return
+    try {
+      await updateHousehold(household.id, { size })
+      setHousehold({ ...household, size })
+    } catch (err) {
+      console.warn('Household size saved in this browser only:', err)
     }
   }
 
@@ -259,6 +283,41 @@ export function HouseholdPage() {
                 )}
               </div>
             )}
+          </CardContent>
+        </Card>
+
+        {/* People eating at home: used to turn servings into dinners */}
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <p id="household-size-label" className="font-medium">People eating at home</p>
+                <p className="text-sm text-gray-500">Used to work out how many dinners your pantry holds</p>
+              </div>
+              <div className="flex items-center gap-3" role="group" aria-labelledby="household-size-label">
+                <button
+                  type="button"
+                  onClick={() => handleChangeSize(householdSize - 1)}
+                  disabled={householdSize <= 1}
+                  aria-label="One fewer person"
+                  className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 disabled:opacity-40 transition-colors"
+                >
+                  <Minus className="h-4 w-4" />
+                </button>
+                <span className="w-6 text-center text-lg font-semibold tabular-nums" aria-live="polite">
+                  {householdSize}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => handleChangeSize(householdSize + 1)}
+                  disabled={householdSize >= MAX_HOUSEHOLD_SIZE}
+                  aria-label="One more person"
+                  className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 disabled:opacity-40 transition-colors"
+                >
+                  <Plus className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
           </CardContent>
         </Card>
 

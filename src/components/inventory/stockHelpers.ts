@@ -54,6 +54,9 @@ export function snapshotStock(name: string): () => void {
         expirationDate: saved.expirationDate,
         expirationSource: saved.expirationSource,
         freshnessScore: saved.freshnessScore,
+        // Undo is not a new touch, and the servings were for the old amount
+        touchedAt: saved.touchedAt,
+        servings: saved.servings,
       })
     }
 

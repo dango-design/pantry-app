@@ -1,5 +1,5 @@
 import { addDays, differenceInCalendarDays, format, parseISO } from 'date-fns'
-import type { FoodCategory, FoodItem, QuantityUnit, ShoppingListItem, Staple, StorageLocation } from '@/types'
+import type { FoodCategory, FoodItem, FoodRole, QuantityUnit, ShoppingListItem, Staple, StorageLocation } from '@/types'
 import { toLocalDateString } from './dates'
 import { calculateFreshnessScore } from './freshness'
 import { estimateExpirationDate, getDefaultStorageLocation } from './foodDatabase'
@@ -71,6 +71,8 @@ export interface ProductMemory {
   /** yyyy-MM-dd. Empty for a staple that was never bought */
   lastPurchased: string
   brand?: string
+  /** A role a person chose for this product, on the staple or on one of its rows. Not set when the role was only guessed */
+  role?: FoodRole
   isStaple: boolean
 }
 
@@ -498,6 +500,7 @@ export function getProductMemory(inventory: FoodItem[], staples: Staple[]): Prod
       timesBought: new Set(rows.map((row) => row.purchaseDate)).size,
       lastPurchased: last.purchaseDate,
       brand: last.brand ?? rows.find((row) => row.brand)?.brand,
+      role: chosenRole(rows, staple),
       isStaple: staple !== undefined,
     })
   }
@@ -520,6 +523,7 @@ export function getProductMemory(inventory: FoodItem[], staples: Staple[]): Prod
       shelfLifeFromUser: false,
       timesBought: 0,
       lastPurchased: '',
+      role: staple.role,
       isStaple: true,
     })
   }
@@ -529,6 +533,12 @@ export function getProductMemory(inventory: FoodItem[], staples: Staple[]): Prod
     b.timesBought - a.timesBought ||
     b.lastPurchased.localeCompare(a.lastPurchased)
   )
+}
+
+// The role a person chose for a product: on its staple, or on its newest row with a hand-set role
+function chosenRole(rows: FoodItem[], staple: Staple | undefined): FoodRole | undefined {
+  if (staple?.role) return staple.role
+  return latestPurchase(rows.filter((row) => row.role && row.roleSource === 'manual'))?.role
 }
 
 export function findProductMemory(name: string, memory: ProductMemory[]): ProductMemory | undefined {
