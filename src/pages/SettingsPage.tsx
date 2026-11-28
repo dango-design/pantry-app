@@ -10,6 +10,7 @@ import {
   ShieldCheck,
 } from 'lucide-react'
 import { Card, CardContent } from '@/components/common'
+import { usePantryView, type Density } from '@/components/inventory'
 import { PageHeader, pageContainer } from '@/components/layout'
 import { useAuth } from '@/contexts/AuthContext'
 import { cn } from '@/utils/cn'
@@ -48,6 +49,40 @@ function SettingItem({ icon: Icon, label, description, onClick, danger }: Settin
       </div>
       <ChevronRight className={cn('h-5 w-5', danger ? 'text-red-400' : 'text-gray-400')} />
     </button>
+  )
+}
+
+const DENSITY_CHOICES: { key: Density; label: string; description: string }[] = [
+  { key: 'compact', label: 'Compact', description: 'One line per item' },
+  { key: 'comfortable', label: 'Comfortable', description: 'Large cards with pictures' },
+]
+
+/** How the Pantry tab draws each item. Saved on this device only. */
+function PantryDensitySetting() {
+  const { density, setDensity } = usePantryView()
+  return (
+    <div className="p-3">
+      <p id="pantry-density-label" className="font-medium text-gray-900">Pantry list</p>
+      <p className="text-sm text-gray-500">How items show on the Pantry tab, on this device</p>
+      <div role="radiogroup" aria-labelledby="pantry-density-label" className="mt-3 grid grid-cols-2 gap-2">
+        {DENSITY_CHOICES.map((choice) => (
+          <button
+            key={choice.key}
+            type="button"
+            role="radio"
+            aria-checked={density === choice.key}
+            onClick={() => setDensity(choice.key)}
+            className={cn(
+              'rounded-lg border px-3 py-2 text-left transition-colors',
+              density === choice.key ? 'border-primary bg-primary-soft' : 'border-gray-200 hover:border-gray-300'
+            )}
+          >
+            <span className="block text-sm font-medium text-gray-900">{choice.label}</span>
+            <span className="block text-xs text-gray-500">{choice.description}</span>
+          </button>
+        ))}
+      </div>
+    </div>
   )
 }
 
@@ -113,6 +148,13 @@ export function SettingsPage() {
               label="Privacy"
               description="Data and privacy settings"
             />
+          </CardContent>
+        </Card>
+
+        {/* Display */}
+        <Card>
+          <CardContent className="p-2">
+            <PantryDensitySetting />
           </CardContent>
         </Card>
 
