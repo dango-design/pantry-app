@@ -43,7 +43,8 @@ function row(name: string, options: ProductOptions, overrides: Partial<FoodItem>
     quantity: options.quantity ?? 1,
     quantityUnit: options.unit ?? 'count',
     servings: options.servings,
-    expirationDate: inDays(options.expiresIn ?? 30),
+    // A year out by default, so expiry only matters in tests that set it
+    expirationDate: inDays(options.expiresIn ?? 365),
     purchaseDate: inDays(-60),
     createdAt: daysAgoIso(60),
     touchedAt: daysAgoIso(options.touchedDaysAgo ?? 1),
@@ -81,7 +82,7 @@ describe('getStaplesSummary', () => {
       product('Rice', { staple: {}, status: 'ok', daysLeft: 40 }),
       product('Pasta', { staple: {}, status: 'ok', daysLeft: 12 }),
       product('Chips'),
-    ])
+    ], NOW)
     expect(summary).toMatchObject({ total: 4, stocked: 2, low: 1, out: 1 })
   })
 
@@ -93,7 +94,7 @@ describe('getStaplesSummary', () => {
       product('Milk', { staple: {}, status: 'out', estimated: 0 }),
       product('Pasta', { staple: {}, daysLeft: 12 }),
       product('Flour', { staple: {}, quantity: 1 }),
-    ])
+    ], NOW)
     expect(summary.gauges.map((gauge) => gauge.name)).toEqual(['Milk', 'Eggs', 'Pasta', 'Rice', 'Flour', 'Salt'])
   })
 
@@ -104,7 +105,7 @@ describe('getStaplesSummary', () => {
       // Many days but at its minimum: orange
       product('Salt', { staple: {}, status: 'low', daysLeft: 45 }),
       product('Milk', { staple: {}, status: 'out', estimated: 0 }),
-    ])
+    ], NOW)
     const tone = Object.fromEntries(summary.gauges.map((gauge) => [gauge.name, gauge.tone]))
     expect(tone).toEqual({ Milk: 'red', Bread: 'green', Salt: 'orange' })
   })
@@ -114,7 +115,7 @@ describe('getStaplesSummary', () => {
       product('Milk', { staple: {}, status: 'out', estimated: 0 }),
       product('Eggs', { staple: {}, status: 'low', daysLeft: 2.7 }),
       product('Rice', { staple: {}, daysLeft: 45 }),
-    ]).gauges
+    ], NOW).gauges
     expect(milk).toMatchObject({ label: 'out', fill: 0 })
     expect(eggs).toMatchObject({ label: '2 d' })
     expect(eggs.fill).toBeCloseTo(0.09, 2)
@@ -122,18 +123,50 @@ describe('getStaplesSummary', () => {
   })
 
   it('shows the amount when the daily use is not known', () => {
-    const [salt] = getStaplesSummary([product('Salt', { staple: { minQuantity: 1 }, quantity: 2 })]).gauges
+    const [salt] = getStaplesSummary([product('Salt', { staple: { minQuantity: 1 }, quantity: 2 })], NOW).gauges
     expect(salt.label).toBe('2 left')
     expect(salt.fill).toBeCloseTo(2 / 3)
   })
 
+  it('counts down to the expiry date when it comes before running out', () => {
+    const [bread, yogurt, rice] = getStaplesSummary([
+      // Eaten over 4 days, but goes bad today
+      product('Bread', { staple: {}, status: 'ok', daysLeft: 4, expiresIn: 0 }),
+      // 8 days of use, goes bad in 5: green, since 5 days is not soon
+      product('Yogurt', { staple: {}, status: 'ok', daysLeft: 8, expiresIn: 5 }),
+      // Runs out long before it goes bad: unchanged
+      product('Rice', { staple: {}, status: 'ok', daysLeft: 20, expiresIn: 300 }),
+    ], NOW).gauges
+    expect(bread).toMatchObject({ label: 'today', tone: 'orange', daysLeft: 0, goesBadFirst: true, fill: 0 })
+    expect(yogurt).toMatchObject({ label: '5 d', tone: 'green', daysLeft: 5, goesBadFirst: true })
+    expect(rice).toMatchObject({ label: '20 d', goesBadFirst: false })
+  })
+
+  it('marks an expired staple red, even when its amount is fine', () => {
+    const [milk] = getStaplesSummary([product('Milk', { staple: {}, status: 'ok', daysLeft: 6, expiresIn: -1 })], NOW).gauges
+    expect(milk).toMatchObject({ label: 'expired', tone: 'red', goesBadFirst: true })
+  })
+
+  it('uses the expiry date for a staple with no daily use when it goes bad within 30 days', () => {
+    const [cheese] = getStaplesSummary([product('Cheese', { staple: {}, quantity: 3, expiresIn: 10 })], NOW).gauges
+    expect(cheese).toMatchObject({ label: '10 d', goesBadFirst: true, daysLeft: 10 })
+  })
+
+  it('sorts by the earlier of running out and going bad', () => {
+    const summary = getStaplesSummary([
+      product('Pasta', { staple: {}, daysLeft: 3, expiresIn: 300 }),
+      product('Bread', { staple: {}, daysLeft: 9, expiresIn: 1 }),
+    ], NOW)
+    expect(summary.gauges.map((gauge) => gauge.name)).toEqual(['Bread', 'Pasta'])
+  })
+
   it('is empty with no staples', () => {
-    expect(getStaplesSummary([product('Chips')])).toEqual({ total: 0, stocked: 0, low: 0, out: 0, gauges: [] })
+    expect(getStaplesSummary([product('Chips')], NOW)).toEqual({ total: 0, stocked: 0, low: 0, out: 0, gauges: [] })
   })
 })
 
 describe('estimateDinners', () => {
-  it('divides the smallest of mains, bases and veg by household size, rounded down', () => {
+  it('divides each role by its dinner portion and household size, and takes the smallest, rounded down', () => {
     const estimate = estimateDinners(
       [
         product('Chicken', { role: 'main', servings: 14 }),
@@ -144,7 +177,9 @@ describe('estimateDinners', () => {
       NOW
     )
     expect(estimate.servings).toEqual({ main: 14, base: 30, produce: 20 })
-    expect(estimate.dinners).toBe(4)
+    // Mains: 14 / 1.5 / 3 = 3.1. Bases: 30 / 3 = 10. Veg: 20 / 3 = 6.7
+    expect(estimate.dinnersBy).toEqual({ main: 3.1, base: 10, produce: 6.7 })
+    expect(estimate.dinners).toBe(3)
     expect(estimate.limitedBy).toBe('main')
   })
 
@@ -178,7 +213,8 @@ describe('estimateDinners', () => {
       2,
       NOW
     )
-    expect(estimate.dinners).toBe(2)
+    // Mains: 4 / 1.5 / 2 = 1.3
+    expect(estimate.dinners).toBe(1)
     expect(estimate.totalProducts).toBe(7)
     expect(estimate.roleCounts).toEqual([
       { role: 'main', count: 1 },
@@ -205,7 +241,8 @@ describe('estimateDinners', () => {
       NOW
     )
     expect(estimate.servings.main).toBe(8)
-    expect(estimate.dinners).toBe(8)
+    // 8 / 1.5 = 5.3
+    expect(estimate.dinners).toBe(5)
   })
 
   it('estimates servings from the amount when none were typed', () => {
@@ -230,7 +267,32 @@ describe('estimateDinners', () => {
       0,
       NOW
     )
-    expect(estimate.dinners).toBe(3)
+    // Mains: 3 / 1.5 / 1 = 2
+    expect(estimate.dinners).toBe(2)
+  })
+
+  it('leaves snacking fruit out of dinner veg but keeps it in the role bar', () => {
+    const estimate = estimateDinners(
+      [
+        product('Chicken', { role: 'main', servings: 30 }),
+        product('Rice', { role: 'base', servings: 20 }),
+        product('Broccoli', { role: 'produce', servings: 4 }),
+        product('Apples', { role: 'produce', servings: 6 }),
+        product('Banana', { role: 'produce', servings: 5 }),
+        product('Tomatoes', { role: 'produce', servings: 4 }),
+      ],
+      2,
+      NOW
+    )
+    // Broccoli and tomatoes count; apples and bananas do not
+    expect(estimate.servings.produce).toBe(8)
+    expect(estimate.dinners).toBe(4)
+    expect(estimate.limitedBy).toBe('produce')
+    expect(estimate.roleCounts).toEqual([
+      { role: 'main', count: 1 },
+      { role: 'base', count: 1 },
+      { role: 'produce', count: 4 },
+    ])
   })
 })
 

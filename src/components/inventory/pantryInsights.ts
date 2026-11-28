@@ -2,7 +2,7 @@
 // a while" parts of the Pantry tab. They hold no React state and take `now`
 // as an argument, so they can be tested on their own (pantryInsights.test.ts).
 
-import { estimateServings, getRole, getTouchedAt, daysSinceTouched, FOOD_ROLES } from '@/utils/foodRoles'
+import { estimateServings, getRole, getTouchedAt, daysSinceTouched, isSnackingFruit, FOOD_ROLES } from '@/utils/foodRoles'
 import { differenceInCalendarDays, parseISO } from 'date-fns'
 import { matchAllRecipes } from '@/utils/recipeMatching'
 import { formatStockCount, roundStockCount, type StockInfo } from '@/utils/stock'
@@ -22,14 +22,22 @@ export const GAUGE_FULL_DAYS = 30
 export interface StapleGauge {
   stock: StockInfo
   name: string
-  /** "out", "2 d", "30+ d", or the amount ("3 left") when the daily use is not known */
+  /** "out", "2 d", "30+ d", "today", "expired", or the amount ("3 left") when the daily use is not known */
   label: string
   /** How full the bar is, from 0 to 1 */
   fill: number
   tone: GaugeTone
-  /** Days left at the usual pace. Not set when the daily use is not known. */
+  /**
+   * Days until it runs out at the usual pace or goes bad, whichever comes
+   * first. Not set when the daily use is not known and nothing goes bad soon.
+   */
   daysLeft?: number
+  /** True when the expiry date comes before running out, so the bar counts down to that date */
+  goesBadFirst: boolean
 }
+
+/** A staple that goes bad within this many days is at least orange, whatever its amount */
+export const GOES_BAD_SOON_DAYS = 3
 
 export interface StaplesSummary {
   total: number
@@ -48,11 +56,39 @@ function daysUntil(date: string, now: Date): number {
 
 const TONE_BY_STATUS: Record<StockInfo['status'], GaugeTone> = { ok: 'green', low: 'orange', out: 'red' }
 
-function gaugeFor(stock: StockInfo): StapleGauge {
+const TONE_RANK: Record<GaugeTone, number> = { green: 0, orange: 1, red: 2 }
+
+function worseTone(a: GaugeTone, b: GaugeTone): GaugeTone {
+  return TONE_RANK[a] >= TONE_RANK[b] ? a : b
+}
+
+function gaugeFor(stock: StockInfo, now: Date): StapleGauge {
   const tone = TONE_BY_STATUS[stock.status]
-  const base = { stock, name: stock.name, tone, daysLeft: stock.daysLeft }
+  const base = { stock, name: stock.name, tone, daysLeft: stock.daysLeft, goesBadFirst: false }
 
   if (stock.status === 'out') return { ...base, label: 'out', fill: 0 }
+
+  // items[0] is the soonest-expiring row. When it goes bad before the staple
+  // would run out, the bar counts down to that date instead. Bread eaten over
+  // 4 days that expires today should not look fine.
+  const soonest = stock.items[0]?.expirationDate
+  const expiresIn = soonest ? daysUntil(soonest, now) : undefined
+  const goesBadFirst =
+    expiresIn !== undefined &&
+    (stock.daysLeft !== undefined ? expiresIn < stock.daysLeft : expiresIn < GAUGE_FULL_DAYS)
+  if (goesBadFirst) {
+    const days = Math.max(0, expiresIn)
+    const label = expiresIn < 0 ? 'expired' : expiresIn === 0 ? 'today' : `${expiresIn} d`
+    const expiryTone: GaugeTone = expiresIn < 0 ? 'red' : expiresIn <= GOES_BAD_SOON_DAYS ? 'orange' : 'green'
+    return {
+      ...base,
+      label,
+      fill: Math.min(1, days / GAUGE_FULL_DAYS),
+      tone: worseTone(tone, expiryTone),
+      daysLeft: days,
+      goesBadFirst: true,
+    }
+  }
 
   if (stock.daysLeft !== undefined) {
     const days = Math.floor(stock.daysLeft + 1e-9)
@@ -70,11 +106,12 @@ function gaugeFor(stock: StockInfo): StapleGauge {
 /**
  * Every staple with its days-left gauge. Pass the full list from
  * groupByProduct: products without a staple are skipped, and staples that are
- * out (with nothing in the pantry) are included.
+ * out (with nothing in the pantry) are included. The stocked / low / out
+ * counts go by amount only; a gauge's colour and days also count the expiry date.
  */
-export function getStaplesSummary(stocks: StockInfo[]): StaplesSummary {
+export function getStaplesSummary(stocks: StockInfo[], now: Date = new Date()): StaplesSummary {
   const staples = stocks.filter((stock) => stock.staple)
-  const gauges = staples.map(gaugeFor).sort((a, b) => {
+  const gauges = staples.map((stock) => gaugeFor(stock, now)).sort((a, b) => {
     const outA = a.stock.status === 'out' ? 0 : 1
     const outB = b.stock.status === 'out' ? 0 : 1
     if (outA !== outB) return outA - outB
@@ -125,6 +162,13 @@ export const ROLE_COLORS: Record<FoodRole, string> = {
 /** Short names for the three meters */
 export const DINNER_ROLE_LABELS: Record<DinnerRole, string> = { main: 'Mains', base: 'Bases', produce: 'Veg' }
 
+/**
+ * Servings one person eats at one dinner. A main's serving is the 4 oz on a
+ * nutrition label, and a dinner portion is about 6 oz, so a dinner takes 1.5.
+ * Bases and veg servings are already about one dinner's worth.
+ */
+export const DINNER_PORTIONS: Record<DinnerRole, number> = { main: 1.5, base: 1, produce: 1 }
+
 export interface RoleCount {
   role: FoodRole
   count: number
@@ -135,12 +179,14 @@ export interface DinnerEstimate {
   roleCounts: RoleCount[]
   /** Products counted in roleCounts */
   totalProducts: number
-  /** Servings left of mains, bases and veg, rounded to one decimal. Expired food is left out. */
+  /** Servings left of mains, bases and veg, rounded to one decimal. Expired food and snacking fruit are left out. */
   servings: Record<DinnerRole, number>
   householdSize: number
-  /** The smallest of the three servings, divided by household size, rounded down */
+  /** Dinners for the household each role would last on its own (servings ÷ portion ÷ people), one decimal */
+  dinnersBy: Record<DinnerRole, number>
+  /** The smallest of dinnersBy, rounded down */
   dinners: number
-  /** The role with the fewest servings. Ties go main, then base, then veg. */
+  /** The role that runs out first. Ties go main, then base, then veg. */
   limitedBy: DinnerRole
 }
 
@@ -164,6 +210,9 @@ export function estimateDinners(products: StockInfo[], householdSize: number, no
     counts.set(role, (counts.get(role) ?? 0) + 1)
     if (!(DINNER_ROLES as readonly string[]).includes(role)) continue
 
+    // Apples and bananas are "Veg & fruit" in the bar, but not dinner veg
+    if (role === 'produce' && isSnackingFruit(stock.name)) continue
+
     for (const item of stock.items) {
       if (daysUntil(item.expirationDate, now) < 0) continue
       // A row keeps the product's role, so servings use the same role as the count
@@ -174,15 +223,23 @@ export function estimateDinners(products: StockInfo[], householdSize: number, no
   for (const role of DINNER_ROLES) servings[role] = Math.round(servings[role] * 10) / 10
 
   const people = Math.max(1, householdSize)
+  const exact = {} as Record<DinnerRole, number>
+  const dinnersBy = {} as Record<DinnerRole, number>
+  for (const role of DINNER_ROLES) {
+    exact[role] = servings[role] / DINNER_PORTIONS[role] / people
+    dinnersBy[role] = Math.round(exact[role] * 10) / 10
+  }
+
   let limitedBy: DinnerRole = 'main'
-  for (const role of DINNER_ROLES) if (servings[role] < servings[limitedBy]) limitedBy = role
+  for (const role of DINNER_ROLES) if (exact[role] < exact[limitedBy]) limitedBy = role
 
   return {
     roleCounts: FOOD_ROLES.filter((role) => counts.has(role)).map((role) => ({ role, count: counts.get(role)! })),
     totalProducts,
     servings,
     householdSize: people,
-    dinners: Math.floor(servings[limitedBy] / people + 1e-9),
+    dinnersBy,
+    dinners: Math.floor(exact[limitedBy] + 1e-9),
     limitedBy,
   }
 }

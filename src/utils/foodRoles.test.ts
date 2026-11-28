@@ -12,6 +12,8 @@ import {
   guessRole,
   ROLE_BY_FOOD,
   SERVINGS_BY_FOOD,
+  SNACKING_FRUIT,
+  isSnackingFruit,
 } from './foodRoles'
 import { guessItem, roleForNewItem } from './itemDefaults'
 import { getProductMemory } from './stock'
@@ -110,6 +112,22 @@ describe('guessRole', () => {
     const names = new Set(FOOD_TABLE.map((entry) => entry.name.toLowerCase()))
     expect(Object.keys(ROLE_BY_FOOD).filter((name) => !names.has(name))).toEqual([])
     expect(Object.keys(SERVINGS_BY_FOOD).filter((name) => !names.has(name))).toEqual([])
+    expect([...SNACKING_FRUIT].filter((name) => !names.has(name))).toEqual([])
+  })
+})
+
+describe('isSnackingFruit', () => {
+  it('finds fruit eaten on its own, including frozen', () => {
+    expect(isSnackingFruit('Apples')).toBe(true)
+    expect(isSnackingFruit('Banana')).toBe(true)
+    expect(isSnackingFruit('Frozen Blueberries')).toBe(true)
+  })
+
+  it('leaves out fruit used in cooking, and vegetables', () => {
+    expect(isSnackingFruit('Tomatoes')).toBe(false)
+    expect(isSnackingFruit('Avocados')).toBe(false)
+    expect(isSnackingFruit('Broccoli')).toBe(false)
+    expect(isSnackingFruit('Mystery thing')).toBe(false)
   })
 })
 
