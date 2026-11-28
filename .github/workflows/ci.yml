@@ -39,7 +39,9 @@ jobs:
 
   stories:
     name: Storybook story tests
-    runs-on: ubuntu-latest
+    # Playwright 1.58 cannot install Chromium on ubuntu-latest (26.04).
+    # Move to ubuntu-latest when Playwright is upgraded to a version that supports it.
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
 
@@ -55,7 +57,9 @@ jobs:
 
   e2e:
     name: End-to-end tests
-    runs-on: ubuntu-latest
+    # Playwright 1.58 cannot install Chromium on ubuntu-latest (26.04).
+    # Move to ubuntu-latest when Playwright is upgraded to a version that supports it.
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
 
