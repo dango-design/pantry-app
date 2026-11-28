@@ -48,7 +48,7 @@ interface BarcodeLookupResult {
   error?: string
 }
 
-const DEMO_MODE_ERROR = 'AI features require Supabase to be configured. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in your .env file and deploy the Edge Functions.'
+const DEMO_MODE_ERROR = 'AI features require Supabase to be configured. Set VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY in your .env file and deploy the Edge Functions.'
 
 /**
  * Process a grocery photo to detect food items
@@ -60,7 +60,7 @@ export async function processGroceryImage(
     return { success: false, items: [], error: DEMO_MODE_ERROR }
   }
 
-  const { data, error } = await supabase.functions.invoke('process-image', {
+  const { data, error } = await supabase.functions.invoke('pantry-process-image', {
     body: { imageBase64 },
   })
 
@@ -82,7 +82,7 @@ export async function processGroceryImageUrl(
     return { success: false, items: [], error: DEMO_MODE_ERROR }
   }
 
-  const { data, error } = await supabase.functions.invoke('process-image', {
+  const { data, error } = await supabase.functions.invoke('pantry-process-image', {
     body: { imageUrl },
   })
 
@@ -104,7 +104,7 @@ export async function processReceipt(
     return { success: false, items: [], error: DEMO_MODE_ERROR }
   }
 
-  const { data, error } = await supabase.functions.invoke('process-receipt', {
+  const { data, error } = await supabase.functions.invoke('pantry-process-receipt', {
     body: { imageBase64 },
   })
 
@@ -126,7 +126,7 @@ export async function processReceiptUrl(
     return { success: false, items: [], error: DEMO_MODE_ERROR }
   }
 
-  const { data, error } = await supabase.functions.invoke('process-receipt', {
+  const { data, error } = await supabase.functions.invoke('pantry-process-receipt', {
     body: { imageUrl },
   })
 
@@ -146,7 +146,7 @@ export async function lookupBarcode(barcode: string): Promise<BarcodeLookupResul
     return { success: false, error: DEMO_MODE_ERROR }
   }
 
-  const { data, error } = await supabase.functions.invoke('barcode-lookup', {
+  const { data, error } = await supabase.functions.invoke('pantry-barcode-lookup', {
     body: { barcode },
   })
 
@@ -188,7 +188,7 @@ export async function importRecipeFromUrl(url: string): Promise<ImportRecipeResu
     return { success: false, error: DEMO_MODE_ERROR }
   }
 
-  const { data, error } = await supabase.functions.invoke('import-recipe', {
+  const { data, error } = await supabase.functions.invoke('pantry-import-recipe', {
     body: { url },
   })
 
@@ -230,7 +230,7 @@ export async function suggestRecipes(ingredients: string[]): Promise<SuggestReci
     return { success: false, error: DEMO_MODE_ERROR }
   }
 
-  const { data, error } = await supabase.functions.invoke('suggest-recipes', {
+  const { data, error } = await supabase.functions.invoke('pantry-suggest-recipes', {
     body: { ingredients },
   })
 

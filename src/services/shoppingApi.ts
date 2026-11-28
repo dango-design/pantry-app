@@ -1,4 +1,4 @@
-import { supabase } from './supabase'
+import { supabase, DB_SCHEMA } from './supabase'
 import type { Tables, InsertTables, UpdateTables } from '@/types/database'
 import { getUserHouseholdId, addFoodItem } from './inventoryApi'
 import { todayDateString, dateStringFromToday } from '@/utils/dates'
@@ -271,7 +271,7 @@ export function subscribeToShoppingList(
       'postgres_changes',
       {
         event: '*',
-        schema: 'public',
+        schema: DB_SCHEMA,
         table: 'shopping_list_items',
         filter: `shopping_list_id=eq.${listId}`,
       },

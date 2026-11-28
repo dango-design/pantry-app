@@ -1,4 +1,4 @@
-import { supabase } from './supabase'
+import { supabase, DB_SCHEMA } from './supabase'
 import type { Tables, InsertTables, UpdateTables } from '@/types/database'
 import { getUserHouseholdId } from './inventoryApi'
 
@@ -165,7 +165,7 @@ export function subscribeToRecipes(
       'postgres_changes',
       {
         event: '*',
-        schema: 'public',
+        schema: DB_SCHEMA,
         table: 'recipes',
         filter: `household_id=eq.${householdId}`,
       },

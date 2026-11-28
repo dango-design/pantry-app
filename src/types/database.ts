@@ -10,7 +10,9 @@ export type Json =
   | Json[]
 
 export type Database = {
-  public: {
+  // The other app in this Supabase project owns the public schema,
+  // so every pantry table and function is in the pantry schema.
+  pantry: {
     Tables: {
       food_items: {
         Row: {
@@ -396,6 +398,12 @@ export type Database = {
         }
         Returns: number
       }
+      // Creates the signed-in user's profile, household, owner membership and
+      // default shopping list if they are missing. Returns the household id.
+      ensure_user_setup: {
+        Args: Record<string, never>
+        Returns: string
+      }
       join_household_by_invite: {
         Args: {
           p_invite_code: string
@@ -417,13 +425,13 @@ export type Database = {
           p_member_id: string
           p_role: string
         }
-        Returns: Database['public']['Tables']['household_members']['Row']
+        Returns: Database['pantry']['Tables']['household_members']['Row']
       }
       transfer_household_ownership: {
         Args: {
           p_member_id: string
         }
-        Returns: Database['public']['Tables']['household_members']['Row']
+        Returns: Database['pantry']['Tables']['household_members']['Row']
       }
       update_all_freshness_scores: {
         Args: Record<string, never>
@@ -440,6 +448,6 @@ export type Database = {
 }
 
 // Helper types for easier usage
-export type Tables<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Row']
-export type InsertTables<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Insert']
-export type UpdateTables<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Update']
+export type Tables<T extends keyof Database['pantry']['Tables']> = Database['pantry']['Tables'][T]['Row']
+export type InsertTables<T extends keyof Database['pantry']['Tables']> = Database['pantry']['Tables'][T]['Insert']
+export type UpdateTables<T extends keyof Database['pantry']['Tables']> = Database['pantry']['Tables'][T]['Update']
