@@ -1,0 +1,34 @@
+{
+  "id": "off-0850068582013",
+  "name": "Dark Chocolate Pistachio Almond Cranberry Bites",
+  "brand": "Jojo's",
+  "gtin": "0850068582013",
+  "source": "off",
+  "sourceUrl": "https://world.openfoodfacts.org/product/0850068582013",
+  "labelRegion": "us",
+  "ingredientsText": "Dark chocolate (unsweetened chocolate, sugar, cocoa butter, sunflower lecithin, vanilla), dried cranberries (cranberries, sugar, sunflower oil), almonds, pistachios, hemp protein.",
+  "containsStatement": "Allergen information: Contains almonds and pistachios.",
+  "mayContainStatement": "May contain milk, soy, and other nuts. Made in a facility that also produces dairy products, cashews, peanuts, soy, and other nuts. In rare cases, may contain nut shell pieces.",
+  "offAllergenTags": [
+    "en:nuts",
+    "en:peanuts"
+  ],
+  "offTraceTags": [
+    "en:milk",
+    "en:nuts",
+    "en:peanuts",
+    "en:soybeans"
+  ],
+  "expected": {
+    "milk": "may_contain",
+    "egg": "none",
+    "peanut": "may_contain",
+    "tree_nut": "contains",
+    "wheat": "none",
+    "soy": "may_contain",
+    "fish": "none",
+    "shellfish": "none",
+    "sesame": "none"
+  },
+  "notes": "'dairy products' in the facility statement is read as milk. Sunflower lecithin is not soy. Hemp is not one of the 9."
+}

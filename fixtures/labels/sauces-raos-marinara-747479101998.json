@@ -1,0 +1,26 @@
+{
+  "id": "off-0747479101998",
+  "name": "Marinara",
+  "brand": "Rao’s Homemade",
+  "gtin": "0747479101998",
+  "source": "off",
+  "sourceUrl": "https://world.openfoodfacts.org/product/0747479101998",
+  "labelRegion": "us",
+  "ingredientsText": "Italian Whole Peeled Tomatoes, Olive Oil, Onions, Salt, Garlic, Basil, Black Pepper, Oregano.",
+  "containsStatement": null,
+  "mayContainStatement": null,
+  "offAllergenTags": [],
+  "offTraceTags": [],
+  "expected": {
+    "milk": "none",
+    "egg": "none",
+    "peanut": "none",
+    "tree_nut": "none",
+    "wheat": "none",
+    "soy": "none",
+    "fish": "none",
+    "shellfish": "none",
+    "sesame": "none"
+  },
+  "notes": ""
+}

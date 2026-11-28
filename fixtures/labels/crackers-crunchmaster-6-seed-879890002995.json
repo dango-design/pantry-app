@@ -1,0 +1,30 @@
+{
+  "id": "off-0879890002995",
+  "name": "Crunchmaster Multi-Grain 6-Seed Crunchy Baked Rice Crackers",
+  "brand": "Crunchmaster",
+  "gtin": "0879890002995",
+  "source": "off",
+  "sourceUrl": "https://world.openfoodfacts.org/product/0879890002995",
+  "labelRegion": "us",
+  "ingredientsText": "Brown rice flour, sesame seeds, potato starch, flax seeds, olive oil, amaranth seeds, quinoa seeds, chia seeds, sea salt, tamari soy sauce powder (tamari soy sauce [soybeans, salt], maltodextrin, salt), millet.",
+  "containsStatement": "Contains: sesame, soy.",
+  "mayContainStatement": "Produced in a facility that also uses milk and tree nuts.",
+  "offAllergenTags": [
+    "en:nuts",
+    "en:sesame-seeds",
+    "en:soybeans"
+  ],
+  "offTraceTags": [],
+  "expected": {
+    "milk": "may_contain",
+    "egg": "none",
+    "peanut": "none",
+    "tree_nut": "may_contain",
+    "wheat": "none",
+    "soy": "contains",
+    "fish": "none",
+    "shellfish": "none",
+    "sesame": "contains"
+  },
+  "notes": ""
+}

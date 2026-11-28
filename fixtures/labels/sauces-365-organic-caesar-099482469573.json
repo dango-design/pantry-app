@@ -1,0 +1,31 @@
+{
+  "id": "off-0099482469573",
+  "name": "Organic caesar dressing",
+  "brand": "365 everyday value",
+  "gtin": "0099482469573",
+  "source": "off",
+  "sourceUrl": "https://world.openfoodfacts.org/product/0099482469573",
+  "labelRegion": "us",
+  "ingredientsText": "Water, organic expeller pressed soybean oil, organic parmesan cheese (pasteurized organic milk, cheese cultures, sea salt, microbial enzymes), organic distilled white vinegar, organic apple cider vinegar, salt, organic egg yolk, organic cornstarch, organic dijon mustard (water, organic mustard seed, organic distilled white vinegar, salt, organic turmeric powder, organic spices), organic dried garlic, organic lemon juice concentrate, organic garlic powder, organic egg powder, organic black pepper, organic ground mustard seed, natural anchovy flavor, xanthan gum, organic rosemary extract (to maintain freshness).",
+  "containsStatement": null,
+  "mayContainStatement": null,
+  "offAllergenTags": [
+    "en:eggs",
+    "en:milk",
+    "en:mustard",
+    "en:soybeans"
+  ],
+  "offTraceTags": [],
+  "expected": {
+    "milk": "contains",
+    "egg": "contains",
+    "peanut": "none",
+    "tree_nut": "none",
+    "wheat": "none",
+    "soy": "contains",
+    "fish": "contains",
+    "shellfish": "none",
+    "sesame": "none"
+  },
+  "notes": "Judgment calls: expeller pressed soybean oil is not highly refined (FARE says avoid it), so soy is contains; 'natural anchovy flavor' is taken as made from anchovy, so fish is contains. Mustard is not one of the 9."
+}

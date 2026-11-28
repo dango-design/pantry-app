@@ -1,0 +1,29 @@
+{
+  "note": "Real-world wordings of precautionary statements. Every sample must be detected as advisory, and each listed allergen must come out as may_contain.",
+  "samples": [
+    { "text": "May contain peanuts.", "allergens": ["peanut"] },
+    { "text": "MAY CONTAIN TREE NUTS AND PEANUTS", "allergens": ["tree_nut", "peanut"] },
+    { "text": "May also contain milk, egg and sesame.", "allergens": ["milk", "egg", "sesame"] },
+    { "text": "May contain traces of almonds.", "allergens": ["tree_nut"] },
+    { "text": "Made in a facility that also processes peanuts, tree nuts, wheat and soy.", "allergens": ["peanut", "tree_nut", "wheat", "soy"] },
+    { "text": "Manufactured in a facility that processes milk and eggs.", "allergens": ["milk", "egg"] },
+    { "text": "Processed in a facility which also handles sesame.", "allergens": ["sesame"] },
+    { "text": "Produced in a plant that also produces products containing shellfish.", "allergens": ["shellfish"] },
+    { "text": "Packaged in a facility that also packages fish.", "allergens": ["fish"] },
+    { "text": "Made on shared equipment with milk.", "allergens": ["milk"] },
+    { "text": "Manufactured on shared equipment that processes egg and wheat.", "allergens": ["egg", "wheat"] },
+    { "text": "Made on the same equipment that also makes products containing peanuts.", "allergens": ["peanut"] },
+    { "text": "Processed on equipment that also processes soy and milk.", "allergens": ["soy", "milk"] },
+    { "text": "This product was made on equipment shared with tree nuts.", "allergens": ["tree_nut"] },
+    { "text": "Made in a facility with peanuts and tree nuts.", "allergens": ["peanut", "tree_nut"] },
+    { "text": "Produced in a facility handling wheat.", "allergens": ["wheat"] },
+    { "text": "Our facility also processes walnuts and pecans.", "allergens": ["tree_nut"] },
+    { "text": "Manufactured alongside products containing sesame.", "allergens": ["sesame"] },
+    { "text": "Contains traces of milk.", "allergens": ["milk"] },
+    { "text": "Not suitable for people with a peanut allergy.", "allergens": ["peanut"] },
+    { "text": "Due to cross contact, may contain soy.", "allergens": ["soy"] },
+    { "text": "May contain nuts.", "allergens": ["tree_nut", "peanut"] },
+    { "text": "Prepared in a kitchen that also uses shrimp and crab.", "allergens": ["shellfish"] },
+    { "text": "Made in a bakery that also uses eggs, milk, and sesame seeds.", "allergens": ["egg", "milk", "sesame"] }
+  ]
+}

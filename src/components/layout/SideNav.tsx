@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom'
 import { Plus, Settings } from 'lucide-react'
 import { cn } from '@/utils/cn'
 import { BrandMark } from './BrandMark'
-import { CART_TARGET_ATTR, NAV_ITEMS, isNavItemActive } from './navItems'
+import { CART_TARGET_ATTR, CHECK_NAV_ITEM, NAV_ITEMS, isNavItemActive } from './navItems'
 
 interface SideNavLinkProps {
   to: string
@@ -56,7 +56,7 @@ export function SideNav({ addOpen, onAddClick }: SideNavProps) {
     <nav
       aria-label="Main"
       className={cn(
-        'hidden md:flex fixed inset-y-0 left-0 w-[var(--side-nav-width)] pl-[env(safe-area-inset-left)] flex-col bg-white border-r border-gray-200',
+        'hidden md:flex print:!hidden fixed inset-y-0 left-0 w-[var(--side-nav-width)] pl-[env(safe-area-inset-left)] flex-col bg-white border-r border-gray-200',
         // Above the Add popover's backdrop while it's open, so the + (now ×) closes it
         addOpen ? 'z-[52]' : 'z-40'
       )}
@@ -79,7 +79,7 @@ export function SideNav({ addOpen, onAddClick }: SideNavProps) {
       </div>
 
       <div className="flex-1 flex flex-col gap-2 px-2 lg:gap-1 lg:px-3">
-        {NAV_ITEMS.map((item) => (
+        {[...NAV_ITEMS, CHECK_NAV_ITEM].map((item) => (
           <SideNavLink key={item.to} to={item.to} label={item.label} Icon={item.Icon} active={isNavItemActive(item, pathname)} />
         ))}
       </div>

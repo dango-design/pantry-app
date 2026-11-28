@@ -1,0 +1,35 @@
+{
+  "code": "0040822346108",
+  "product": {
+    "allergens_tags": [
+      "en:sesame-seeds",
+      "en:soybeans"
+    ],
+    "brands": "Sabra",
+    "categories_tags": [
+      "en:plant-based-foods-and-beverages",
+      "en:plant-based-foods",
+      "en:condiments",
+      "en:spreads",
+      "en:plant-based-spreads",
+      "en:salted-spreads",
+      "en:sauces",
+      "en:dips",
+      "en:hummus"
+    ],
+    "code": "0040822346108",
+    "countries_tags": [
+      "en:united-states"
+    ],
+    "image_front_small_url": "https://images.openfoodfacts.org/images/products/004/082/234/6108/front_en.10.200.jpg",
+    "ingredients_text": "Chickpeas, water, tahini (sesame), soybean oil and/or sunflower oil, salt, garlic, citric acid, potassium sorbate, spices, natural flavor. Contains: sesame.",
+    "ingredients_text_en": "Chickpeas, water, tahini (sesame), soybean oil and/or sunflower oil, salt, garlic, citric acid, potassium sorbate, spices, natural flavor. Contains: sesame.",
+    "last_modified_t": 1786469042,
+    "product_name": "Classic Hummus",
+    "product_name_en": "Classic Hummus",
+    "quantity": "227 g",
+    "traces_tags": []
+  },
+  "status": 1,
+  "status_verbose": "product found"
+}

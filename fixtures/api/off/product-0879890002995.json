@@ -1,0 +1,33 @@
+{
+  "code": "0879890002995",
+  "product": {
+    "allergens_tags": [
+      "en:nuts",
+      "en:sesame-seeds",
+      "en:soybeans"
+    ],
+    "brands": "Crunchmaster",
+    "categories_tags": [
+      "en:snacks",
+      "en:salty-snacks",
+      "en:appetizers",
+      "en:biscuits-and-crackers",
+      "en:crackers-appetizers",
+      "en:Multigrain-cracker"
+    ],
+    "code": "0879890002995",
+    "countries_tags": [
+      "en:united-states"
+    ],
+    "image_front_small_url": "https://images.openfoodfacts.org/images/products/087/989/000/2995/front_en.38.200.jpg",
+    "ingredients_text": "Brown rice flour, sesame seeds, potato starch, flax seeds, olive oil, amaranth seeds, quinoa seeds, chia seeds, sea salt, tamari soy sauce powder (tamari soy sauce [soybeans, salt], maltodextrin, salt), millet. \n\nContains: sesame, soy. \n\nProduced in a facility that also uses milk and tree nuts.",
+    "ingredients_text_en": "Brown rice flour, sesame seeds, potato starch, flax seeds, olive oil, amaranth seeds, quinoa seeds, chia seeds, sea salt, tamari soy sauce powder (tamari soy sauce [soybeans, salt], maltodextrin, salt), millet. \n\nContains: sesame, soy. \n\nProduced in a facility that also uses milk and tree nuts.",
+    "last_modified_t": 1780623885,
+    "product_name": "Crunchmaster Multi-Grain 6-Seed Crunchy Baked Rice Crackers",
+    "product_name_en": "Crunchmaster Multi-Grain 6-Seed Crunchy Baked Rice Crackers",
+    "quantity": "794 g",
+    "traces_tags": []
+  },
+  "status": 1,
+  "status_verbose": "product found"
+}

@@ -1,0 +1,28 @@
+{
+  "id": "off-0884912004710",
+  "name": "grape-nuts cereal",
+  "brand": "Post",
+  "gtin": "0884912004710",
+  "source": "off",
+  "sourceUrl": "https://world.openfoodfacts.org/product/0884912004710",
+  "labelRegion": "us",
+  "ingredientsText": "whole grain wheat flour, malted barley flour, salt, dried yeast, vitamins and minerals: reduced iron, niacinamide, zinc oxide (source of zinc), vitamin b6, thiamin mononitrate (vitamin b1), folic acid.",
+  "containsStatement": null,
+  "mayContainStatement": null,
+  "offAllergenTags": [
+    "en:gluten"
+  ],
+  "offTraceTags": [],
+  "expected": {
+    "milk": "none",
+    "egg": "none",
+    "peanut": "none",
+    "tree_nut": "none",
+    "wheat": "contains",
+    "soy": "none",
+    "fish": "none",
+    "shellfish": "none",
+    "sesame": "none"
+  },
+  "notes": "'Nuts' is only in the name; there are no nuts. Malted barley is not one of the 9."
+}

@@ -1,0 +1,1445 @@
+{
+ "version": "2026-11-08.1",
+ "allergens": [
+  {
+   "id": "milk",
+   "displayName": "Milk",
+   "isUsMajor": true
+  },
+  {
+   "id": "egg",
+   "displayName": "Eggs",
+   "isUsMajor": true
+  },
+  {
+   "id": "peanut",
+   "displayName": "Peanuts",
+   "isUsMajor": true
+  },
+  {
+   "id": "tree_nut",
+   "displayName": "Tree nuts",
+   "isUsMajor": true
+  },
+  {
+   "id": "wheat",
+   "displayName": "Wheat",
+   "isUsMajor": true
+  },
+  {
+   "id": "soy",
+   "displayName": "Soy",
+   "isUsMajor": true
+  },
+  {
+   "id": "fish",
+   "displayName": "Fish",
+   "isUsMajor": true
+  },
+  {
+   "id": "shellfish",
+   "displayName": "Shellfish",
+   "isUsMajor": true
+  },
+  {
+   "id": "sesame",
+   "displayName": "Sesame",
+   "isUsMajor": true
+  },
+  {
+   "id": "gluten",
+   "displayName": "Gluten",
+   "isUsMajor": false,
+   "includes": [
+    "wheat"
+   ]
+  },
+  {
+   "id": "mollusc",
+   "displayName": "Molluscs",
+   "isUsMajor": false
+  },
+  {
+   "id": "coconut",
+   "displayName": "Coconut",
+   "isUsMajor": false
+  },
+  {
+   "id": "mustard",
+   "displayName": "Mustard",
+   "isUsMajor": false
+  },
+  {
+   "id": "celery",
+   "displayName": "Celery",
+   "isUsMajor": false
+  },
+  {
+   "id": "lupin",
+   "displayName": "Lupin",
+   "isUsMajor": false
+  },
+  {
+   "id": "sulfites",
+   "displayName": "Sulfites",
+   "isUsMajor": false
+  }
+ ],
+ "groups": [
+  {
+   "allergenIds": [
+    "milk"
+   ],
+   "strength": "definite",
+   "addedBy": "import",
+   "reviewed": false,
+   "sourceUrl": "https://www.foodallergy.org/living-food-allergy/food-allergy-essentials/common-allergens/milk",
+   "terms": [
+    "butter",
+    "butter fat",
+    "butterfat",
+    "butter oil",
+    "butter acid",
+    "butter ester",
+    "buttermilk",
+    "casein",
+    "casein hydrolysate",
+    "caseinate",
+    "cheese",
+    "cream",
+    "curds",
+    "custard",
+    "ghee",
+    "half-and-half",
+    "lactalbumin",
+    "lactic acid starter culture",
+    "lactoferrin",
+    "lactoglobulin",
+    "lactose",
+    "lactulose",
+    "milk",
+    "pudding",
+    "recaldent",
+    "simplesse",
+    "sour cream",
+    "tagatose",
+    "whey",
+    "yogurt",
+    "dairy"
+   ]
+  },
+  {
+   "allergenIds": [
+    "milk"
+   ],
+   "strength": "definite",
+   "addedBy": "import",
+   "reviewed": false,
+   "sourceUrl": "https://github.com/openfoodfacts/openfoodfacts-server/blob/main/taxonomies/allergens.txt",
+   "terms": [
+    "yoghurt",
+    "parmigiano reggiano",
+    "grana padano"
+   ]
+  },
+  {
+   "allergenIds": [
+    "egg"
+   ],
+   "strength": "definite",
+   "addedBy": "import",
+   "reviewed": false,
+   "sourceUrl": "https://www.foodallergy.org/living-food-allergy/food-allergy-essentials/common-allergens/egg",
+   "terms": [
+    "albumin",
+    "albumen",
+    "apovitellin",
+    "avidin globulin",
+    "egg",
+    "eggnog",
+    "lysozyme",
+    "mayonnaise",
+    "meringue",
+    "ovalbumin",
+    "ovomucoid",
+    "ovomucin",
+    "ovovitellin",
+    "surimi",
+    "vitellin"
+   ]
+  },
+  {
+   "allergenIds": [
+    "egg"
+   ],
+   "strength": "possible",
+   "addedBy": "import",
+   "reviewed": false,
+   "sourceUrl": "https://www.foodallergy.org/living-food-allergy/food-allergy-essentials/common-allergens/egg",
+   "note": "FARE: eggs are sometimes found in these.",
+   "terms": [
+    "lecithin",
+    "nougat",
+    "marshmallow",
+    "hollandaise",
+    "marzipan"
+   ]
+  },
+  {
+   "allergenIds": [
+    "peanut"
+   ],
+   "strength": "definite",
+   "addedBy": "import",
+   "reviewed": false,
+   "sourceUrl": "https://www.foodallergy.org/living-food-allergy/food-allergy-essentials/common-allergens/peanut",
+   "terms": [
+    "arachis",
+    "artificial nuts",
+    "beer nuts",
+    "cold pressed peanut oil",
+    "expelled peanut oil",
+    "expeller pressed peanut oil",
+    "extruded peanut oil",
+    "ground nuts",
+    "mandelonas",
+    "monkey nuts",
+    "nut meat",
+    "nut meal",
+    "nut pieces",
+    "peanut",
+    "peanut butter",
+    "peanut flour",
+    {
+     "term": "mixed nuts",
+     "allergenIds": [
+      "peanut",
+      "tree_nut"
+     ]
+    }
+   ]
+  },
+  {
+   "allergenIds": [
+    "peanut"
+   ],
+   "strength": "possible",
+   "addedBy": "import",
+   "reviewed": false,
+   "sourceUrl": "https://www.foodallergy.org/living-food-allergy/food-allergy-essentials/common-allergens/peanut",
+   "note": "Highly refined peanut oil is exempt from allergen labeling; FARE lists lupin for peanut allergy because of cross-reactivity.",
+   "terms": [
+    "peanut oil",
+    "arachis oil",
+    "groundnut oil",
+    "lupin",
+    "lupine"
+   ]
+  },
+  {
+   "allergenIds": [
+    "peanut"
+   ],
+   "strength": "definite",
+   "addedBy": "import",
+   "reviewed": false,
+   "sourceUrl": "https://github.com/openfoodfacts/openfoodfacts-server/blob/main/taxonomies/allergens.txt",
+   "terms": [
+    "groundnut",
+    "arachis hypogaea"
+   ]
+  },
+  {
+   "allergenIds": [
+    "soy"
+   ],
+   "strength": "definite",
+   "addedBy": "import",
+   "reviewed": false,
+   "sourceUrl": "https://www.foodallergy.org/living-food-allergy/food-allergy-essentials/common-allergens/soy",
+   "terms": [
+    "cold pressed soy oil",
+    "expelled soy oil",
+    "expeller pressed soy oil",
+    "extruded soy oil",
+    "edamame",
+    "miso",
+    "natto",
+    "okara",
+    "shoyu",
+    "soy",
+    "soya",
+    "soybean",
+    "soybean curd",
+    "soy protein",
+    "soy sauce",
+    "tamari",
+    "tempeh",
+    "textured vegetable protein",
+    "tvp",
+    "tofu"
+   ]
+  },
+  {
+   "allergenIds": [
+    "soy"
+   ],
+   "strength": "possible",
+   "addedBy": "import",
+   "reviewed": false,
+   "sourceUrl": "https://www.foodallergy.org/living-food-allergy/food-allergy-essentials/common-allergens/soy",
+   "note": "Highly refined soy oil is exempt from allergen labeling.",
+   "terms": [
+    "soybean oil",
+    "soy oil",
+    "soya oil",
+    "soy bean oil",
+    "soya bean oil"
+   ]
+  },
+  {
+   "allergenIds": [
+    "soy"
+   ],
+   "strength": "definite",
+   "addedBy": "import",
+   "reviewed": false,
+   "sourceUrl": "https://github.com/openfoodfacts/openfoodfacts-server/blob/main/taxonomies/allergens.txt",
+   "terms": [
+    "soja",
+    "soia",
+    "soy lecithin",
+    "soya lecithin"
+   ]
+  },
+  {
+   "allergenIds": [
+    "wheat"
+   ],
+   "strength": "definite",
+   "addedBy": "import",
+   "reviewed": false,
+   "sourceUrl": "https://www.foodallergy.org/living-food-allergies/food-allergy-essentials/common-allergens/wheat",
+   "terms": [
+    "bread crumbs",
+    "bulgur",
+    "cereal extract",
+    "couscous",
+    "cracker meal",
+    "durum",
+    "einkorn",
+    "emmer",
+    "farina",
+    "farro",
+    "flour",
+    "freekeh",
+    "kamut",
+    "matzoh",
+    "matzo",
+    "matzah",
+    "matza",
+    "pasta",
+    "seitan",
+    "semolina",
+    "spelt",
+    "triticale",
+    "wheat",
+    "wheatgrass"
+   ]
+  },
+  {
+   "allergenIds": [
+    "wheat"
+   ],
+   "strength": "possible",
+   "addedBy": "import",
+   "reviewed": false,
+   "sourceUrl": "https://www.foodallergy.org/living-food-allergies/food-allergy-essentials/common-allergens/wheat",
+   "note": "FARE: wheat is sometimes found in these.",
+   "terms": [
+    "soy sauce",
+    "surimi"
+   ]
+  },
+  {
+   "allergenIds": [
+    "tree_nut"
+   ],
+   "strength": "definite",
+   "addedBy": "import",
+   "reviewed": false,
+   "sourceUrl": "https://www.foodallergy.org/living-food-allergies/food-allergy-essentials/common-allergens/tree-nut",
+   "note": "Only the 12 tree nuts FDA kept in its January 2025 guidance, plus FARE's nut products.",
+   "terms": [
+    "almond",
+    "artificial nuts",
+    "brazil nut",
+    "cashew",
+    "filbert",
+    "hazelnut",
+    "gianduja",
+    "heart nut",
+    "heartnut",
+    "macadamia",
+    "bush nut",
+    "marzipan",
+    "natural nut extract",
+    "nut butter",
+    "nut distillate",
+    "nut meal",
+    "nut meat",
+    "nut milk",
+    "nut oil",
+    "nut paste",
+    "nut pieces",
+    "pecan",
+    "pine nut",
+    "pignoli",
+    "pignolia",
+    "pignon",
+    "pinon",
+    "pinyon",
+    "indian nut",
+    "pistachio",
+    "praline",
+    "walnut"
+   ]
+  },
+  {
+   "allergenIds": [
+    "tree_nut"
+   ],
+   "strength": "possible",
+   "addedBy": "import",
+   "reviewed": false,
+   "sourceUrl": "https://www.foodallergy.org/living-food-allergies/food-allergy-essentials/common-allergens/tree-nut",
+   "note": "FARE: pesto often includes pine nuts or walnuts.",
+   "terms": [
+    "pesto"
+   ]
+  },
+  {
+   "allergenIds": [
+    "tree_nut"
+   ],
+   "strength": "definite",
+   "addedBy": "import",
+   "reviewed": false,
+   "sourceUrl": "https://github.com/openfoodfacts/openfoodfacts-server/blob/main/taxonomies/allergens.txt",
+   "terms": [
+    "nuts",
+    "tree nut",
+    "treenut",
+    "queensland nut"
+   ]
+  },
+  {
+   "allergenIds": [
+    "coconut"
+   ],
+   "strength": "definite",
+   "addedBy": "import",
+   "reviewed": false,
+   "sourceUrl": "https://www.foodallergy.org/living-food-allergies/food-allergy-essentials/common-allergens/tree-nut",
+   "note": "FDA removed coconut from the tree nut list in January 2025; tracked as its own allergen.",
+   "terms": [
+    "coconut"
+   ]
+  },
+  {
+   "allergenIds": [
+    "fish"
+   ],
+   "strength": "definite",
+   "addedBy": "import",
+   "reviewed": false,
+   "sourceUrl": "https://www.foodallergy.org/living-food-allergies/food-allergy-essentials/common-allergens/fish",
+   "terms": [
+    "anchovy",
+    "anchovies",
+    "bass",
+    "catfish",
+    "cod",
+    "flounder",
+    "grouper",
+    "haddock",
+    "hake",
+    "halibut",
+    "herring",
+    "mahi mahi",
+    "perch",
+    "pike",
+    "pollock",
+    "salmon",
+    "scrod",
+    "sole",
+    "snapper",
+    "swordfish",
+    "tilapia",
+    "trout",
+    "tuna",
+    "fish",
+    "fish sauce",
+    "fish stock"
+   ]
+  },
+  {
+   "allergenIds": [
+    "fish"
+   ],
+   "strength": "possible",
+   "addedBy": "import",
+   "reviewed": false,
+   "sourceUrl": "https://www.foodallergy.org/living-food-allergies/food-allergy-essentials/common-allergens/fish",
+   "note": "FARE: sometimes contains fish.",
+   "terms": [
+    "worcestershire",
+    "caesar dressing",
+    "caponata",
+    "bouillabaisse",
+    "surimi",
+    "imitation crab"
+   ]
+  },
+  {
+   "allergenIds": [
+    "fish"
+   ],
+   "strength": "definite",
+   "addedBy": "import",
+   "reviewed": false,
+   "sourceUrl": "https://github.com/openfoodfacts/openfoodfacts-server/blob/main/taxonomies/allergens.txt",
+   "terms": [
+    "mackerel",
+    "turbot",
+    "sardine"
+   ]
+  },
+  {
+   "allergenIds": [
+    "shellfish"
+   ],
+   "strength": "definite",
+   "addedBy": "import",
+   "reviewed": false,
+   "sourceUrl": "https://www.foodallergy.org/living-food-allergy/food-allergy-essentials/common-allergens/shellfish",
+   "terms": [
+    "barnacle",
+    "crab",
+    "crawfish",
+    "crawdad",
+    "crayfish",
+    "ecrevisse",
+    "krill",
+    "lobster",
+    "langouste",
+    "langoustine",
+    "moreton bay bug",
+    "scampi",
+    "tomalley",
+    "prawn",
+    "shrimp",
+    "crevette"
+   ]
+  },
+  {
+   "allergenIds": [
+    "shellfish"
+   ],
+   "strength": "possible",
+   "addedBy": "import",
+   "reviewed": false,
+   "sourceUrl": "https://www.foodallergy.org/living-food-allergy/food-allergy-essentials/common-allergens/shellfish",
+   "note": "FARE: other possible sources of shellfish.",
+   "terms": [
+    "glucosamine",
+    "seafood flavoring",
+    "fish stock",
+    "fish sauce",
+    "surimi",
+    "bouillabaisse",
+    "imitation crab"
+   ]
+  },
+  {
+   "allergenIds": [
+    "shellfish"
+   ],
+   "strength": "definite",
+   "addedBy": "import",
+   "reviewed": false,
+   "sourceUrl": "https://www.fda.gov/food/nutrition-food-labeling-and-critical-foods/food-allergies",
+   "note": "FDA's major allergen is crustacean shellfish.",
+   "terms": [
+    "shellfish",
+    "crustacean",
+    "crustacean shellfish"
+   ]
+  },
+  {
+   "allergenIds": [
+    "sesame"
+   ],
+   "strength": "definite",
+   "addedBy": "import",
+   "reviewed": false,
+   "sourceUrl": "https://www.foodallergy.org/living-food-allergy/food-allergy-essentials/common-allergens/sesame",
+   "terms": [
+    "benne",
+    "benne seed",
+    "benniseed",
+    "gingelly",
+    "gomasio",
+    "halvah",
+    "sesame",
+    "sesame salt",
+    "sesamol",
+    "sesamum indicum",
+    "sesemolina",
+    "sim sim",
+    "tahini",
+    "tahina",
+    "tehina",
+    "til"
+   ]
+  },
+  {
+   "allergenIds": [
+    "gluten"
+   ],
+   "strength": "definite",
+   "addedBy": "import",
+   "reviewed": false,
+   "sourceUrl": "https://eur-lex.europa.eu/eli/reg/2011/1169/oj",
+   "note": "EU Regulation 1169/2011 Annex II: cereals containing gluten.",
+   "terms": [
+    "barley",
+    "rye",
+    {
+     "term": "oat",
+     "strength": "possible",
+     "note": "EU lists oats; many are contaminated with wheat."
+    },
+    {
+     "term": "oatmeal",
+     "strength": "possible",
+     "note": "EU lists oats; many are contaminated with wheat."
+    }
+   ]
+  },
+  {
+   "allergenIds": [
+    "gluten"
+   ],
+   "strength": "definite",
+   "addedBy": "import",
+   "reviewed": false,
+   "sourceUrl": "https://github.com/openfoodfacts/openfoodfacts-server/blob/main/taxonomies/allergens.txt",
+   "terms": [
+    "gluten",
+    "malted barley"
+   ]
+  },
+  {
+   "allergenIds": [
+    "mollusc"
+   ],
+   "strength": "definite",
+   "addedBy": "import",
+   "reviewed": false,
+   "sourceUrl": "https://www.foodallergy.org/living-food-allergy/food-allergy-essentials/common-allergens/shellfish",
+   "terms": [
+    "abalone",
+    "clam",
+    "cherrystone",
+    "geoduck",
+    "littleneck",
+    "quahog",
+    "cockle",
+    "cuttlefish",
+    "limpet",
+    "mussel",
+    "octopus",
+    "oyster",
+    "periwinkle",
+    "sea cucumber",
+    "sea urchin",
+    "scallop",
+    "snail",
+    "escargot",
+    "squid",
+    "calamari",
+    "whelk"
+   ]
+  },
+  {
+   "allergenIds": [
+    "mollusc"
+   ],
+   "strength": "definite",
+   "addedBy": "import",
+   "reviewed": false,
+   "sourceUrl": "https://github.com/openfoodfacts/openfoodfacts-server/blob/main/taxonomies/allergens.txt",
+   "terms": [
+    "mollusc",
+    "mollusk"
+   ]
+  },
+  {
+   "allergenIds": [
+    "mustard"
+   ],
+   "strength": "definite",
+   "addedBy": "import",
+   "reviewed": false,
+   "sourceUrl": "https://eur-lex.europa.eu/eli/reg/2011/1169/oj",
+   "terms": [
+    "mustard"
+   ]
+  },
+  {
+   "allergenIds": [
+    "celery"
+   ],
+   "strength": "definite",
+   "addedBy": "import",
+   "reviewed": false,
+   "sourceUrl": "https://github.com/openfoodfacts/openfoodfacts-server/blob/main/taxonomies/allergens.txt",
+   "terms": [
+    "celery",
+    "celeriac"
+   ]
+  },
+  {
+   "allergenIds": [
+    "lupin"
+   ],
+   "strength": "definite",
+   "addedBy": "import",
+   "reviewed": false,
+   "sourceUrl": "https://eur-lex.europa.eu/eli/reg/2011/1169/oj",
+   "terms": [
+    "lupin",
+    "lupine"
+   ]
+  },
+  {
+   "allergenIds": [
+    "sulfites"
+   ],
+   "strength": "definite",
+   "addedBy": "import",
+   "reviewed": false,
+   "sourceUrl": "https://github.com/openfoodfacts/openfoodfacts-server/blob/main/taxonomies/allergens.txt",
+   "terms": [
+    "sulfite",
+    "sulphite",
+    "sulphur dioxide"
+   ]
+  },
+  {
+   "allergenIds": [
+    "milk"
+   ],
+   "strength": "none",
+   "addedBy": "import",
+   "reviewed": false,
+   "sourceUrl": "https://www.foodallergy.org/living-food-allergy/food-allergy-essentials/common-allergens/milk",
+   "note": "Guard: FARE lists these as not containing milk.",
+   "terms": [
+    "cocoa butter",
+    "cream of tartar"
+   ]
+  },
+  {
+   "allergenIds": [
+    "milk"
+   ],
+   "strength": "none",
+   "addedBy": "import",
+   "reviewed": false,
+   "sourceUrl": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/draft-guidance-industry-labeling-plant-based-milk-alternatives-and-voluntary-nutrient-statements",
+   "note": "Guard: plant-based milk alternatives, not dairy milk.",
+   "terms": [
+    "oat milk",
+    "rice milk",
+    "coconut milk",
+    "soy milk",
+    "almond milk"
+   ]
+  },
+  {
+   "allergenIds": [
+    "gluten"
+   ],
+   "strength": "possible",
+   "addedBy": "import",
+   "reviewed": false,
+   "sourceUrl": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/draft-guidance-industry-labeling-plant-based-milk-alternatives-and-voluntary-nutrient-statements",
+   "note": "Oat milk is made from oats.",
+   "terms": [
+    "oat milk"
+   ]
+  },
+  {
+   "allergenIds": [
+    "coconut"
+   ],
+   "strength": "definite",
+   "addedBy": "import",
+   "reviewed": false,
+   "sourceUrl": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/draft-guidance-industry-labeling-plant-based-milk-alternatives-and-voluntary-nutrient-statements",
+   "terms": [
+    "coconut milk"
+   ]
+  },
+  {
+   "allergenIds": [
+    "milk"
+   ],
+   "strength": "none",
+   "addedBy": "import",
+   "reviewed": false,
+   "sourceUrl": "https://www.foodallergy.org/living-food-allergies/food-allergy-essentials/common-allergens/tree-nut",
+   "note": "Guard: FARE lists nut milks and nut butters as tree nut products, not dairy.",
+   "terms": [
+    "nut milk",
+    "cashew milk",
+    "hazelnut milk",
+    "macadamia milk",
+    "nut butter",
+    "almond butter",
+    "cashew butter"
+   ]
+  },
+  {
+   "allergenIds": [
+    "milk"
+   ],
+   "strength": "none",
+   "addedBy": "import",
+   "reviewed": false,
+   "sourceUrl": "https://www.foodallergy.org/living-food-allergy/food-allergy-essentials/common-allergens/peanut",
+   "note": "Guard: peanut butter is a peanut product, not dairy.",
+   "terms": [
+    "peanut butter"
+   ]
+  },
+  {
+   "allergenIds": [
+    "milk"
+   ],
+   "strength": "none",
+   "addedBy": "import",
+   "reviewed": false,
+   "sourceUrl": "https://www.foodallergy.org/living-food-allergy/food-allergy-essentials/common-allergens/soy",
+   "note": "Guard: FARE lists these as soy products.",
+   "terms": [
+    "soy yogurt",
+    "soy cheese",
+    "soy ice cream"
+   ]
+  },
+  {
+   "allergenIds": [
+    "wheat"
+   ],
+   "strength": "none",
+   "addedBy": "import",
+   "reviewed": false,
+   "sourceUrl": "https://www.foodallergy.org/living-food-allergies/food-allergy-essentials/common-allergens/wheat",
+   "note": "Guard: FARE says buckwheat is not wheat and names amaranth, barley, corn, oat, quinoa, rice, rye and tapioca as other grains.",
+   "terms": [
+    "amaranth flour",
+    "corn flour",
+    "quinoa flour",
+    "rice flour",
+    "tapioca flour",
+    "buckwheat flour",
+    "barley flour",
+    "rye flour",
+    "oat flour"
+   ]
+  },
+  {
+   "allergenIds": [
+    "wheat"
+   ],
+   "strength": "none",
+   "addedBy": "import",
+   "reviewed": false,
+   "sourceUrl": "https://www.foodallergy.org/living-food-allergies/food-allergy-essentials/common-allergens/tree-nut",
+   "note": "Guard: nut meal, not wheat flour.",
+   "terms": [
+    "almond flour",
+    "hazelnut flour"
+   ]
+  },
+  {
+   "allergenIds": [
+    "wheat"
+   ],
+   "strength": "none",
+   "addedBy": "import",
+   "reviewed": false,
+   "sourceUrl": "https://www.foodallergy.org/living-food-allergy/food-allergy-essentials/common-allergens/peanut",
+   "note": "Guard: peanut flour is not wheat flour.",
+   "terms": [
+    "peanut flour"
+   ]
+  },
+  {
+   "allergenIds": [
+    "wheat"
+   ],
+   "strength": "none",
+   "addedBy": "import",
+   "reviewed": false,
+   "sourceUrl": "https://www.foodallergy.org/living-food-allergy/food-allergy-essentials/common-allergens/soy",
+   "note": "Guard: soy flour is not wheat flour.",
+   "terms": [
+    "soy flour"
+   ]
+  },
+  {
+   "allergenIds": [
+    "wheat"
+   ],
+   "strength": "none",
+   "addedBy": "import",
+   "reviewed": false,
+   "sourceUrl": "https://www.foodallergy.org/living-food-allergy/food-allergy-essentials/common-allergens/sesame",
+   "note": "Guard: sesame flour is not wheat flour.",
+   "terms": [
+    "sesame flour"
+   ]
+  },
+  {
+   "allergenIds": [
+    "wheat"
+   ],
+   "strength": "none",
+   "addedBy": "import",
+   "reviewed": false,
+   "sourceUrl": "https://eur-lex.europa.eu/eli/reg/2011/1169/oj",
+   "note": "Guard: lupin flour is not wheat flour.",
+   "terms": [
+    "lupin flour"
+   ]
+  },
+  {
+   "allergenIds": [
+    "egg"
+   ],
+   "strength": "none",
+   "addedBy": "import",
+   "reviewed": false,
+   "sourceUrl": "https://github.com/openfoodfacts/openfoodfacts-server/blob/main/taxonomies/allergens.txt",
+   "note": "Guard: soy lecithin is soy, not egg.",
+   "terms": [
+    "soy lecithin",
+    "soya lecithin"
+   ]
+  },
+  {
+   "allergenIds": [
+    "gluten"
+   ],
+   "strength": "definite",
+   "addedBy": "import",
+   "reviewed": false,
+   "sourceUrl": "https://celiac.org/what-is-gluten/sources-of-gluten/",
+   "note": "Celiac Disease Foundation: sources of gluten.",
+   "terms": [
+    "triticale",
+    "malt",
+    "malt extract",
+    "malt syrup",
+    "malt flavoring",
+    "malt vinegar",
+    "malted milk",
+    "brewer's yeast",
+    "wheat starch"
+   ]
+  },
+  {
+   "allergenIds": [
+    "wheat"
+   ],
+   "strength": "definite",
+   "addedBy": "import",
+   "reviewed": false,
+   "sourceUrl": "https://celiac.org/what-is-gluten/sources-of-gluten/",
+   "note": "Celiac Disease Foundation: wheat varieties and derivatives.",
+   "terms": [
+    "wheatberries",
+    "graham",
+    "khorasan"
+   ]
+  },
+  {
+   "allergenIds": [
+    "wheat"
+   ],
+   "strength": "none",
+   "addedBy": "import",
+   "reviewed": false,
+   "sourceUrl": "https://celiac.org/gluten-free-living/gluten-free-foods/",
+   "note": "Guard: Celiac Disease Foundation lists these grains, beans and starches as naturally gluten-free.",
+   "terms": [
+    "arrowroot flour",
+    "bean flour",
+    "cassava flour",
+    "chia flour",
+    "flax flour",
+    "millet flour",
+    "potato flour",
+    "sorghum flour",
+    "teff flour",
+    "yucca flour",
+    "chickpea flour",
+    "garbanzo flour",
+    "garbanzo bean flour",
+    "nut flour"
+   ]
+  },
+  {
+   "allergenIds": [
+    "milk"
+   ],
+   "strength": "none",
+   "addedBy": "claude",
+   "reviewed": false,
+   "sourceUrl": "https://www.foodallergy.org/living-food-allergy/food-allergy-essentials/common-allergens/peanut",
+   "note": "Added by Claude with a supporting source; counts only as possible (guards hide nothing) until a person reviews it. FARE names sunflower seed butter as an alternative nut butter.",
+   "terms": [
+    "sunflower butter",
+    "sunflower seed butter"
+   ]
+  },
+  {
+   "allergenIds": [
+    "milk"
+   ],
+   "strength": "none",
+   "addedBy": "claude",
+   "reviewed": false,
+   "sourceUrl": "https://www.fda.gov/regulatory-information/search-fda-guidance-documents/draft-guidance-industry-labeling-plant-based-milk-alternatives-and-voluntary-nutrient-statements",
+   "note": "Added by Claude with a supporting source; counts only as possible (guards hide nothing) until a person reviews it. Plant-based milk alternatives.",
+   "terms": [
+    "hemp milk",
+    "pea milk",
+    "flax milk"
+   ]
+  },
+  {
+   "allergenIds": [
+    "peanut"
+   ],
+   "strength": "possible",
+   "addedBy": "claude",
+   "reviewed": false,
+   "sourceUrl": "https://www.foodallergy.org/living-food-allergy/food-allergy-essentials/common-allergens/peanut",
+   "note": "Added by Claude with a supporting source; counts only as possible (guards hide nothing) until a person reviews it. FARE lists mixed nuts and nut pieces as peanut sources.",
+   "terms": [
+    "nuts"
+   ]
+  },
+  {
+   "allergenIds": [
+    "soy"
+   ],
+   "strength": "possible",
+   "addedBy": "claude",
+   "reviewed": false,
+   "sourceUrl": "https://www.foodallergy.org/living-food-allergy/food-allergy-essentials/common-allergens/soy",
+   "note": "Added by Claude with a supporting source; counts only as possible (guards hide nothing) until a person reviews it. Lecithin with no source named; bean curd is tofu.",
+   "terms": [
+    "lecithin",
+    "bean curd"
+   ]
+  },
+  {
+   "allergenIds": [
+    "wheat"
+   ],
+   "strength": "definite",
+   "addedBy": "claude",
+   "reviewed": false,
+   "sourceUrl": "https://www.foodallergy.org/living-food-allergies/food-allergy-essentials/common-allergens/wheat",
+   "note": "Added by Claude with a supporting source; counts only as possible (guards hide nothing) until a person reviews it. One-word spelling of FARE's bread crumbs.",
+   "terms": [
+    "breadcrumbs"
+   ]
+  },
+  {
+   "allergenIds": [
+    "wheat"
+   ],
+   "strength": "none",
+   "addedBy": "claude",
+   "reviewed": false,
+   "sourceUrl": "https://celiac.org/gluten-free-living/gluten-free-foods/",
+   "note": "Added by Claude with a supporting source; counts only as possible (guards hide nothing) until a person reviews it. Made from grains or legumes the Celiac Disease Foundation lists as naturally gluten-free.",
+   "terms": [
+    "masa flour",
+    "lentil flour",
+    "pea flour",
+    "coconut flour",
+    "rice pasta",
+    "corn pasta",
+    "lentil pasta",
+    "chickpea pasta",
+    "quinoa pasta"
+   ]
+  },
+  {
+   "allergenIds": [
+    "fish"
+   ],
+   "strength": "definite",
+   "addedBy": "claude",
+   "reviewed": false,
+   "sourceUrl": "https://www.cfsanappsexternal.fda.gov/scripts/fdcc/?set=SeafoodList",
+   "note": "Added by Claude with a supporting source; counts only as possible (guards hide nothing) until a person reviews it. Fish market names from the FDA Seafood List.",
+   "terms": [
+    "carp",
+    "eel",
+    "pollack",
+    "whitefish",
+    "mullet",
+    "pangasius",
+    "basa",
+    "swai",
+    "bonito",
+    "roe",
+    "caviar",
+    "monkfish",
+    "rockfish",
+    "lingcod",
+    "bluefish",
+    "whiting",
+    "arctic char",
+    "sprat",
+    "smelt",
+    "shad",
+    "orange roughy"
+   ]
+  },
+  {
+   "allergenIds": [
+    "shellfish"
+   ],
+   "strength": "definite",
+   "addedBy": "claude",
+   "reviewed": false,
+   "sourceUrl": "https://www.cfsanappsexternal.fda.gov/scripts/fdcc/?set=SeafoodList",
+   "note": "Added by Claude with a supporting source; counts only as possible (guards hide nothing) until a person reviews it.",
+   "terms": [
+    "crabmeat"
+   ]
+  },
+  {
+   "allergenIds": [
+    "sesame"
+   ],
+   "strength": "definite",
+   "addedBy": "claude",
+   "reviewed": false,
+   "sourceUrl": "https://www.foodallergy.org/living-food-allergy/food-allergy-essentials/common-allergens/sesame",
+   "note": "Added by Claude with a supporting source; counts only as possible (guards hide nothing) until a person reviews it. Spelling variant of FARE's halvah.",
+   "terms": [
+    "halva"
+   ]
+  },
+  {
+   "allergenIds": [
+    "mollusc"
+   ],
+   "strength": "possible",
+   "addedBy": "claude",
+   "reviewed": false,
+   "sourceUrl": "https://www.foodallergy.org/living-food-allergy/food-allergy-essentials/common-allergens/shellfish",
+   "note": "Added by Claude with a supporting source; counts only as possible (guards hide nothing) until a person reviews it. Shellfish can mean molluscs as well as crustaceans.",
+   "terms": [
+    "shellfish"
+   ]
+  },
+  {
+   "allergenIds": [
+    "sulfites"
+   ],
+   "strength": "definite",
+   "addedBy": "claude",
+   "reviewed": false,
+   "sourceUrl": "https://www.ecfr.gov/current/title-21/chapter-I/subchapter-B/part-182",
+   "note": "Added by Claude with a supporting source; counts only as possible (guards hide nothing) until a person reviews it. Sulfiting agents listed in 21 CFR 182.",
+   "terms": [
+    "sulfur dioxide",
+    "metabisulfite",
+    "metabisulphite",
+    "bisulfite",
+    "bisulphite"
+   ]
+  },
+  {
+   "allergenIds": [
+    "gluten"
+   ],
+   "strength": "none",
+   "addedBy": "claude",
+   "reviewed": false,
+   "sourceUrl": "https://www.fda.gov/food/nutrition-food-labeling-and-critical-foods/gluten-free-labeling-foods",
+   "note": "Added by Claude with a supporting source; counts only as possible (guards hide nothing) until a person reviews it. FDA's gluten-free claim means under 20 ppm gluten.",
+   "terms": [
+    "gluten free"
+   ]
+  },
+  {
+   "allergenIds": [
+    "milk"
+   ],
+   "strength": "definite",
+   "addedBy": "import",
+   "reviewed": false,
+   "sourceUrl": "https://github.com/openfoodfacts/openfoodfacts-server/blob/main/taxonomies/food/ingredients.txt",
+   "note": "Open Food Facts ingredients taxonomy: these sit under en:dairy, which carries allergens:en:milk.",
+   "terms": [
+    "milkfat",
+    "cheddar",
+    "mozzarella",
+    "parmesan",
+    "provolone",
+    "romano",
+    "asiago",
+    "gouda",
+    "kefir",
+    "ricotta",
+    "feta",
+    "brie",
+    "paneer",
+    "skyr",
+    "dulce de leche"
+   ]
+  },
+  {
+   "allergenIds": [
+    "milk"
+   ],
+   "strength": "none",
+   "addedBy": "import",
+   "reviewed": false,
+   "sourceUrl": "https://github.com/openfoodfacts/openfoodfacts-server/blob/main/taxonomies/food/ingredients.txt",
+   "note": "Guard: Open Food Facts ingredients taxonomy files these under coconut or vegetable fats, not dairy.",
+   "terms": [
+    "coconut cream",
+    "shea butter",
+    "cacao butter"
+   ]
+  },
+  {
+   "allergenIds": [
+    "egg"
+   ],
+   "strength": "none",
+   "addedBy": "import",
+   "reviewed": false,
+   "sourceUrl": "https://github.com/openfoodfacts/openfoodfacts-server/blob/main/taxonomies/food/ingredients.txt",
+   "note": "Guard: Open Food Facts ingredients taxonomy lists sunflower lecithin (E322(i)) as vegan, with no allergen.",
+   "terms": [
+    "sunflower lecithin"
+   ]
+  },
+  {
+   "allergenIds": [
+    "soy"
+   ],
+   "strength": "none",
+   "addedBy": "import",
+   "reviewed": false,
+   "sourceUrl": "https://github.com/openfoodfacts/openfoodfacts-server/blob/main/taxonomies/food/ingredients.txt",
+   "note": "Guard: sunflower lecithin is made from sunflower, not soy (Open Food Facts ingredients taxonomy).",
+   "terms": [
+    "sunflower lecithin"
+   ]
+  },
+  {
+   "allergenIds": [
+    "peanut"
+   ],
+   "strength": "definite",
+   "addedBy": "import",
+   "reviewed": false,
+   "sourceUrl": "https://www.foodallergy.org/living-food-allergy/food-allergy-essentials/common-allergens/peanut",
+   "note": "FARE: oils that are not highly refined may contain peanut protein.",
+   "terms": [
+    {
+     "term": "(?<![\\p{L}])(?:cold[\\s-]+pressed|expeller[\\s-]+pressed|mechanically[\\s-]+pressed|expelled|extruded|unrefined|virgin)(?:[\\s-]+\\p{L}+){0,4}[\\s-]+peanut[\\s-]+oils?(?![\\p{L}])",
+     "matchType": "regex",
+     "note": "Cold-pressed, expeller-pressed, extruded or unrefined peanut oil is not highly refined."
+    },
+    {
+     "term": "(?<![\\p{L}])(?:cold[\\s-]+pressed|expeller[\\s-]+pressed|mechanically[\\s-]+pressed|expelled|extruded|unrefined|virgin)(?:[\\s-]+\\p{L}+){0,4}[\\s-]+(?:arachis|groundnut)[\\s-]+oils?(?![\\p{L}])",
+     "matchType": "regex"
+    }
+   ]
+  },
+  {
+   "allergenIds": [
+    "soy"
+   ],
+   "strength": "definite",
+   "addedBy": "import",
+   "reviewed": false,
+   "sourceUrl": "https://www.foodallergy.org/living-food-allergy/food-allergy-essentials/common-allergens/soy",
+   "note": "FARE: oils that are not highly refined may contain soy protein.",
+   "terms": [
+    {
+     "term": "(?<![\\p{L}])(?:cold[\\s-]+pressed|expeller[\\s-]+pressed|mechanically[\\s-]+pressed|expelled|extruded|unrefined|virgin)(?:[\\s-]+\\p{L}+){0,4}[\\s-]+(?:soy|soya|soybean|soy[\\s-]+bean)[\\s-]+oils?(?![\\p{L}])",
+     "matchType": "regex",
+     "note": "Cold-pressed, expeller-pressed, extruded or unrefined soy oil is not highly refined."
+    }
+   ]
+  },
+  {
+   "allergenIds": [
+    "peanut"
+   ],
+   "strength": "none",
+   "addedBy": "import",
+   "reviewed": false,
+   "sourceUrl": "https://www.foodallergy.org/fare-blog/update-fda-guidance-food-allergen-labeling",
+   "note": "Guard: these are tree nuts on FDA's 2025 list, so the word \"nuts\" in them does not mean peanuts.",
+   "terms": [
+    "tree nut",
+    "pine nut",
+    "brazil nut",
+    "bush nut",
+    "heart nut",
+    "indian nut",
+    "macadamia nut",
+    "queensland nut",
+    "cashew nut",
+    "pecan nut",
+    "pistachio nut",
+    "almond nut"
+   ]
+  },
+  {
+   "allergenIds": [
+    "wheat"
+   ],
+   "strength": "none",
+   "addedBy": "import",
+   "reviewed": false,
+   "sourceUrl": "https://celiac.org/gluten-free-living/gluten-free-foods/",
+   "note": "Guard: nut and seed flours (chia, flax) are naturally gluten-free per the Celiac Disease Foundation.",
+   "terms": [
+    "nut & seed flour",
+    "nut and seed flour",
+    "seed flour"
+   ]
+  }
+ ],
+ "advisoryPhrases": [
+  "\\bmay (?:also )?contain\\b",
+  "\\bmay have (?:come into )?contact with\\b",
+  "\\bmay be present\\b",
+  "\\b(?:made|manufactured|processed|produced|packaged|packed|prepared|roasted|baked)\\s+(?:in|on|at)\\s+(?:a|an|the|our)?\\s*(?:shared\\s+|same\\s+|common\\s+)?(?:facility|facilities|plant|factory|kitchen|bakery|site|equipment|line|lines|premises)\\s+(?:that|which|where)\\s+(?:\\w+\\s+)?(?:process|handle|use|manufacture|produce|package|make|contain|bake|roast|pack)",
+  "\\b(?:made|manufactured|processed|produced|packaged|packed|prepared)\\s+in\\s+a\\s+(?:facility|plant|factory|kitchen|bakery)\\s+(?:with|handling|processing|using|producing)\\b",
+  "\\b(?:made|manufactured|processed|produced|packaged|packed|prepared)\\s+(?:on|using|with)\\s+(?:shared|the same|common)\\s+(?:equipment|lines?|machinery)",
+  "\\b(?:shared|same|common)\\s+(?:equipment|facility|line|lines|machinery|plant)\\s+(?:with|that|as)\\b",
+  "\\bon equipment (?:that|which) (?:also )?(?:process|handle|use|make|produce)\\w*",
+  "\\bequipment (?:shared|also used) (?:with|for|to)\\b",
+  "\\bfacility (?:also )?(?:processes|handles|uses|manufactures|produces|packages)\\b",
+  "\\b(?:manufactured|produced|made|processed) alongside\\b",
+  "\\btraces? of\\b",
+  "\\btrace amounts? of\\b",
+  "\\bcross[- ]?contact\\b",
+  "\\bnot suitable for (?:those|people|persons|anyone|consumers|individuals) with\\b"
+ ],
+ "vagueTerms": [
+  "flavor",
+  "flavour",
+  "flavoring",
+  "flavouring",
+  "spice",
+  "seasoning"
+ ],
+ "offTagMap": {
+  "en:milk": [
+   {
+    "allergenId": "milk"
+   }
+  ],
+  "en:eggs": [
+   {
+    "allergenId": "egg"
+   }
+  ],
+  "en:peanuts": [
+   {
+    "allergenId": "peanut"
+   }
+  ],
+  "en:nuts": [
+   {
+    "allergenId": "tree_nut"
+   }
+  ],
+  "en:gluten": [
+   {
+    "allergenId": "gluten"
+   },
+   {
+    "allergenId": "wheat",
+    "signal": "possible"
+   }
+  ],
+  "en:soybeans": [
+   {
+    "allergenId": "soy"
+   }
+  ],
+  "en:fish": [
+   {
+    "allergenId": "fish"
+   }
+  ],
+  "en:crustaceans": [
+   {
+    "allergenId": "shellfish"
+   }
+  ],
+  "en:molluscs": [
+   {
+    "allergenId": "mollusc"
+   }
+  ],
+  "en:sesame-seeds": [
+   {
+    "allergenId": "sesame"
+   }
+  ],
+  "en:mustard": [
+   {
+    "allergenId": "mustard"
+   }
+  ],
+  "en:celery": [
+   {
+    "allergenId": "celery"
+   }
+  ],
+  "en:lupin": [
+   {
+    "allergenId": "lupin"
+   }
+  ],
+  "en:sulphur-dioxide-and-sulphites": [
+   {
+    "allergenId": "sulfites"
+   }
+  ]
+ }
+}

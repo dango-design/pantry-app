@@ -1,0 +1,38 @@
+{
+  "code": "0009800895250",
+  "product": {
+    "allergens_tags": [
+      "en:milk",
+      "en:nuts",
+      "en:soybeans"
+    ],
+    "brands": "Nutella",
+    "categories_tags": [
+      "en:plant-based-foods-and-beverages",
+      "en:plant-based-foods",
+      "en:breakfasts",
+      "en:fats",
+      "en:spreads",
+      "en:sweet-spreads",
+      "en:vegetable-fats",
+      "fr:pates-a-tartiner",
+      "en:hazelnut-spreads",
+      "en:chocolate-spreads",
+      "en:cocoa-and-hazelnuts-spreads"
+    ],
+    "code": "0009800895250",
+    "countries_tags": [
+      "en:united-states"
+    ],
+    "image_front_small_url": "https://images.openfoodfacts.org/images/products/000/980/089/5250/front_en.63.200.jpg",
+    "ingredients_text": "sugar, palm oil, hazelnuts, cocoa, skim milk, whey (milk), lecithin as emulsifier (soy), vanillin: an artificial flavor,",
+    "ingredients_text_en": "sugar, palm oil, hazelnuts, cocoa, skim milk, whey (milk), lecithin as emulsifier (soy), vanillin: an artificial flavor,",
+    "last_modified_t": 1786366491,
+    "product_name": "Hazelnut Spread With Cocoa",
+    "product_name_en": "Hazelnut Spread With Cocoa",
+    "quantity": "",
+    "traces_tags": []
+  },
+  "status": 1,
+  "status_verbose": "product found"
+}

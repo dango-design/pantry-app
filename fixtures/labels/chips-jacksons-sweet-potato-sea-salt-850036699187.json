@@ -1,0 +1,26 @@
+{
+  "id": "off-0850036699187",
+  "name": "Sweet Potato Chips Sea Salt",
+  "brand": "Jackson's",
+  "gtin": "0850036699187",
+  "source": "off",
+  "sourceUrl": "https://world.openfoodfacts.org/product/0850036699187",
+  "labelRegion": "us",
+  "ingredientsText": "sweet potatoes, avocado oil, sea salt",
+  "containsStatement": null,
+  "mayContainStatement": null,
+  "offAllergenTags": [],
+  "offTraceTags": [],
+  "expected": {
+    "milk": "none",
+    "egg": "none",
+    "peanut": "none",
+    "tree_nut": "none",
+    "wheat": "none",
+    "soy": "none",
+    "fish": "none",
+    "shellfish": "none",
+    "sesame": "none"
+  },
+  "notes": ""
+}

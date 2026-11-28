@@ -1,0 +1,26 @@
+{
+  "id": "off-0022506104105",
+  "name": "Peanut Oil",
+  "brand": "Spectrum",
+  "gtin": "0022506104105",
+  "source": "off",
+  "sourceUrl": "https://world.openfoodfacts.org/product/0022506104105",
+  "labelRegion": "us",
+  "ingredientsText": "100% UNREFINED HIGH OLEIC PEANUT OIL.",
+  "containsStatement": null,
+  "mayContainStatement": null,
+  "offAllergenTags": [],
+  "offTraceTags": [],
+  "expected": {
+    "milk": "none",
+    "egg": "none",
+    "peanut": "contains",
+    "tree_nut": "none",
+    "wheat": "none",
+    "soy": "none",
+    "fish": "none",
+    "shellfish": "none",
+    "sesame": "none"
+  },
+  "notes": "Judgment call: 'UNREFINED' peanut oil is not highly refined, so it is treated like cold-pressed oil: peanut contains."
+}

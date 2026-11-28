@@ -1,0 +1,28 @@
+{
+  "id": "off-0073391000607",
+  "name": "Pure peanut oil",
+  "brand": "Louana",
+  "gtin": "0073391000607",
+  "source": "off",
+  "sourceUrl": "https://world.openfoodfacts.org/product/0073391000607",
+  "labelRegion": "us",
+  "ingredientsText": "Peanut oil.",
+  "containsStatement": null,
+  "mayContainStatement": null,
+  "offAllergenTags": [
+    "en:peanuts"
+  ],
+  "offTraceTags": [],
+  "expected": {
+    "milk": "none",
+    "egg": "none",
+    "peanut": "possible",
+    "tree_nut": "none",
+    "wheat": "none",
+    "soy": "none",
+    "fish": "none",
+    "shellfish": "none",
+    "sesame": "none"
+  },
+  "notes": "Plain 'Peanut oil' is treated as highly refined (FALCPA exempt), so peanut is possible, not contains."
+}

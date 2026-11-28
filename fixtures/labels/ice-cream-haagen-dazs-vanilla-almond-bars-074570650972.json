@@ -1,0 +1,31 @@
+{
+  "id": "off-0074570650972",
+  "name": "vanilla milk chocolate almond ice cream bars",
+  "brand": "Häagen-Dazs",
+  "gtin": "0074570650972",
+  "source": "off",
+  "sourceUrl": "https://world.openfoodfacts.org/product/0074570650972",
+  "labelRegion": "us",
+  "ingredientsText": "Vanilla ice cream: cream, skim milk, sugar, egg yolks, vanilla extract. milk chocolate and vegetable oil coating with almonds: milk chocolate (sugar, whole milk powder, chocolate, cocoa butter, soy lecithin, vanilla extract), almonds roasted in vegetable oil (almonds, safflower oil), coconut oil.",
+  "containsStatement": null,
+  "mayContainStatement": null,
+  "offAllergenTags": [
+    "en:eggs",
+    "en:milk",
+    "en:nuts",
+    "en:soybeans"
+  ],
+  "offTraceTags": [],
+  "expected": {
+    "milk": "contains",
+    "egg": "contains",
+    "peanut": "none",
+    "tree_nut": "contains",
+    "wheat": "none",
+    "soy": "contains",
+    "fish": "none",
+    "shellfish": "none",
+    "sesame": "none"
+  },
+  "notes": "Coconut oil is not a tree nut; almonds are."
+}

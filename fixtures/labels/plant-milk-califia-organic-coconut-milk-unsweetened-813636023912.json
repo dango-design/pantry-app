@@ -1,0 +1,26 @@
+{
+  "id": "off-0813636023912",
+  "name": "Organic Coconut Milk Unsweetened",
+  "brand": "Califia Farms",
+  "gtin": "0813636023912",
+  "source": "off",
+  "sourceUrl": "https://world.openfoodfacts.org/product/0813636023912",
+  "labelRegion": "us",
+  "ingredientsText": "WATER, ORGANIC COCONUT CREAM, ORGANIC COCONUT WATER FROM CONCENTRATE, BAKING SODA.",
+  "containsStatement": null,
+  "mayContainStatement": null,
+  "offAllergenTags": [],
+  "offTraceTags": [],
+  "expected": {
+    "milk": "none",
+    "egg": "none",
+    "peanut": "none",
+    "tree_nut": "none",
+    "wheat": "none",
+    "soy": "none",
+    "fish": "none",
+    "shellfish": "none",
+    "sesame": "none"
+  },
+  "notes": "Coconut is not a tree nut under FDA's January 2025 guidance, and this label has no Contains line saying otherwise."
+}

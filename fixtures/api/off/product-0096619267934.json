@@ -1,0 +1,32 @@
+{
+  "code": "0096619267934",
+  "product": {
+    "allergens_tags": [
+      "en:crustaceans",
+      "en:gluten",
+      "en:soybeans"
+    ],
+    "brands": "KIRKLAND",
+    "categories_tags": [
+      "en:seafood",
+      "en:frozen-foods",
+      "en:crustaceans",
+      "en:frozen-seafood",
+      "en:shrimps"
+    ],
+    "code": "0096619267934",
+    "countries_tags": [
+      "en:united-states"
+    ],
+    "image_front_small_url": "https://images.openfoodfacts.org/images/products/009/661/926/7934/front_en.18.200.jpg",
+    "ingredients_text": "Farm Raised Shrimp, Tempura Batter (Water, Wheat Flour, Corn Starch, Rice Flour, Yellow Corn Flour, Raising Agents (Sodium Acid Pyrophosphate, Sodium Bicarbonate), Salt, Dextrose), Soybean Oil, Modified Food Starch (Tapioca, Safflower Oil), Rice Flour, Salt. \r\n\r\nWater, Sugar, Soy Sauce (Molasses, Water, Salt, Soy Sauce (Sea Water, Soybean, Wheat Flour)), Maltodextrin, Modified Tapioca Starch, Salt, Yeast Extract.",
+    "ingredients_text_en": "Farm Raised Shrimp, Tempura Batter (Water, Wheat Flour, Corn Starch, Rice Flour, Yellow Corn Flour, Raising Agents (Sodium Acid Pyrophosphate, Sodium Bicarbonate), Salt, Dextrose), Soybean Oil, Modified Food Starch (Tapioca, Safflower Oil), Rice Flour, Salt. \r\n\r\nWater, Sugar, Soy Sauce (Molasses, Water, Salt, Soy Sauce (Sea Water, Soybean, Wheat Flour)), Maltodextrin, Modified Tapioca Starch, Salt, Yeast Extract.",
+    "last_modified_t": 1792759802,
+    "product_name": "TEMPURA SHRIMP",
+    "product_name_en": "TEMPURA SHRIMP",
+    "quantity": "1.07 kg",
+    "traces_tags": []
+  },
+  "status": 1,
+  "status_verbose": "product found"
+}

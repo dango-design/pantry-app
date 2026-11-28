@@ -1,0 +1,31 @@
+{
+  "id": "off-0040000424314",
+  "name": "Snickers",
+  "brand": "Snickers",
+  "gtin": "0040000424314",
+  "source": "off",
+  "sourceUrl": "https://world.openfoodfacts.org/product/0040000424314",
+  "labelRegion": "us",
+  "ingredientsText": "milk chocolate (sugar, cocoa butter, chocolate, skim milk, lactose, milkfat, soy lecithin, artificial flavor), peanuts, corn syrup, sugar, sugar, milkfat, skim milk, partially hydrogenated soybean oil, lactose, salt, egg whites, chocolate, artificially flavor",
+  "containsStatement": null,
+  "mayContainStatement": null,
+  "offAllergenTags": [
+    "en:eggs",
+    "en:milk",
+    "en:peanuts",
+    "en:soybeans"
+  ],
+  "offTraceTags": [],
+  "expected": {
+    "milk": "contains",
+    "egg": "contains",
+    "peanut": "contains",
+    "tree_nut": "none",
+    "wheat": "none",
+    "soy": "contains",
+    "fish": "none",
+    "shellfish": "none",
+    "sesame": "none"
+  },
+  "notes": "No Contains line in this text. Labels are for this OFF text only: the OFF ingredient photo also shows 'MAY CONTAIN ALMONDS.', which would make tree_nut may_contain."
+}

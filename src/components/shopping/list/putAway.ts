@@ -7,9 +7,11 @@ import { findProductMemory, type ProductMemory } from '@/utils/stock'
 /**
  * The "Add to pantry" review row for a checked list item.
  *
- * A product bought before goes where it went last time, with the same shelf
- * life, category and brand. The list item's own quantity wins. Without one,
- * the row gets the amount bought last time.
+ * A product bought before goes where it went last time, with the same
+ * category and brand. It keeps as long as last time when someone typed or
+ * scanned that date; a date the app estimated is estimated again. The list
+ * item's own quantity wins. Without one, the row gets the amount bought last
+ * time.
  *
  * A product never bought before gets its details from the general food table.
  */
@@ -28,8 +30,7 @@ export function toReviewItem(item: ShoppingListItem, memory: ProductMemory[]): R
       quantityUnit: quantity !== undefined ? item.quantityUnit ?? known.unit : known.unit,
       storageLocation: known.storageLocation,
       brand: known.brand,
-      // A last purchase with no usable dates has a shelf life of 0. Estimate instead.
-      expirationDate: known.shelfLifeDays > 0
+      expirationDate: known.shelfLifeFromUser && known.shelfLifeDays > 0
         ? dateStringFromToday(known.shelfLifeDays)
         : estimateExpirationDate(item.name, known.category, known.storageLocation),
       selected: true,

@@ -1,0 +1,30 @@
+{
+  "id": "off-0041449601236",
+  "name": "Cheddar Bay Biscuit Mix",
+  "brand": "Red Lobster",
+  "gtin": "0041449601236",
+  "source": "off",
+  "sourceUrl": "https://world.openfoodfacts.org/product/0041449601236",
+  "labelRegion": "us",
+  "ingredientsText": "Enriched bleached flour (wheat flour, malted barley flour, niacin, reduced iron, thiamin mononitrate, riboflavin, folic acid), palm and soybean oil, ascorbic acid, baking soda, buttermilk, dextrose, enzymes, monocalcium phosphate, salt, sodium aluminum phosphate, garlic powder, maltodextrin, salt, onion powder, hydrolyzed soy protein, torula yeast, dehydrated parsley, malic acid, sugar, natural and artificial flavors (maltodextrin, butter oil), corn oil, silicon dioxide",
+  "containsStatement": null,
+  "mayContainStatement": null,
+  "offAllergenTags": [
+    "en:gluten",
+    "en:milk",
+    "en:soybeans"
+  ],
+  "offTraceTags": [],
+  "expected": {
+    "milk": "contains",
+    "egg": "none",
+    "peanut": "none",
+    "tree_nut": "none",
+    "wheat": "contains",
+    "soy": "contains",
+    "fish": "none",
+    "shellfish": "none",
+    "sesame": "none"
+  },
+  "notes": "'Lobster' is only the brand; there is no shellfish. Hydrolyzed soy protein names soy. Labels are for this OFF text only: the OFF photo also shows 'CONTAINS: Wheat, Milk, Soy. May contain eggs and tree nuts.'"
+}

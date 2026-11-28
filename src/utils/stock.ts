@@ -58,8 +58,14 @@ export interface ProductMemory {
   usualQuantity: number
   /** From the last purchase */
   storageLocation: StorageLocation
-  /** The last purchase's expiration date minus its purchase date */
+  /**
+   * Days from purchase to expiration. From the latest purchase kept in
+   * `storageLocation` whose date someone typed or scanned, when there is one.
+   * Otherwise from the last purchase. 0 when there are no usable dates
+   */
   shelfLifeDays: number
+  /** True when `shelfLifeDays` comes from a date someone typed or scanned, not from the app's estimate */
+  shelfLifeFromUser: boolean
   /** Distinct purchase dates */
   timesBought: number
   /** yyyy-MM-dd. Empty for a staple that was never bought */
@@ -114,6 +120,11 @@ function byNewestPurchase(a: FoodItem, b: FoodItem): number {
 
 function latestPurchase(rows: FoodItem[]): FoodItem | undefined {
   return [...rows].sort(byNewestPurchase)[0]
+}
+
+// Days from a row's purchase to its expiration
+function shelfLifeOf(row: FoodItem): number {
+  return differenceInCalendarDays(parseISO(row.expirationDate), parseISO(row.purchaseDate))
 }
 
 // ---------------------------------------------------------------------------
@@ -465,7 +476,13 @@ export function getProductMemory(inventory: FoodItem[], staples: Staple[]): Prod
   for (const [key, rows] of byKey) {
     const last = latestPurchase(rows)
     if (!last) continue
-    const shelfLife = differenceInCalendarDays(parseISO(last.expirationDate), parseISO(last.purchaseDate))
+    // A date the household gave beats the app's own estimate, which a better
+    // estimate can replace. It has to be for the same place: milk keeps
+    // longer in the freezer than in the fridge.
+    const fromUser = latestPurchase(rows.filter((row) =>
+      row.expirationSource !== 'calculated' && row.storageLocation === last.storageLocation && shelfLifeOf(row) > 0
+    ))
+    const shelfLife = shelfLifeOf(fromUser ?? last)
     // A staple says how many to buy. Its last row can hold a corrected count
     // (for example 5 after a recount), which is not a purchase amount.
     const staple = findStaple(last.name, staples)
@@ -477,6 +494,7 @@ export function getProductMemory(inventory: FoodItem[], staples: Staple[]): Prod
       usualQuantity: staple ? staple.buyQuantity : last.originalQuantity > 0 ? last.originalQuantity : last.quantity,
       storageLocation: last.storageLocation,
       shelfLifeDays: shelfLife > 0 ? shelfLife : 0,
+      shelfLifeFromUser: fromUser !== undefined,
       timesBought: new Set(rows.map((row) => row.purchaseDate)).size,
       lastPurchased: last.purchaseDate,
       brand: last.brand ?? rows.find((row) => row.brand)?.brand,
@@ -499,6 +517,7 @@ export function getProductMemory(inventory: FoodItem[], staples: Staple[]): Prod
       usualQuantity: staple.buyQuantity,
       storageLocation,
       shelfLifeDays: differenceInCalendarDays(parseISO(expires), parseISO(today)),
+      shelfLifeFromUser: false,
       timesBought: 0,
       lastPurchased: '',
       isStaple: true,

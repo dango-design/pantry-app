@@ -1,0 +1,31 @@
+{
+  "id": "off-0041789001215",
+  "name": "Chicken Ramen",
+  "brand": "Maruchan",
+  "gtin": "0041789001215",
+  "source": "off",
+  "sourceUrl": "https://world.openfoodfacts.org/product/0041789001215",
+  "labelRegion": "us",
+  "ingredientsText": "ENRICHED WHEAT FLOUR (WHEAT FLOUR, NACIN, REDUCED IRON, THIAMINE MONONITRATE RIBOFLAVIN, FOLIC ACID), VEGETABLE OIL (CONTAINS ONE OR MORE OF THE FOLLOWING: CANOLA COTTONSEED, PALM) PRESERVED BY TBHQ, SALT DEHYDRATED VEGETABLES (CARROT, CORN, GREEN PEAS, GARLIC, ONION, CELERY STALK, CHIVE), CONTAINS LESS THAN 2% OF: MALTODEXTRIN, MONOSODIUM GLUTAMATE, SUGAR, HYDROLYZED CORN PROTEIN, HYDROLYZED WHEAT PROTEIN, HYDROLYZED SOY PROTEIN, CHICKEN FAT POTASSIUM CARBONATE, POWDERED COOKED CHICKEN SPICES (CELERY SEED, YEAST EXTRACT, DEHYDRATED SOY SAUCE (WHEAT, SOYBEANS, SALT), SODIUM CARBONATE, SODIUM HEXAMETAPHOSPHATE, TURMERIC, SODIUM TRIPOLYPHOSPHATE, DISODIUM GUANYLATE, DISODIUM INOSINATE, MONOSODIUM PHOSPHATE, LACTOSE SILICON DIOXIDE (ANTI-CAKING AGENT).",
+  "containsStatement": "CONTAINS WHEAT, SOY, AND MILK INGREDIENTS.",
+  "mayContainStatement": "MANUFACTURED IN A FACILITY THAT ALSO PROCESSES CRUSTACEAN SHELLFISH AND SESAME PRODUCTS.",
+  "offAllergenTags": [
+    "en:celery",
+    "en:gluten",
+    "en:milk",
+    "en:soybeans"
+  ],
+  "offTraceTags": [],
+  "expected": {
+    "milk": "contains",
+    "egg": "none",
+    "peanut": "none",
+    "tree_nut": "none",
+    "wheat": "contains",
+    "soy": "contains",
+    "fish": "none",
+    "shellfish": "may_contain",
+    "sesame": "may_contain"
+  },
+  "notes": "Hydrolyzed wheat and soy protein name their sources. Lactose is milk. Bioengineered-food sentence removed from ingredientsText."
+}

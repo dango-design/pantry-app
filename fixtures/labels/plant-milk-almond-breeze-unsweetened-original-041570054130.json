@@ -1,0 +1,28 @@
+{
+  "id": "off-0041570054130",
+  "name": "Almond Breeze Almondmilk Unsweetened Original Aseptic",
+  "brand": "Almond Breeze",
+  "gtin": "0041570054130",
+  "source": "off",
+  "sourceUrl": "https://world.openfoodfacts.org/product/0041570054130",
+  "labelRegion": "us",
+  "ingredientsText": "ALMONDMILK (FILTERED WATER, ALMONDS), CALCIUM CARBONATE, SEA SALT, POTASSIUM CITRATE, SUNFLOWER LECITHIN, GELLAN GUM, NATURAL FLAVORS, D ALPHA TOCOPHEROL (NATURAL VITAMIN E).",
+  "containsStatement": null,
+  "mayContainStatement": null,
+  "offAllergenTags": [
+    "en:nuts"
+  ],
+  "offTraceTags": [],
+  "expected": {
+    "milk": "none",
+    "egg": "none",
+    "peanut": "none",
+    "tree_nut": "contains",
+    "wheat": "none",
+    "soy": "none",
+    "fish": "none",
+    "shellfish": "none",
+    "sesame": "none"
+  },
+  "notes": "Sunflower lecithin names its source, so it is not soy. No Contains line."
+}

@@ -34,3 +34,6 @@ supabase/.temp
 
 *storybook.log
 storybook-static
+
+# TypeScript build info, rewritten by every tsc -b
+*.tsbuildinfo

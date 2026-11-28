@@ -1,0 +1,30 @@
+{
+  "id": "off-0077958529204",
+  "name": "New England Clam Chowder",
+  "brand": "Blount Clam Shack",
+  "gtin": "0077958529204",
+  "source": "off",
+  "sourceUrl": "https://world.openfoodfacts.org/product/0077958529204",
+  "labelRegion": "us",
+  "ingredientsText": "Cream, clam stock (water, cooked clams [clams, water, corn starch, salt, clam broth, sugar, potato flour, natural flavor, onion powder, codfish powder]), potatoes, clam meat, onions, contains 2% or less of: butter (cream, salt), modified corn & tapioca starch, garlic, water, sea salt, nisin preparation, spices.",
+  "containsStatement": "Contains: fish (cod) and milk.",
+  "mayContainStatement": "May contain crustacean shellfish.",
+  "offAllergenTags": [
+    "en:fish",
+    "en:milk",
+    "en:molluscs"
+  ],
+  "offTraceTags": [],
+  "expected": {
+    "milk": "contains",
+    "egg": "none",
+    "peanut": "none",
+    "tree_nut": "none",
+    "wheat": "none",
+    "soy": "none",
+    "fish": "contains",
+    "shellfish": "may_contain",
+    "sesame": "none"
+  },
+  "notes": "Clams are molluscs, so shellfish is not contains; the 'May contain crustacean shellfish' line makes it may_contain. Codfish powder is fish."
+}

@@ -1,0 +1,29 @@
+{
+  "id": "off-0040822346108",
+  "name": "Classic Hummus",
+  "brand": "Sabra",
+  "gtin": "0040822346108",
+  "source": "off",
+  "sourceUrl": "https://world.openfoodfacts.org/product/0040822346108",
+  "labelRegion": "us",
+  "ingredientsText": "Chickpeas, water, tahini (sesame), soybean oil and/or sunflower oil, salt, garlic, citric acid, potassium sorbate, spices, natural flavor.",
+  "containsStatement": "Contains: sesame.",
+  "mayContainStatement": null,
+  "offAllergenTags": [
+    "en:sesame-seeds",
+    "en:soybeans"
+  ],
+  "offTraceTags": [],
+  "expected": {
+    "milk": "none",
+    "egg": "none",
+    "peanut": "none",
+    "tree_nut": "none",
+    "wheat": "none",
+    "soy": "possible",
+    "fish": "none",
+    "shellfish": "none",
+    "sesame": "contains"
+  },
+  "notes": "'soybean oil and/or sunflower oil' is a highly refined oil, so soy is possible."
+}

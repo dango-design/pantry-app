@@ -1,0 +1,28 @@
+{
+  "id": "off-0023923900028",
+  "name": "Whoel Grain Multi-Grain Cereal",
+  "brand": "Earth's Best",
+  "gtin": "0023923900028",
+  "source": "off",
+  "sourceUrl": "https://world.openfoodfacts.org/product/0023923900028",
+  "labelRegion": "us",
+  "ingredientsText": "Organic whole grain oat flour, organic whole grain barley flour, organic whole grain spelt (wheat) flour, electrolytic iron, vitamin E (mixed tocopherols) added to preserve freshness.",
+  "containsStatement": null,
+  "mayContainStatement": null,
+  "offAllergenTags": [
+    "en:gluten"
+  ],
+  "offTraceTags": [],
+  "expected": {
+    "milk": "none",
+    "egg": "none",
+    "peanut": "none",
+    "tree_nut": "none",
+    "wheat": "contains",
+    "soy": "none",
+    "fish": "none",
+    "shellfish": "none",
+    "sesame": "none"
+  },
+  "notes": "'spelt (wheat) flour' is wheat. Oat and barley are not among the 9. No Contains line."
+}

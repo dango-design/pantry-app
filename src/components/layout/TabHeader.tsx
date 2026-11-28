@@ -1,6 +1,6 @@
 import { useEffect, useRef, type ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Search, Settings } from 'lucide-react'
+import { Search, Settings, ShieldCheck } from 'lucide-react'
 import { pageContainer, type PageWidth } from './pageWidth'
 
 interface TabHeaderProps {
@@ -29,6 +29,15 @@ export function TabHeader({ title, tool, children, width = 'wide' }: TabHeaderPr
         <div className="flex items-start gap-3 md:items-center md:gap-6">
           <h1 className="sr-only md:not-sr-only md:flex-shrink-0 md:text-2xl md:font-semibold md:text-gray-900">{title}</h1>
           <div className="flex-1 min-w-0 md:flex-none md:w-80 md:ml-auto">{tool}</div>
+          {/* Phones only: the side nav has Check and Settings from tablet width up */}
+          <button
+            onClick={() => navigate('/check')}
+            aria-label="Check a product for allergens"
+            title="Check a product for allergens"
+            className="md:hidden w-10 h-10 -mr-2 flex-shrink-0 flex items-center justify-center text-gray-500 hover:text-gray-700"
+          >
+            <ShieldCheck className="h-5 w-5" />
+          </button>
           <button
             onClick={() => navigate('/settings')}
             aria-label="Settings"

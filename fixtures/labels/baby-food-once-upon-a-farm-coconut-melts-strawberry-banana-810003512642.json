@@ -1,0 +1,26 @@
+{
+  "id": "off-0810003512642",
+  "name": "Organic & Dairy-Free Coconut Melts - Strawberry Banana",
+  "brand": "Once Upon A Farm",
+  "gtin": "0810003512642",
+  "source": "off",
+  "sourceUrl": "https://world.openfoodfacts.org/product/0810003512642",
+  "labelRegion": "us",
+  "ingredientsText": "COCONUT CREAM (COCONUT*, WATER), BANANA PUREE STRAWBERRY PUREE*, INULIN* (PREBIOTIC), VITAMIN E (MIXED TOCOPHEROLS TO PROTECT FLAVOR), BIFIDOBACTERIUM LACTIS (PROBIOTIC). *ORGANIC",
+  "containsStatement": "CONTAINS: COCONUT",
+  "mayContainStatement": "MADE ON SHARED EQUIPMENT THAT ALSO PROCESSES MILK.",
+  "offAllergenTags": [],
+  "offTraceTags": [],
+  "expected": {
+    "milk": "may_contain",
+    "egg": "none",
+    "peanut": "none",
+    "tree_nut": "none",
+    "wheat": "none",
+    "soy": "none",
+    "fish": "none",
+    "shellfish": "none",
+    "sesame": "none"
+  },
+  "notes": "Coconut rule: the Contains line says only 'COCONUT', not 'tree nuts (coconut)', so tree_nut is none. Package text after the statements (address, codes) dropped."
+}

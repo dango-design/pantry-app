@@ -1,0 +1,32 @@
+{
+  "id": "off-0853479006895",
+  "name": "Protein Pasta",
+  "brand": "Brami",
+  "gtin": "0853479006895",
+  "source": "off",
+  "sourceUrl": "https://world.openfoodfacts.org/product/0853479006895",
+  "labelRegion": "us",
+  "ingredientsText": "Semolina durum wheat, lupini beans.",
+  "containsStatement": "Contains wheat.",
+  "mayContainStatement": "May contain traces of peanuts and soy.",
+  "offAllergenTags": [
+    "en:gluten",
+    "en:lupin"
+  ],
+  "offTraceTags": [
+    "en:peanuts",
+    "en:soybeans"
+  ],
+  "expected": {
+    "milk": "none",
+    "egg": "none",
+    "peanut": "may_contain",
+    "tree_nut": "none",
+    "wheat": "contains",
+    "soy": "may_contain",
+    "fish": "none",
+    "shellfish": "none",
+    "sesame": "none"
+  },
+  "notes": "Lupini beans (lupin) are not one of the 9."
+}

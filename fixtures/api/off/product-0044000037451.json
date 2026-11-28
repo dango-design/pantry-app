@@ -1,0 +1,33 @@
+{
+  "code": "0044000037451",
+  "product": {
+    "allergens_tags": [
+      "en:gluten",
+      "en:peanuts",
+      "en:soybeans"
+    ],
+    "brands": "Nutter Butter",
+    "categories_tags": [
+      "en:snacks",
+      "en:sweet-snacks",
+      "en:biscuits-and-cakes",
+      "en:biscuits-and-crackers",
+      "en:biscuits"
+    ],
+    "code": "0044000037451",
+    "countries_tags": [
+      "en:france",
+      "en:united-states"
+    ],
+    "image_front_small_url": "https://images.openfoodfacts.org/images/products/004/400/003/7451/front_en.34.200.jpg",
+    "ingredients_text": "unbleached enriched flour (wheat flour, niacin, reduced iron, thiamine mononitrate vitamin b1), riboflavin (vitamin b2), folic acid), sugar, peanut butter (roasted peanuts, corn syrup solids, hydrogenated vegetable oil (rapeseed, cottonseed, and soybean oils), salt, peanut oil), canola oil, whole grain wheat flour, high fructose corn syrup, palm oil, salt, leavening (baking soda, calcium phosphate), soy lecithin, artificial flavor.\n\ncontains: wheat, peanut, soy.\n\ncontains a bioengineered food ingredient.",
+    "ingredients_text_en": "unbleached enriched flour (wheat flour, niacin, reduced iron, thiamine mononitrate vitamin b1), riboflavin (vitamin b2), folic acid), sugar, peanut butter (roasted peanuts, corn syrup solids, hydrogenated vegetable oil (rapeseed, cottonseed, and soybean oils), salt, peanut oil), canola oil, whole grain wheat flour, high fructose corn syrup, palm oil, salt, leavening (baking soda, calcium phosphate), soy lecithin, artificial flavor.\n\ncontains: wheat, peanut, soy.\n\ncontains a bioengineered food ingredient.",
+    "last_modified_t": 1793632233,
+    "product_name": "Peanut Butter Sandwich Cookie",
+    "product_name_en": "Peanut Butter Sandwich Cookie",
+    "quantity": "1.9oz",
+    "traces_tags": []
+  },
+  "status": 1,
+  "status_verbose": "product found"
+}

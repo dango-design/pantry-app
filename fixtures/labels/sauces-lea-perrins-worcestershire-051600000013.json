@@ -1,0 +1,28 @@
+{
+  "id": "off-0051600000013",
+  "name": "Worcestershire Sauce",
+  "brand": "Lea & Perrins",
+  "gtin": "0051600000013",
+  "source": "off",
+  "sourceUrl": "https://world.openfoodfacts.org/product/0051600000013",
+  "labelRegion": "us",
+  "ingredientsText": "Distilled white vinegar, molasses, sugar, water, salt, onions, anchovies, garlic, cloves, tamarind extract, natural flavorings, chili pepper extract.",
+  "containsStatement": null,
+  "mayContainStatement": null,
+  "offAllergenTags": [
+    "en:fish"
+  ],
+  "offTraceTags": [],
+  "expected": {
+    "milk": "none",
+    "egg": "none",
+    "peanut": "none",
+    "tree_nut": "none",
+    "wheat": "none",
+    "soy": "none",
+    "fish": "contains",
+    "shellfish": "none",
+    "sesame": "none"
+  },
+  "notes": "Anchovies make fish contains. No Contains line in this text (the OFF photo shows 'CONTAINS: ANCHOVY.')."
+}

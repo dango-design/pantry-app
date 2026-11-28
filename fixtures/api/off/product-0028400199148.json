@@ -1,0 +1,36 @@
+{
+  "code": "0028400199148",
+  "product": {
+    "allergens_tags": [
+      "en:soybeans"
+    ],
+    "brands": "Lay's",
+    "categories_tags": [
+      "en:plant-based-foods-and-beverages",
+      "en:plant-based-foods",
+      "en:snacks",
+      "en:cereals-and-potatoes",
+      "en:salty-snacks",
+      "en:appetizers",
+      "en:chips-and-fries",
+      "en:potatoes-and-their-products",
+      "en:crisps",
+      "en:salty-snacks-made-from-potato",
+      "en:potato-crisps"
+    ],
+    "code": "0028400199148",
+    "countries_tags": [
+      "en:united-states"
+    ],
+    "image_front_small_url": "https://images.openfoodfacts.org/images/products/002/840/019/9148/front_en.82.200.jpg",
+    "ingredients_text": "POTATOES, VEGETABLE OIL (CANOLA, CORN, SOYBEAN AND/OR SUNFLOWER OIL), AND SALT",
+    "ingredients_text_en": "POTATOES, VEGETABLE OIL (CANOLA, CORN, SOYBEAN AND/OR SUNFLOWER OIL), AND SALT",
+    "last_modified_t": 1779742528,
+    "product_name": "Classic",
+    "product_name_en": "Classic",
+    "quantity": "8 OZ (226.8 g)",
+    "traces_tags": []
+  },
+  "status": 1,
+  "status_verbose": "product found"
+}
