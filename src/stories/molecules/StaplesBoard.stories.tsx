@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite'
 import { fn } from 'storybook/test'
 import { StaplesBoard } from '@/components/inventory/StaplesBoard'
 import { TilePanel } from '@/components/inventory/SummaryTile'
-import type { StapleGauge, StaplesSummary } from '@/components/inventory/pantryInsights'
+import type { GaugeTone, StapleGauge, StaplesSummary } from '@/components/inventory/pantryInsights'
 import type { StockInfo } from '@/utils/stock'
 
 // Builds one gauge. The board only reads `key` and `status` from `stock`, so the rest is left out.
@@ -11,9 +11,11 @@ function gauge(
   status: StockInfo['status'],
   label: string,
   fill: number,
-  daysLeft?: number
+  daysLeft?: number,
+  // goesBadFirst: the expiry date comes before running out. tone: when the date makes it worse than its status.
+  options: { goesBadFirst?: boolean; tone?: GaugeTone } = {}
 ): StapleGauge {
-  const tone = status === 'out' ? 'red' : status === 'low' ? 'orange' : 'green'
+  const tone = options.tone ?? (status === 'out' ? 'red' : status === 'low' ? 'orange' : 'green')
   return {
     stock: { name, key: name.toLowerCase(), status, daysLeft } as StockInfo,
     name,
@@ -21,6 +23,7 @@ function gauge(
     fill,
     tone,
     daysLeft,
+    goesBadFirst: options.goesBadFirst ?? false,
   }
 }
 
@@ -37,10 +40,11 @@ function summaryOf(gauges: StapleGauge[]): StaplesSummary {
 
 const ALL_GAUGES: StapleGauge[] = [
   gauge('Milk', 'out', 'out', 0),
+  // Eaten over a few days, but the loaf goes bad today
+  gauge('Bread', 'ok', 'today', 0, 0, { goesBadFirst: true, tone: 'orange' }),
   gauge('Eggs', 'low', '2 d', 2 / 30, 2),
-  gauge('Bread', 'low', '3 d', 3 / 30, 3),
   gauge('Bananas', 'ok', '5 d', 5 / 30, 5),
-  gauge('Greek yogurt', 'ok', '6 d', 6 / 30, 6),
+  gauge('Greek yogurt', 'ok', '6 d', 6 / 30, 6, { goesBadFirst: true }),
   gauge('Butter', 'ok', '9 d', 9 / 30, 9),
   gauge('Cheddar cheese', 'ok', '11 d', 11 / 30, 11),
   gauge('Coffee beans', 'ok', '12 d', 12 / 30, 12),

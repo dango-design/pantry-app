@@ -403,7 +403,7 @@ export function InventoryPage() {
                 ],
               }),
       },
-      panelHint: 'days left at your usual pace',
+      panelHint: 'days until each runs out or goes bad',
       panel: <StaplesBoard summary={staplesSummary} onOpenStaple={setStapleName} />,
       // The gauges are not item rows, so the groups below still list every product
       shownKeys: new Set(),

@@ -13,13 +13,14 @@ const ROLE_COUNTS: DinnerEstimate['roleCounts'] = [
   { role: 'drink', count: 5 },
 ]
 
-// 3 people, 14 servings of mains: 14 / 3 rounds down to 4 dinners
+// 3 people, 14 servings of mains at 1.5 a dinner: 14 / 1.5 / 3 = 3.1, so 3 dinners
 const DEFAULT_ESTIMATE: DinnerEstimate = {
   roleCounts: ROLE_COUNTS,
   totalProducts: ROLE_COUNTS.reduce((sum, { count }) => sum + count, 0),
   servings: { main: 14, base: 30, produce: 20 },
   householdSize: 3,
-  dinners: 4,
+  dinnersBy: { main: 3.1, base: 10, produce: 6.7 },
+  dinners: 3,
   limitedBy: 'main',
 }
 
@@ -31,7 +32,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'The body of the "Dinners on hand" panel on the Pantry tab. A bar shows what the pantry\'s items are for, by role. Three meters show servings of mains, bases and veg. The grey box says about how many dinners those make for the household and which role runs out first. A line under it says how many saved recipes can be made now.',
+          'The body of the "Dinners on hand" panel on the Pantry tab. A bar shows what the pantry\'s items are for, by role. Three meters show how many dinners the mains, bases and veg would each last. The grey box says about how many dinners those make for the household and which role runs out first. A line under it says how many saved recipes can be made now.',
       },
     },
   },
@@ -55,15 +56,16 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-/** Three people with enough mains for about 4 dinners. Mains run out first. */
+/** Three people with enough mains for about 3 dinners. Mains run out first. */
 export const Default: Story = {}
 
-/** Veg has the fewest servings, so it sets the number of dinners */
+/** Veg runs out first, so it sets the number of dinners */
 export const VegRunsOutFirst: Story = {
   args: {
     estimate: {
       ...DEFAULT_ESTIMATE,
       servings: { main: 18, base: 30, produce: 7.5 },
+      dinnersBy: { main: 4, base: 10, produce: 2.5 },
       dinners: 2,
       limitedBy: 'produce',
     },
@@ -76,6 +78,7 @@ export const NotEnough: Story = {
     estimate: {
       ...DEFAULT_ESTIMATE,
       servings: { main: 2, base: 12, produce: 6 },
+      dinnersBy: { main: 0.4, base: 4, produce: 2 },
       dinners: 0,
       limitedBy: 'main',
     },

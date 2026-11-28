@@ -377,6 +377,27 @@ export const SERVINGS_BY_FOOD: Record<string, { grams?: number; ml?: number; eac
   'watermelon': { each: 15 },
 }
 
+/**
+ * Fruit people mostly eat on its own, keyed by the food table's lowercase
+ * names. It still counts as "Veg & fruit" in the role bar, but the dinner
+ * count leaves it out: a bag of apples does not make a dinner. Fruit that
+ * goes into cooking (tomatoes, avocados, plantains) is not listed, so it
+ * still counts as dinner veg. A test checks every key is in the table.
+ */
+export const SNACKING_FRUIT: ReadonlySet<string> = new Set([
+  'apples', 'bananas', 'oranges', 'clementines', 'grapefruit', 'strawberries', 'blueberries',
+  'raspberries', 'blackberries', 'berries', 'cranberries', 'grapes', 'cherries', 'peaches',
+  'nectarines', 'plums', 'pears', 'mangoes', 'pineapple', 'watermelon', 'cantaloupe', 'honeydew',
+  'kiwis', 'pomegranates', 'dates', 'fruit',
+])
+
+/** True for fruit people mostly eat on its own (see SNACKING_FRUIT). "Frozen blueberries" counts too. */
+export function isSnackingFruit(name: string): boolean {
+  const foodName = lookupFood(name)?.name
+  if (!foodName) return false
+  return SNACKING_FRUIT.has(foodName) || SNACKING_FRUIT.has(foodName.replace(MODIFIER_PREFIX, ''))
+}
+
 type ServingsInput = Pick<FoodItem, 'name' | 'category' | 'quantity' | 'quantityUnit'> &
   Partial<Pick<FoodItem, 'role' | 'servings'>>
 

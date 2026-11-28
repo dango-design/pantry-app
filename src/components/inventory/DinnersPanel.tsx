@@ -7,10 +7,11 @@ export interface DinnersPanelProps {
   recipes?: { cookable: number; total: number }
 }
 
-// Whole numbers from 10 up ("66"), one decimal below that ("2.5"). These are estimates, so more detail would mislead.
-function formatServings(value: number): string {
-  const rounded = value >= 10 ? Math.round(value) : Math.round(value * 10) / 10
-  return `${rounded} ${rounded === 1 ? 'serving' : 'servings'}`
+// Whole dinners, rounded down, since part of a dinner is not a dinner. "Under 1" below that.
+function formatDinners(value: number): string {
+  const whole = Math.floor(value + 1e-9)
+  if (whole < 1) return value > 0 ? 'under 1' : 'none'
+  return `${whole} ${whole === 1 ? 'dinner' : 'dinners'}`
 }
 
 function capitalize(text: string): string {
@@ -25,13 +26,13 @@ function recipeLine({ cookable, total }: { cookable: number; total: number }): s
 
 /**
  * The body of the "Dinners on hand" panel on the Pantry tab. It shows what
- * the pantry's items are for (a bar split by role), servings of mains, bases
- * and veg, and about how many dinners those make for the household. Pass the
- * result of estimateDinners. Render it inside a TilePanel.
+ * the pantry's items are for (a bar split by role), how many dinners the
+ * mains, bases and veg would each last, and the overall count for the
+ * household. Pass the result of estimateDinners. Render it inside a TilePanel.
  */
 export function DinnersPanel({ estimate, recipes }: DinnersPanelProps) {
-  const { roleCounts, totalProducts, servings, householdSize, dinners, limitedBy } = estimate
-  const maxServings = Math.max(...DINNER_ROLES.map((role) => servings[role]))
+  const { roleCounts, totalProducts, dinnersBy, householdSize, dinners, limitedBy } = estimate
+  const maxDinners = Math.max(...DINNER_ROLES.map((role) => dinnersBy[role]))
   const people = `${householdSize} ${householdSize === 1 ? 'person' : 'people'}`
   const limit = `${capitalize(describeLimit(limitedBy))}.`
   const barLabel = `Items by role: ${roleCounts.map(({ role, count }) => `${ROLE_PLURALS[role]} ${count}`).join(', ')}`
@@ -62,10 +63,10 @@ export function DinnersPanel({ estimate, recipes }: DinnersPanelProps) {
         )}
       </div>
 
-      {/* Servings of the three dinner roles */}
+      {/* How many dinners each of the three dinner roles would last */}
       <ul className="space-y-1.5">
         {DINNER_ROLES.map((role) => {
-          const fill = maxServings > 0 ? servings[role] / maxServings : 0
+          const fill = maxDinners > 0 ? dinnersBy[role] / maxDinners : 0
           return (
             <li key={role} className="grid grid-cols-[58px_1fr_auto] items-center gap-2 text-xs">
               <span className={cn('text-gray-700', role === limitedBy && 'font-semibold text-gray-900')}>
@@ -74,7 +75,7 @@ export function DinnersPanel({ estimate, recipes }: DinnersPanelProps) {
               <span aria-hidden className="block h-2 overflow-hidden rounded-full bg-gray-100">
                 <span className="block h-full rounded-full" style={{ width: `${fill * 100}%`, backgroundColor: ROLE_COLORS[role] }} />
               </span>
-              <span className="text-right tabular-nums text-gray-600">{formatServings(servings[role])}</span>
+              <span className="text-right tabular-nums text-gray-600">{formatDinners(dinnersBy[role])}</span>
             </li>
           )
         })}
@@ -93,7 +94,7 @@ export function DinnersPanel({ estimate, recipes }: DinnersPanelProps) {
           for {people}. {limit}
         </p>
         <p className="mt-1 text-xs text-gray-500">
-          An estimate from amounts and usual portion sizes. Expired food is left out.
+          An estimate from amounts, at about 6 oz of a main per person. Expired food and snacking fruit are left out.
         </p>
       </div>
 
