@@ -106,3 +106,28 @@ export const Chips: Story = {
     )
   },
 }
+
+/** The flavor group as chips, with one staple running low. That chip has an orange outline and says "low". */
+export const FlavorGroupWithLowChip: Story = {
+  render: () => {
+    const names = [
+      'Olive oil', 'Vegetable oil', 'Sesame oil', 'Soy sauce', 'Fish sauce', 'Salt', 'Black pepper', 'Cumin', 'Paprika',
+      'Chili flakes', 'Oregano', 'Cinnamon', 'Garlic powder', 'Ketchup', 'Mayo', 'Dijon', 'Sriracha', 'Honey',
+      'Rice vinegar', 'Hoisin',
+    ]
+    const products = names.map((name) => sampleProduct(name, { days: 200, category: 'condiments', place: 'pantry' }))
+    const soySauce = products.find((stock) => stock.name === 'Soy sauce')!
+    return (
+      <PantryGroupSection
+        label="Oils, spices & sauces"
+        color="#B5B5BF"
+        count={products.length}
+        status={{ text: '1 low', tone: 'orange' }}
+        open
+        onToggle={fn()}
+      >
+        <GroupChips products={products} lowKeys={new Set([soySauce.key])} />
+      </PantryGroupSection>
+    )
+  },
+}

@@ -81,15 +81,19 @@ export function PantryGroupSection({
 
 /**
  * A group's products as small chips instead of rows, for long lists of small
- * things (session C uses it for oils, spices and sauces). A chip opens the
- * item. Chips for things expiring soon get an orange outline.
+ * things such as oils, spices and sauces. A chip opens the item.
+ *
+ * Chips whose key is in `lowKeys` get an orange outline and the word "low".
+ * Other chips for things expiring soon get an orange outline and hidden
+ * "(use soon)" text. A chip that is both shows as low.
  */
-export function GroupChips({ products }: { products: StockInfo[] }) {
+export function GroupChips({ products, lowKeys }: { products: StockInfo[]; lowKeys?: Set<string> }) {
   const navigate = useNavigate()
   return (
     <ul className="flex flex-wrap gap-1.5 px-3 py-3">
       {products.map((stock) => {
-        const soon = daysLeft(stock) <= USE_SOON_DAYS
+        const low = lowKeys?.has(stock.key) ?? false
+        const soon = !low && daysLeft(stock) <= USE_SOON_DAYS
         return (
           <li key={stock.key}>
             <button
@@ -97,10 +101,11 @@ export function GroupChips({ products }: { products: StockInfo[] }) {
               onClick={() => navigate(`/item/${stock.items[0].id}`)}
               className={cn(
                 'rounded-full border px-2.5 py-1 text-xs touch-manipulation hover:bg-gray-50',
-                soon ? 'border-orange-500 text-orange-700' : 'border-gray-200 text-gray-700'
+                low || soon ? 'border-orange-500 text-orange-700' : 'border-gray-200 text-gray-700'
               )}
             >
               {stock.name}
+              {low && <span className="text-orange-700"> · low</span>}
               {soon && <span className="sr-only"> (use soon)</span>}
             </button>
           </li>

@@ -80,7 +80,7 @@ export type GroupDisplay = 'rows' | 'chips'
 
 /**
  * A group that pulls matching products out before the place or food-type
- * grouping runs. Session C adds "Oils, spices & sauces" this way, shown as chips.
+ * grouping runs. The Pantry tab uses one for "Oils, spices & sauces", shown as chips.
  */
 export interface SpecialGroup {
   key: string
