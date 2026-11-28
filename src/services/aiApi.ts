@@ -48,7 +48,7 @@ interface BarcodeLookupResult {
   error?: string
 }
 
-const DEMO_MODE_ERROR = 'AI features require Supabase to be configured. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in your .env file and deploy the Edge Functions.'
+const DEMO_MODE_ERROR = 'AI features require Supabase to be configured. Set VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY in your .env file and deploy the Edge Functions.'
 
 /**
  * Process a grocery photo to detect food items

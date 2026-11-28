@@ -2,15 +2,18 @@ import { createClient } from '@supabase/supabase-js'
 import type { Database } from '@/types/database'
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+// The publishable key (sb_publishable_...). It is safe to ship in the browser:
+// it only reaches what row-level security allows. Supabase is retiring the
+// legacy anon key in early 2027, so do not use it here.
+const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY
 
 // Check if we're in demo mode (no Supabase credentials)
-export const isDemoMode = !supabaseUrl || !supabaseAnonKey
+export const isDemoMode = !supabaseUrl || !supabaseKey
 
 if (isDemoMode) {
   console.warn(
     'Supabase credentials not found. Running in demo mode with local data.\n' +
-    'To enable full functionality, set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in your .env file.'
+    'To enable full functionality, set VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY in your .env file.'
   )
 }
 
@@ -21,7 +24,7 @@ export const DB_SCHEMA = 'pantry'
 
 export const supabase = createClient<Database, typeof DB_SCHEMA>(
   supabaseUrl || 'https://placeholder.supabase.co',
-  supabaseAnonKey || 'placeholder-key',
+  supabaseKey || 'placeholder-key',
   {
     db: { schema: DB_SCHEMA },
     auth: {

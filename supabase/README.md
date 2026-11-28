@@ -110,8 +110,11 @@ Do these in order. Steps 3 to 5 are in the Supabase dashboard.
    Secrets are visible to every function in the project.
 
 7. Set the app's environment variables to the shared project's values:
-   `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`. They are the same URL and
-   anon key DoDone uses.
+   `VITE_SUPABASE_URL`, and `VITE_SUPABASE_PUBLISHABLE_KEY` set to the
+   `default` publishable key (`sb_publishable_...`) from Settings → API Keys.
+   Do not use the legacy `anon` key: Supabase is retiring it in early 2027.
+   Never put a secret key (`sb_secret_...`) in the app. It bypasses row-level
+   security, and anyone can read what the browser loads.
 
 ## Changing the database later
 
@@ -140,11 +143,13 @@ schema locally.
 
 ## Known gaps
 
-- **`pantry-barcode-lookup` accepts the public anon key.** It only calls the
+- **`pantry-barcode-lookup` accepts the public keys.** It only calls the
   free Open Food Facts API, so it has no sign-in check. The four AI functions
   do have one: they call `requireUser()` from
-  `supabase/functions/_shared/requireUser.ts`, which refuses the anon key and
-  anonymous users. A new function that costs money must call it too.
+  `supabase/functions/_shared/requireUser.ts`, which refuses the publishable
+  key, the legacy anon key and anonymous users. The platform's `verify_jwt`
+  check lets the publishable key through, so a new function that costs money
+  must call `requireUser()` too.
 - **An account that owns a pantry household cannot be deleted.** Several
   pantry columns point at the person (`households.owner_id`,
   `food_items.added_by` and others) with no delete rule, so deleting the row in
