@@ -40,3 +40,8 @@ storybook-static
 
 # Vercel CLI link for this checkout
 .vercel
+
+# Playwright: the E2E build and test output
+dist-e2e
+playwright-report
+test-results

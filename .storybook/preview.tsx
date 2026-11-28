@@ -14,6 +14,9 @@ const preview: Preview = {
       },
     },
     layout: 'centered',
+    // Accessibility checks run on every story (npm run test:stories) but only report for now:
+    // 50 stories have violations, mostly icon buttons without a name. Switch to 'error' once fixed.
+    a11y: { test: 'todo' },
     backgrounds: {
       default: 'light',
       values: [
