@@ -1,0 +1,12 @@
+# Files the Vercel CLI must not upload. Vercel builds the app from source and
+# reads its settings from the project's environment variables.
+node_modules
+dist
+dist-ssr
+storybook-static
+.env
+.env.*
+.claude
+.vercel
+supabase/.temp
+*.log

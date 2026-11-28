@@ -37,3 +37,6 @@ storybook-static
 
 # TypeScript build info, rewritten by every tsc -b
 *.tsbuildinfo
+
+# Vercel CLI link for this checkout
+.vercel
