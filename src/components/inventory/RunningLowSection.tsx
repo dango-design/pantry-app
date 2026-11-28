@@ -1,106 +1,35 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/common'
-import { CARD_GRID } from '@/components/layout/pageWidth'
 import { useDemoStore } from '@/stores/demoStore'
 import { cn } from '@/utils/cn'
-import {
-  describeRunOut,
-  formatStockCount,
-  getRestockSuggestions,
-  groupByProduct,
-  isOnShoppingList,
-  productKey,
-  type StockInfo,
-} from '@/utils/stock'
-import type { FoodCategory, QuantityUnit, Staple } from '@/types'
+import { CATEGORY_TONES } from '@/utils/constants'
+import { StatusPill } from './StatusPill'
+import type { LowRow } from './useRunningLowRows'
+
+// Rows shown before "Show all"
+const MAX_ROWS = 5
 
 interface RunningLowSectionProps {
+  /** From useRunningLowRows() */
+  rows: LowRow[]
   /** Open the "Keep in stock" sheet for this product */
   onOpenStaple: (name: string) => void
   /** Show a message, with undo when the action can be taken back */
   onNotify: (message: string, undo?: () => void) => void
 }
 
-interface LowRow {
-  key: string
-  name: string
-  category: FoodCategory
-  reason: 'out' | 'low'
-  detail: string
-  /** What goes on the shopping list */
-  quantity?: number
-  unit?: QuantityUnit
-  staple?: Staple
-  onList: boolean
-  /** The pantry row to open, for a product that still has some */
-  itemId?: string
-}
-
-// Rows shown before "Show all"
-const MAX_ROWS = 5
-
-// "Out", "About 3 left, out by Nov 22", "2 left". The same wording as the shopping list's suggestions.
-function stapleDetail(stock: StockInfo, now: Date): string {
-  if (stock.status === 'out') return 'Out'
-  const left = `${formatStockCount(stock)} left`
-  const runOut = describeRunOut(stock, now)
-  return runOut ? `${left}, ${runOut.charAt(0).toLowerCase()}${runOut.slice(1)}` : left
-}
-
 /**
- * What needs buying, at the top of the pantry: staples that are low or out,
- * then other products that are low or were used up lately. A staple that is
- * out has no pantry card, so this is the only place it shows.
- *
- * Staples stay listed after they go on the shopping list, marked "On your
- * list". Other products leave once they are on the list.
+ * The "Running low" list, shown under its summary tile: one line per product
+ * with why it is listed and an "Add to list" button. Pass the rows from
+ * useRunningLowRows(). Renders nothing when there are none.
  */
-export function RunningLowSection({ onOpenStaple, onNotify }: RunningLowSectionProps) {
+export function RunningLowSection({ rows, onOpenStaple, onNotify }: RunningLowSectionProps) {
   const navigate = useNavigate()
-  const { inventory, staples, shoppingList, addShoppingItem, removeShoppingItem, updateStaple } = useDemoStore()
+  const { addShoppingItem, removeShoppingItem, updateStaple } = useDemoStore()
   const [showAll, setShowAll] = useState(false)
 
-  const now = new Date()
-  const stocks = groupByProduct(inventory, staples, now)
-  const stockByKey = new Map(stocks.map((stock) => [stock.key, stock]))
-
-  const rows: LowRow[] = []
-  for (const stock of stocks) {
-    if (!stock.staple || stock.status === 'ok') continue
-    rows.push({
-      key: stock.key,
-      name: stock.name,
-      category: stock.category,
-      reason: stock.status,
-      detail: stapleDetail(stock, now),
-      quantity: stock.staple.buyQuantity,
-      unit: stock.unit,
-      staple: stock.staple,
-      onList: isOnShoppingList(stock.name, shoppingList, now),
-    })
-  }
-  for (const suggestion of getRestockSuggestions(inventory, staples, shoppingList, now)) {
-    if (suggestion.stapleId) continue
-    const key = productKey(suggestion.name)
-    rows.push({
-      key,
-      name: suggestion.name,
-      category: suggestion.category,
-      reason: suggestion.reason,
-      detail: suggestion.detail,
-      quantity: suggestion.quantity,
-      unit: suggestion.unit,
-      onList: false,
-      itemId: stockByKey.get(key)?.items[0]?.id,
-    })
-  }
-
   if (rows.length === 0) return null
-
-  // Out before low, and staples first within each
-  const order = (row: LowRow) => (row.reason === 'out' ? 0 : 2) + (row.staple ? 0 : 1)
-  rows.sort((a, b) => order(a) - order(b))
   const visible = showAll ? rows : rows.slice(0, MAX_ROWS)
 
   const handleOpen = (row: LowRow) => {
@@ -130,56 +59,51 @@ export function RunningLowSection({ onOpenStaple, onNotify }: RunningLowSectionP
   }
 
   return (
-    <section aria-labelledby="running-low-heading" className="space-y-2">
-      <div className="flex items-center justify-between gap-3 min-h-[28px]">
-        <h2 id="running-low-heading" className="text-sm font-semibold text-gray-700">
-          Out and running low
-        </h2>
-        {rows.length > MAX_ROWS && (
-          <button
-            type="button"
-            onClick={() => setShowAll(!showAll)}
-            aria-expanded={showAll}
-            className="-my-2 py-2 pl-3 text-sm font-medium text-primary hover:text-primary-hover"
-          >
-            {showAll ? 'Show fewer' : `Show all ${rows.length}`}
-          </button>
-        )}
-      </div>
-
-      <ul className={CARD_GRID}>
-        {visible.map((row) => (
-          <li
-            key={row.key}
-            className="flex items-center gap-2 rounded-xl border border-primary-muted bg-white pl-4 pr-3"
-          >
-            <button
-              type="button"
-              onClick={() => handleOpen(row)}
-              className="flex-1 min-w-0 py-2.5 text-left"
-            >
-              <span className="block font-medium text-base leading-6 text-gray-900 truncate">{row.name}</span>
-              <span className={cn('block text-sm leading-5 truncate', row.reason === 'out' ? 'text-red-600' : 'text-gray-600')}>
-                {row.detail}
-              </span>
-            </button>
-
-            {row.onList ? (
-              <span className="shrink-0 px-1 text-sm text-gray-500">On your list</span>
-            ) : (
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={() => handleAdd(row)}
-                className="shrink-0 min-h-[40px]"
-                aria-label={`Add ${row.name} to shopping list`}
+    <div>
+      <ul className="divide-y divide-gray-100">
+        {visible.map((row) => {
+          const tone = CATEGORY_TONES[row.category] ?? CATEGORY_TONES.other
+          return (
+            <li key={row.key} className="flex items-center gap-2 pl-3 pr-2">
+              <span aria-hidden className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: tone.strip }} />
+              <button
+                type="button"
+                onClick={() => handleOpen(row)}
+                className="min-w-0 flex-1 py-2 text-left"
               >
-                Add to list
-              </Button>
-            )}
-          </li>
-        ))}
+                <span className="block truncate text-sm font-medium text-gray-900">{row.name}</span>
+                <span className={cn('block truncate text-xs', row.reason === 'out' ? 'text-red-700' : 'text-gray-500')}>
+                  {row.detail}
+                </span>
+              </button>
+
+              {row.onList ? (
+                <StatusPill tone="grey" className="shrink-0">On your list</StatusPill>
+              ) : (
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => handleAdd(row)}
+                  className="shrink-0 min-h-[40px]"
+                  aria-label={`Add ${row.name} to shopping list`}
+                >
+                  Add to list
+                </Button>
+              )}
+            </li>
+          )
+        })}
       </ul>
-    </section>
+      {rows.length > MAX_ROWS && (
+        <button
+          type="button"
+          onClick={() => setShowAll(!showAll)}
+          aria-expanded={showAll}
+          className="block w-full border-t border-gray-100 py-2.5 text-center text-sm font-medium text-gray-700 hover:bg-gray-50"
+        >
+          {showAll ? 'Show fewer' : `Show all ${rows.length}`}
+        </button>
+      )}
+    </div>
   )
 }

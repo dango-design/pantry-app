@@ -1,14 +1,32 @@
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo, useCallback, type ReactNode } from 'react'
 import { SlidersHorizontal, ArrowUpDown, Check } from 'lucide-react'
 import {
+  CompactItemRow,
+  CompactRowList,
   FoodItemCard,
+  GroupChips,
+  PantryGroupSection,
   RunningLowSection,
   StapleSheet,
+  SummaryTile,
+  SummaryTileGrid,
+  TilePanel,
+  buildGroups,
+  countByCategory,
   emptyProduct,
+  getGroupStatus,
+  getUseSoon,
+  groupStateKey,
   restoreStaple,
   shownCount,
   snapshotStock,
   useAddToList,
+  usePantryView,
+  useRunningLowRows,
+  type Density,
+  type Grouping,
+  type SpecialGroup,
+  type SummaryTileProps,
 } from '@/components/inventory'
 import { FilterSheet, type ExpirationFilter } from '@/components/inventory/FilterSheet'
 import { TonightBanner } from '@/components/plan'
@@ -17,7 +35,7 @@ import { Snackbar } from '@/components/common'
 import { useDemoStore } from '@/stores/demoStore'
 import { cn } from '@/utils/cn'
 import { getDaysUntilExpiration } from '@/utils/freshness'
-import { getStock, groupByProduct } from '@/utils/stock'
+import { getStock, groupByProduct, type StockInfo } from '@/utils/stock'
 import type { FoodCategory, StorageLocation, FoodItem } from '@/types'
 
 // Category chips configuration
@@ -43,6 +61,51 @@ const SORT_OPTIONS: { key: SortOption; label: string }[] = [
   { key: 'name', label: 'Name' },
 ]
 
+const DENSITY_OPTIONS: { key: Density; label: string }[] = [
+  { key: 'compact', label: 'Compact' },
+  { key: 'comfortable', label: 'Comfortable' },
+]
+
+const GROUPING_OPTIONS: { key: Grouping; label: string }[] = [
+  { key: 'place', label: 'Place' },
+  { key: 'category', label: 'Food type' },
+]
+
+// Groups that take their products out of the place or food-type groups.
+// Session C adds "Oils, spices & sauces" here, shown as chips.
+const SPECIAL_GROUPS: SpecialGroup[] = []
+
+/** A summary tile and the list it shows below the tiles when selected */
+interface TileDefinition {
+  key: string
+  tile: Omit<SummaryTileProps, 'selected' | 'onClick' | 'controls'>
+  panelHint?: string
+  panel: ReactNode
+  /** Products the panel lists, so the groups below don't repeat them */
+  shownKeys: Set<string>
+}
+
+// `items[0]` is a product's soonest-expiring row, so sorting goes by that one.
+// Returns a sorted copy, so the list from groupByProduct keeps its order.
+function sortProducts(list: StockInfo[], sortBy: SortOption): StockInfo[] {
+  return [...list].sort((a, b) => {
+    const rowA = a.items[0]
+    const rowB = b.items[0]
+    switch (sortBy) {
+      case 'expiration':
+        return getDaysUntilExpiration(rowA.expirationDate) - getDaysUntilExpiration(rowB.expirationDate)
+      case 'category':
+        return rowA.category.localeCompare(rowB.category)
+      case 'location':
+        return rowA.storageLocation.localeCompare(rowB.storageLocation)
+      case 'name':
+        return a.name.localeCompare(b.name)
+      default:
+        return 0
+    }
+  })
+}
+
 // Snackbar state type
 interface SnackbarState {
   open: boolean
@@ -64,7 +127,15 @@ export function InventoryPage() {
   // The product whose "Keep in stock" sheet is open
   const [stapleName, setStapleName] = useState<string | null>(null)
 
+  // Which summary tile's list shows under the tiles. Tapping it again closes the list.
+  const [selectedTile, setSelectedTile] = useState<string | null>('soon')
+  // The compact row whose action bar is open. One at a time.
+  const [expandedKey, setExpandedKey] = useState<string | null>(null)
+
   const { inventory, staples, adjustStock } = useDemoStore()
+  const { density, setDensity, grouping, setGrouping, openGroups, setGroupOpen } = usePantryView()
+  const lowRows = useRunningLowRows()
+  const contentWidth = density === 'compact' ? 'regular' : 'wide'
 
   const showSnackbar = useCallback((message: string, undoAction?: () => void) => {
     setSnackbar((prev) => ({ open: true, message, undoAction, id: prev.id + 1 }))
@@ -146,7 +217,7 @@ export function InventoryPage() {
   }
 
   // Filter and sort the products. `items[0]` is a product's soonest-expiring
-  // row, so expiry filters and sorting go by that one.
+  // row, so expiry filters go by that one.
   const filteredProducts = useMemo(() => {
     let list = products
 
@@ -188,33 +259,110 @@ export function InventoryPage() {
       })
     }
 
-    // Sort a copy, so the list from groupByProduct keeps its order
-    return [...list].sort((a, b) => {
-      const rowA = a.items[0]
-      const rowB = b.items[0]
-      switch (sortBy) {
-        case 'expiration':
-          return getDaysUntilExpiration(rowA.expirationDate) - getDaysUntilExpiration(rowB.expirationDate)
-        case 'category':
-          return rowA.category.localeCompare(rowB.category)
-        case 'location':
-          return rowA.storageLocation.localeCompare(rowB.storageLocation)
-        case 'name':
-          return a.name.localeCompare(b.name)
-        default:
-          return 0
-      }
-    })
+    return sortProducts(list, sortBy)
   }, [products, selectedCategories, selectedLocations, expirationFilter, searchQuery, sortBy])
 
-  // The "Out and running low" section only shows on the plain, unfiltered pantry
+  // Tiles and groups show on the plain pantry. Searching or filtering shows one flat list instead.
   const isBrowsing = searchQuery.trim() === '' && activeFilterCount === 0
+
+  const categoryCounts = useMemo(() => countByCategory(products), [products])
+  const useSoon = useMemo(() => getUseSoon(products), [products])
+  const sortedProducts = useMemo(() => sortProducts(products, sortBy), [products, sortBy])
+  const groups = useMemo(() => buildGroups(sortedProducts, grouping, SPECIAL_GROUPS), [sortedProducts, grouping])
+
+  const toggleRow = useCallback((key: string) => {
+    setExpandedKey((current) => (current === key ? null : key))
+  }, [])
+
+  // Products as compact rows in a white card, or as today's cards
+  const renderProducts = (list: StockInfo[], options: { showLocation: boolean; framed: boolean }) => {
+    if (density === 'comfortable') {
+      return (
+        <div className={cn(CARD_GRID, options.framed && 'p-2')}>
+          {list.map((stock) => (
+            <FoodItemCard
+              key={stock.key}
+              item={stock.items[0]}
+              stock={stock}
+              onMarkUsed={handleMarkUsed}
+              onAddToCart={requestAdd}
+              onAdjust={handleAdjust}
+            />
+          ))}
+        </div>
+      )
+    }
+    const rows = (
+      <CompactRowList>
+        {list.map((stock) => (
+          <CompactItemRow
+            key={stock.key}
+            stock={stock}
+            expanded={expandedKey === stock.key}
+            onToggle={() => toggleRow(stock.key)}
+            showLocation={options.showLocation}
+            onMarkUsed={handleMarkUsed}
+            onAddToCart={requestAdd}
+            onAdjust={handleAdjust}
+          />
+        ))}
+      </CompactRowList>
+    )
+    return options.framed ? rows : <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">{rows}</div>
+  }
+
+  const lowOnList = lowRows.filter((row) => row.onList).length
+  const tiles: TileDefinition[] = [
+    {
+      key: 'soon',
+      tile: {
+        label: 'Use soon',
+        value: useSoon.products.length,
+        status:
+          useSoon.products.length === 0
+            ? { text: 'Nothing to use up', tone: 'green' }
+            : useSoon.expired > 0
+              ? { text: `${useSoon.expired} already expired`, tone: 'red' }
+              : { text: 'None expired yet', tone: 'muted' },
+      },
+      panelHint: 'soonest first',
+      panel:
+        useSoon.products.length === 0 ? (
+          <p className="px-3 py-4 text-sm text-gray-500">Nothing expires in the next week.</p>
+        ) : (
+          renderProducts(useSoon.products, { showLocation: true, framed: true })
+        ),
+      shownKeys: new Set(useSoon.products.map((stock) => stock.key)),
+    },
+    {
+      key: 'low',
+      tile: {
+        label: 'Running low',
+        value: lowRows.length,
+        status:
+          lowRows.length === 0
+            ? { text: 'Nothing running low', tone: 'green' }
+            : { text: `${lowOnList} on your list`, tone: 'muted' },
+      },
+      panelHint: 'out first',
+      panel:
+        lowRows.length === 0 ? (
+          <p className="px-3 py-4 text-sm text-gray-500">Nothing is out or running low.</p>
+        ) : (
+          <RunningLowSection rows={lowRows} onOpenStaple={setStapleName} onNotify={showSnackbar} />
+        ),
+      shownKeys: new Set(lowRows.map((row) => row.key)),
+    },
+  ]
+  const activeTile = tiles.find((tile) => tile.key === selectedTile)
+  const shownAbove = activeTile?.shownKeys ?? new Set<string>()
 
   return (
     <div className="min-h-screen bg-gray-50">
       <TabHeader
         title="Pantry"
-        tool={<TabSearchField value={searchQuery} onChange={setSearchQuery} placeholder="Search pantry" />}
+        width={contentWidth}
+        tool={<TabSearchField value={searchQuery} onChange={setSearchQuery} placeholder={products.length > 0 ? `Search ${products.length} items` : 'Search pantry'} />}
       >
         {/* Filter, Sort, and chips row. Top-aligned so the icons sit with the first row when chips wrap. */}
         <div className="flex items-center gap-2 md:items-start">
@@ -237,8 +385,8 @@ export function InventoryPage() {
           <div className="relative">
             <button
               onClick={() => setShowSortMenu(!showSortMenu)}
-              aria-label="Sort"
-              title="Sort"
+              aria-label="Sort and view"
+              title="Sort and view"
               className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-700 flex-shrink-0"
             >
               <ArrowUpDown className="h-4 w-4" />
@@ -250,7 +398,8 @@ export function InventoryPage() {
                   className="fixed inset-0 z-40"
                   onClick={() => setShowSortMenu(false)}
                 />
-                <div className="absolute top-full left-0 mt-1 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50 min-w-[160px]">
+                <div className="absolute top-full left-0 mt-1 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50 min-w-[180px]">
+                  <p className="px-4 pb-1 pt-1.5 text-xs font-medium text-gray-500">Sort by</p>
                   {SORT_OPTIONS.map((option) => (
                     <button
                       key={option.key}
@@ -265,6 +414,24 @@ export function InventoryPage() {
                     >
                       {option.label}
                       {sortBy === option.key && <Check className="h-4 w-4" />}
+                    </button>
+                  ))}
+                  <div className="my-1 border-t border-gray-100" />
+                  <p className="px-4 pb-1 pt-1.5 text-xs font-medium text-gray-500">Show items as</p>
+                  {DENSITY_OPTIONS.map((option) => (
+                    <button
+                      key={option.key}
+                      onClick={() => {
+                        setDensity(option.key)
+                        setShowSortMenu(false)
+                      }}
+                      className={cn(
+                        'w-full px-4 py-2 text-left text-sm flex items-center justify-between hover:bg-gray-50',
+                        density === option.key && 'text-primary'
+                      )}
+                    >
+                      {option.label}
+                      {density === option.key && <Check className="h-4 w-4" />}
                     </button>
                   ))}
                 </div>
@@ -290,6 +457,9 @@ export function InventoryPage() {
                     style={isSelected ? { backgroundColor: chip.color, borderColor: chip.color } : undefined}
                   >
                     {chip.label}
+                    <span className={cn('ml-1.5 tabular-nums', isSelected ? 'text-white/80' : 'text-gray-400')}>
+                      {chip.key === 'all' ? products.length : (categoryCounts.get(chip.key) ?? 0)}
+                    </span>
                   </button>
                 )
               })}
@@ -298,32 +468,97 @@ export function InventoryPage() {
         </div>
       </TabHeader>
 
-      {/* Content: one column of cards on phones, a grid on wider screens */}
-      <div className={cn(pageContainer('wide'), 'pt-2 pb-6 space-y-2 md:pt-6 md:pb-10 md:space-y-3')}>
+      {/* Content. Compact rows read best in one narrower column; cards fill a wide grid. */}
+      <div className={cn(pageContainer(contentWidth), 'pt-2 pb-6 space-y-3 md:pt-6 md:pb-10 md:space-y-4')}>
         <TonightBanner />
 
-        {isBrowsing && <RunningLowSection onOpenStaple={setStapleName} onNotify={showSnackbar} />}
-
-        {filteredProducts.length === 0 ? (
-          <div className="text-center py-16 text-gray-500">
-            <p className="text-lg font-medium mb-1">No items found</p>
-            <p className="text-sm">
-              {searchQuery ? 'Try a different search' : 'Add items to get started'}
-            </p>
-          </div>
+        {!isBrowsing ? (
+          // Searching or filtering: one flat list, no tiles
+          filteredProducts.length === 0 ? (
+            <div className="text-center py-16 text-gray-500">
+              <p className="text-lg font-medium mb-1">No items found</p>
+              <p className="text-sm">{searchQuery ? 'Try a different search' : 'Try fewer filters'}</p>
+            </div>
+          ) : (
+            renderProducts(filteredProducts, { showLocation: true, framed: false })
+          )
         ) : (
-          <div className={CARD_GRID}>
-            {filteredProducts.map((stock) => (
-              <FoodItemCard
-                key={stock.key}
-                item={stock.items[0]}
-                stock={stock}
-                onMarkUsed={handleMarkUsed}
-                onAddToCart={requestAdd}
-                onAdjust={handleAdjust}
-              />
-            ))}
-          </div>
+          <>
+            <SummaryTileGrid label="Pantry summary">
+              {tiles.map((tile) => (
+                <SummaryTile
+                  key={tile.key}
+                  {...tile.tile}
+                  selected={selectedTile === tile.key}
+                  onClick={() => setSelectedTile(selectedTile === tile.key ? null : tile.key)}
+                  controls={`tile-panel-${tile.key}`}
+                />
+              ))}
+            </SummaryTileGrid>
+
+            {activeTile && (
+              <TilePanel id={`tile-panel-${activeTile.key}`} title={activeTile.tile.label} hint={activeTile.panelHint}>
+                {activeTile.panel}
+              </TilePanel>
+            )}
+
+            {products.length === 0 ? (
+              <div className="text-center py-12 text-gray-500">
+                <p className="text-lg font-medium mb-1">Your pantry is empty</p>
+                <p className="text-sm">Add items to get started</p>
+              </div>
+            ) : (
+              <section aria-labelledby="everything-else-heading" className="space-y-2">
+                <div className="flex items-center justify-between gap-3 pt-1">
+                  <h2 id="everything-else-heading" className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                    {activeTile ? 'Everything else' : 'Everything'}
+                  </h2>
+                  <div role="group" aria-label="Group by" className="flex items-center gap-1 text-xs">
+                    <span className="text-gray-500 mr-1">Group by</span>
+                    {GROUPING_OPTIONS.map((option) => (
+                      <button
+                        key={option.key}
+                        type="button"
+                        onClick={() => setGrouping(option.key)}
+                        aria-pressed={grouping === option.key}
+                        className={cn(
+                          'rounded-full px-2.5 py-1.5 font-medium touch-manipulation',
+                          grouping === option.key ? 'bg-primary text-white' : 'text-gray-600 hover:bg-gray-100'
+                        )}
+                      >
+                        {option.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {groups.map((group) => {
+                  const open = openGroups.includes(groupStateKey(grouping, group.key))
+                  const rest = group.products.filter((stock) => !shownAbove.has(stock.key))
+                  const hidden = group.products.length - rest.length
+                  return (
+                    <PantryGroupSection
+                      key={group.key}
+                      label={group.label}
+                      color={group.color}
+                      count={group.products.length}
+                      status={getGroupStatus(group.products)}
+                      open={open}
+                      onToggle={() => setGroupOpen(grouping, group.key, !open)}
+                      shownAbove={activeTile ? { count: hidden, tileLabel: activeTile.tile.label } : undefined}
+                    >
+                      {rest.length > 0 &&
+                        (group.display === 'chips' ? (
+                          <GroupChips products={rest} />
+                        ) : (
+                          renderProducts(rest, { showLocation: grouping !== 'place', framed: true })
+                        ))}
+                    </PantryGroupSection>
+                  )
+                })}
+              </section>
+            )}
+          </>
         )}
       </div>
 
