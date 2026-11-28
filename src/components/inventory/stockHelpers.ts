@@ -2,7 +2,7 @@ import { useDemoStore } from '@/stores/demoStore'
 import { formatQuantity } from '@/utils/mealPlan'
 import { findStaple, getStock, productKey, roundStockCount, type StockInfo } from '@/utils/stock'
 import { isDiscreteUnit } from '@/utils/units'
-import type { QuantityUnit, Staple } from '@/types'
+import type { FoodItem, QuantityUnit, Staple } from '@/types'
 
 // Helpers the pantry screens share for product-level changes.
 // They read and write the store directly, so they work outside components.
@@ -87,6 +87,41 @@ export function emptyProduct(name: string): void {
     if (productKey(item.name) === key && item.status === 'active' && item.quantity > 0) {
       consumeItem(item.id, item.quantity)
     }
+  }
+}
+
+// Rows of a product that still hold some of it
+function rowsInStock(name: string): FoodItem[] {
+  const key = productKey(name)
+  return useDemoStore
+    .getState()
+    .inventory.filter((item) => productKey(item.name) === key && item.status === 'active' && item.quantity > 0)
+}
+
+/**
+ * Takes a product to zero like emptyProduct, but marks the rows thrown out
+ * (status `discarded`) instead of used up. Nothing in the app shows waste
+ * yet; the status keeps the record. Use snapshotStock first for undo.
+ */
+export function discardProduct(name: string): void {
+  const ids = new Set(rowsInStock(name).map((item) => item.id))
+  emptyProduct(name)
+  const { inventory, updateItem } = useDemoStore.getState()
+  for (const item of inventory) {
+    if (ids.has(item.id) && item.status === 'consumed') updateItem(item.id, { status: 'discarded' })
+  }
+}
+
+/**
+ * "Still have it": marks every row of a product in stock as touched now,
+ * without changing the amount. Returns a function that puts the old times back.
+ */
+export function markProductTouched(name: string, now: Date = new Date()): () => void {
+  const rows = rowsInStock(name)
+  const nowIso = now.toISOString()
+  for (const row of rows) useDemoStore.getState().updateItem(row.id, { touchedAt: nowIso })
+  return () => {
+    for (const row of rows) useDemoStore.getState().updateItem(row.id, { touchedAt: row.touchedAt })
   }
 }
 

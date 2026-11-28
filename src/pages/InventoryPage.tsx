@@ -3,21 +3,33 @@ import { SlidersHorizontal, ArrowUpDown, Check } from 'lucide-react'
 import {
   CompactItemRow,
   CompactRowList,
+  DinnersPanel,
   FoodItemCard,
+  ForgottenCard,
   GroupChips,
   PantryGroupSection,
   RunningLowSection,
   StapleSheet,
+  StaplesBoard,
   SummaryTile,
   SummaryTileGrid,
   TilePanel,
   buildGroups,
   countByCategory,
+  countCookableRecipes,
+  describeLimit,
+  discardProduct,
   emptyProduct,
+  estimateDinners,
+  getFlavorStatus,
   getGroupStatus,
+  getStaplesSummary,
   getUseSoon,
   groupStateKey,
+  isFlavor,
+  markProductTouched,
   restoreStaple,
+  selectForgotten,
   shownCount,
   snapshotStock,
   useAddToList,
@@ -72,8 +84,12 @@ const GROUPING_OPTIONS: { key: Grouping; label: string }[] = [
 ]
 
 // Groups that take their products out of the place or food-type groups.
-// Session C adds "Oils, spices & sauces" here, shown as chips.
-const SPECIAL_GROUPS: SpecialGroup[] = []
+// Oils, spices and sauces last for months and rarely need a decision, so they
+// fold into one group of name chips, closed by default.
+const FLAVOR_GROUP_KEY = 'flavor'
+const SPECIAL_GROUPS: SpecialGroup[] = [
+  { key: FLAVOR_GROUP_KEY, label: 'Oils, spices & sauces', color: '#B5B5BF', display: 'chips', match: isFlavor },
+]
 
 /** A summary tile and the list it shows below the tiles when selected */
 interface TileDefinition {
@@ -132,7 +148,7 @@ export function InventoryPage() {
   // The compact row whose action bar is open. One at a time.
   const [expandedKey, setExpandedKey] = useState<string | null>(null)
 
-  const { inventory, staples, adjustStock } = useDemoStore()
+  const { inventory, staples, recipes, householdSize, adjustStock } = useDemoStore()
   const { density, setDensity, grouping, setGrouping, openGroups, setGroupOpen } = usePantryView()
   const lowRows = useRunningLowRows()
   const contentWidth = density === 'compact' ? 'regular' : 'wide'
@@ -182,11 +198,10 @@ export function InventoryPage() {
   // One entry per product that has something in the pantry. A staple that is
   // out shows in "Out and running low" only. That includes one whose estimate
   // has reached zero while its rows still hold the last count.
+  const allStocks = useMemo(() => groupByProduct(inventory, staples), [inventory, staples])
   const products = useMemo(() => {
-    return groupByProduct(inventory, staples).filter(
-      (stock) => stock.items.length > 0 && !(stock.staple && stock.status === 'out')
-    )
-  }, [inventory, staples])
+    return allStocks.filter((stock) => stock.items.length > 0 && !(stock.staple && stock.status === 'out'))
+  }, [allStocks])
 
   const handleChipClick = (categoryKey: FoodCategory | 'all') => {
     setSelectedCategories((prev) => {
@@ -269,6 +284,23 @@ export function InventoryPage() {
   const useSoon = useMemo(() => getUseSoon(products), [products])
   const sortedProducts = useMemo(() => sortProducts(products, sortBy), [products, sortBy])
   const groups = useMemo(() => buildGroups(sortedProducts, grouping, SPECIAL_GROUPS), [sortedProducts, grouping])
+  // Every staple, including ones that are out and have nothing in the pantry
+  const staplesSummary = useMemo(() => getStaplesSummary(allStocks), [allStocks])
+  const dinners = useMemo(() => estimateDinners(products, householdSize), [products, householdSize])
+  const cookable = useMemo(() => countCookableRecipes(recipes, inventory), [recipes, inventory])
+  const forgotten = useMemo(() => selectForgotten(products), [products])
+
+  // "Haven't touched in a while" actions
+  const handleStillHave = useCallback((stock: StockInfo) => {
+    const undo = markProductTouched(stock.name)
+    showSnackbar(`${stock.name} marked as still here`, undo)
+  }, [showSnackbar])
+  const handleUsedUp = useCallback((stock: StockInfo) => handleMarkUsed(stock.items[0]), [handleMarkUsed])
+  const handleThrewOut = useCallback((stock: StockInfo) => {
+    const restore = snapshotStock(stock.name)
+    discardProduct(stock.name)
+    showSnackbar(`${stock.name} thrown out`, restore)
+  }, [showSnackbar])
 
   const toggleRow = useCallback((key: string) => {
     setExpandedKey((current) => (current === key ? null : key))
@@ -352,6 +384,43 @@ export function InventoryPage() {
           <RunningLowSection rows={lowRows} onOpenStaple={setStapleName} onNotify={showSnackbar} />
         ),
       shownKeys: new Set(lowRows.map((row) => row.key)),
+    },
+    {
+      key: 'staples',
+      tile: {
+        label: 'Staples',
+        value: staplesSummary.stocked,
+        valueSuffix: staplesSummary.total > 0 ? `/${staplesSummary.total}` : undefined,
+        ...(staplesSummary.total === 0
+          ? { status: { text: 'None set up yet', tone: 'muted' as const } }
+          : staplesSummary.stocked === staplesSummary.total
+            ? { status: { text: 'All stocked', tone: 'green' as const } }
+            : {
+                bar: [
+                  { value: staplesSummary.stocked, tone: 'green' as const },
+                  { value: staplesSummary.low, tone: 'orange' as const },
+                  { value: staplesSummary.out, tone: 'red' as const },
+                ],
+              }),
+      },
+      panelHint: 'days left at your usual pace',
+      panel: <StaplesBoard summary={staplesSummary} onOpenStaple={setStapleName} />,
+      // The gauges are not item rows, so the groups below still list every product
+      shownKeys: new Set(),
+    },
+    {
+      key: 'dinners',
+      tile: {
+        label: 'Dinners on hand',
+        value: `~${dinners.dinners}`,
+        status: {
+          text: dinners.totalProducts === 0 ? 'Nothing to count yet' : describeLimit(dinners.limitedBy),
+          tone: dinners.dinners === 0 && dinners.totalProducts > 0 ? 'orange' : 'muted',
+        },
+      },
+      panelHint: `estimate for ${dinners.householdSize} ${dinners.householdSize === 1 ? 'person' : 'people'}`,
+      panel: <DinnersPanel estimate={dinners} recipes={cookable} />,
+      shownKeys: new Set(),
     },
   ]
   const activeTile = tiles.find((tile) => tile.key === selectedTile)
@@ -502,6 +571,13 @@ export function InventoryPage() {
               </TilePanel>
             )}
 
+            <ForgottenCard
+              products={forgotten}
+              onStillHave={handleStillHave}
+              onUsedUp={handleUsedUp}
+              onThrewOut={handleThrewOut}
+            />
+
             {products.length === 0 ? (
               <div className="text-center py-12 text-gray-500">
                 <p className="text-lg font-medium mb-1">Your pantry is empty</p>
@@ -536,20 +612,26 @@ export function InventoryPage() {
                   const open = openGroups.includes(groupStateKey(grouping, group.key))
                   const rest = group.products.filter((stock) => !shownAbove.has(stock.key))
                   const hidden = group.products.length - rest.length
+                  const isFlavorGroup = group.key === FLAVOR_GROUP_KEY
                   return (
                     <PantryGroupSection
                       key={group.key}
                       label={group.label}
                       color={group.color}
                       count={group.products.length}
-                      status={getGroupStatus(group.products)}
+                      status={isFlavorGroup ? getFlavorStatus(group.products) : getGroupStatus(group.products)}
                       open={open}
                       onToggle={() => setGroupOpen(grouping, group.key, !open)}
                       shownAbove={activeTile ? { count: hidden, tileLabel: activeTile.tile.label } : undefined}
                     >
                       {rest.length > 0 &&
                         (group.display === 'chips' ? (
-                          <GroupChips products={rest} />
+                          <GroupChips
+                            products={rest}
+                            lowKeys={
+                              new Set(rest.filter((stock) => stock.staple && stock.status !== 'ok').map((stock) => stock.key))
+                            }
+                          />
                         ) : (
                           renderProducts(rest, { showLocation: grouping !== 'place', framed: true })
                         ))}

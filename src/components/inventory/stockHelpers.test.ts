@@ -120,3 +120,34 @@ describe('describeDailyUse', () => {
     expect(helpers.describeDailyUse(0.25, 'lb')).toBe('About 0.25 lb a day')
   })
 })
+
+describe('discardProduct', () => {
+  it('takes the product to zero and marks its rows thrown out, and undo puts them back', () => {
+    const name = 'Frozen Peas'
+    const before = rows(name)
+    const restore = helpers.snapshotStock(name)
+
+    helpers.discardProduct(name)
+    expect(stock(name).items).toHaveLength(0)
+    expect(store().inventory.filter((item) => item.name === name).map((item) => item.status)).toEqual(['discarded'])
+
+    restore()
+    expect(rows(name)).toEqual(before)
+  })
+})
+
+describe('markProductTouched', () => {
+  it('sets touchedAt to now without changing the amount, and undo puts the old time back', () => {
+    const name = 'Frozen Peas'
+    const before = rows(name)
+    const now = new Date()
+
+    const undo = helpers.markProductTouched(name, now)
+    const after = rows(name)
+    expect(after.map((item) => item.touchedAt)).toEqual([now.toISOString()])
+    expect(after.map((item) => item.quantity)).toEqual(before.map((item) => item.quantity))
+
+    undo()
+    expect(rows(name).map((item) => item.touchedAt)).toEqual(before.map((item) => item.touchedAt))
+  })
+})
